@@ -795,7 +795,7 @@ const _navSpinner=document.getElementById('nav-playing');
 let _playingTimer=null;
 window._showPlaying=function(ms){if(_playingTimer)clearTimeout(_playingTimer);_navSpinner.classList.add('active');_playingTimer=setTimeout(()=>{_navSpinner.classList.remove('active');_playingTimer=null;},ms);};
 window._hidePlaying=function(){if(_playingTimer){clearTimeout(_playingTimer);_playingTimer=null;}_navSpinner.classList.remove('active');};
-{const _og=goTo;goTo=function(n){window._hidePlaying();_og(n);const t=allSlides[current]?.dataset.type;const sd=slideSteps.get(allSlides[current]);const hasSteps=sd&&sd.steps.length>0;if(t==='map')window._showPlaying(6000);else if(hasSteps)window._showPlaying(2000);else if(t==='case'||t==='lesson')window._showPlaying(2500);};
+{const _og=goTo;goTo=function(n){window._hidePlaying();_og(n);const t=allSlides[current]?.dataset.type;const sd=slideSteps.get(allSlides[current]);const hasSteps=sd&&sd.steps.length>0;if(hasSteps){try{sd.reset&&sd.reset();}catch(e){}sd.current=0;}if(t==='map')window._showPlaying(6000);else if(hasSteps)window._showPlaying(2000);else if(t==='case'||t==='lesson')window._showPlaying(2500);};
 const _oa=advanceStep;advanceStep=function(){const r=_oa();if(r)window._showPlaying(3000);else window._hidePlaying();return r;};}
 let _apt=null;const _apc=document.getElementById('autoplay-cb');
 function _apTick(){if(!_apc.checked)return;if(!advanceStep()){const n=nextVisible(current,1);if(n>=0)goTo(n);else{_apc.checked=false;return;}}const t=allSlides[current]?.dataset.type;_apt=setTimeout(_apTick,t==='lesson'||t==='bonus'?8000:t==='case'?12000:6000);}
