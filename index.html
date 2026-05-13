@@ -77,7 +77,7 @@ const BONUS = { year:'BONUS', title:'The Best XR Project\nIs the One You Don\u20
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#060810;--teal:#00d4ff;--purple:#a78bfa;--amber:#f59e0b;--rose:#f43f5e;--text:#f0f4ff;--dim:rgba(240,244,255,.45);--font:'Space Grotesk',system-ui,sans-serif;--para-gap:.35em;--tagline-scale:1;--title-scale:1;--primary:#00d4ff;--secondary:#a78bfa;--bg-dark:#060810}
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg-dark);color:var(--text);font-family:var(--font)}
-.bg{position:fixed;inset:0;z-index:0;overflow:hidden}
+.bg{position:fixed;inset:0;z-index:0;overflow:hidden;isolation:isolate}
 .bg-gradient{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 15% 50%,rgba(124,58,237,.18) 0%,transparent 55%),radial-gradient(ellipse 60% 70% at 85% 20%,rgba(0,212,255,.12) 0%,transparent 55%),linear-gradient(180deg,var(--bg-dark) 0%,#0b0820 50%,var(--bg-dark) 100%)}
 canvas#stars{position:absolute;inset:0}
 #deck{position:relative;z-index:1;width:100%;height:100%;overflow:hidden}
@@ -436,9 +436,9 @@ body[data-bg-style="extreme"] .bg-overlay--extreme{display:block}
 /* Nebula */
 .bg-overlay--nebula .blob{filter:blur(120px)}
 .bg-overlay--nebula .swirl{position:absolute;inset:-25%;background:conic-gradient(from 0deg,rgba(0,212,255,.05),rgba(167,139,250,.04),rgba(245,158,11,.05),rgba(244,63,94,.04),rgba(0,212,255,.05));filter:blur(80px);will-change:transform;animation:bgNebSwirl 80s linear infinite}
-.bg-overlay--nebula .b1{width:45%;aspect-ratio:1;background:radial-gradient(circle,rgba(0,212,255,.45),rgba(0,212,255,0));top:-5%;left:0;animation:bgNeb1 30s linear infinite}
-.bg-overlay--nebula .b2{width:42%;aspect-ratio:1;background:radial-gradient(circle,rgba(167,139,250,.42),rgba(167,139,250,0));bottom:-5%;right:5%;animation:bgNeb2 36s linear infinite}
-.bg-overlay--nebula .b3{width:35%;aspect-ratio:1;background:radial-gradient(circle,rgba(245,158,11,.28),rgba(245,158,11,0));top:50%;left:50%;animation:bgNeb3 26s linear infinite}
+.bg-overlay--nebula .b1{width:45%;aspect-ratio:1;background:radial-gradient(circle,rgba(0,212,255,.32),rgba(0,212,255,0));top:-5%;left:0;animation:bgNeb1 30s linear infinite}
+.bg-overlay--nebula .b2{width:42%;aspect-ratio:1;background:radial-gradient(circle,rgba(167,139,250,.30),rgba(167,139,250,0));bottom:-5%;right:5%;animation:bgNeb2 36s linear infinite}
+.bg-overlay--nebula .b3{width:35%;aspect-ratio:1;background:radial-gradient(circle,rgba(245,158,11,.22),rgba(245,158,11,0));top:50%;left:50%;animation:bgNeb3 26s linear infinite}
 @keyframes bgNeb1{0%{transform:translate(0,0)}25%{transform:translate(22vw,18vh)}50%{transform:translate(32vw,8vh)}75%{transform:translate(14vw,-8vh)}100%{transform:translate(0,0)}}
 @keyframes bgNeb2{0%{transform:translate(0,0)}25%{transform:translate(-18vw,-14vh)}50%{transform:translate(-28vw,4vh)}75%{transform:translate(-12vw,12vh)}100%{transform:translate(0,0)}}
 @keyframes bgNeb3{0%{transform:translate(-50%,-50%)}25%{transform:translate(-30%,-58%)}50%{transform:translate(-22%,-42%)}75%{transform:translate(-58%,-44%)}100%{transform:translate(-50%,-50%)}}
