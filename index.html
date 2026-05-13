@@ -25,10 +25,14 @@
    'grid'     Multi-image grid (images:[...] array, optional gridCover:true)
    'big'      Full-slide statement. Fields: bigText (huge gradient headline),
               title (eyebrow), subtitle (italic), bigCaption (footnote)
-   'placed'   PPTX-coordinate absolute layout. Field: placedImages array
-              where each item is [src, left%, top%, width%, height%, obj-pos?]
-              Supports images and .mp4/.webm videos. Optional title/subtitle
-              renders as frosted-glass overlay (bottom-left).
+   'placed'   PPTX-coordinate absolute layout. Two supported field shapes:
+              Legacy: placedImages — array of tuples
+                [src, left%, top%, width%, height%, obj-pos?]
+                Supports images and .mp4/.webm videos.
+              New:    placedItems  — array of objects
+                {type:'img'|'mp4'|'arrow'|'qr-card', src?, x, y, w, h,
+                 label?, url?, year?}
+              Optional title/subtitle renders as frosted-glass overlay.
    'IFRAME:'  Prefix c.img with 'IFRAME:' to embed a URL (YouTube, etc.)
    ======================================================================= */
 const SECTIONS = [
@@ -308,6 +312,15 @@ body.split-view .nav-arrows{bottom:calc(42vh + 4px)!important}
 .placed-overlay{position:absolute;left:5%;bottom:5%;background:rgba(6,8,16,.65);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.08);padding:14px 28px;border-radius:12px;z-index:5;max-width:80%}
 .placed-title{font-size:clamp(1rem,1.7vw,1.5rem);font-weight:600;letter-spacing:-.01em;line-height:1.2}
 .placed-sub{font-size:clamp(.8rem,1.1vw,1rem);color:rgba(240,244,255,.75);line-height:1.4;margin-top:4px}
+/* Placed-overlay extras: per-item label, arrow type, qr-card type */
+.placed-item-label{position:absolute;left:50%;bottom:-30px;transform:translateX(-50%);font-size:.78rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(245,158,11,.95);white-space:nowrap}
+.placed-arrow{overflow:visible;box-shadow:none;background:transparent}
+.placed-arrow svg{width:100%;height:100%;display:block}
+.placed-qr{overflow:visible;box-shadow:none;background:transparent;border-radius:0}
+.placed-qr-card{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;background:rgba(255,255,255,.05);border:1px solid rgba(0,212,255,.3);border-radius:14px;gap:10px;box-sizing:border-box}
+.placed-qr-card img{width:60%;max-width:160px;height:auto;border-radius:6px;background:#fff;padding:6px}
+.placed-qr-card .qr-label{font-size:clamp(.78rem,1vw,.95rem);font-weight:600;color:#f0f4ff;text-align:center;line-height:1.3}
+.placed-qr-card .qr-badge{font-size:.7rem;letter-spacing:.15em;text-transform:uppercase}
 /* === LAYOUT: BIG (full-slide statement text) === */
 .case-slide.layout-big{flex-direction:column;text-align:center;padding:clamp(50px,5vw,110px);justify-content:center;align-items:center}
 .case-slide.layout-big .big-stack{display:flex;flex-direction:column;gap:clamp(18px,2.5vw,40px);align-items:center;max-width:1300px}
@@ -637,10 +650,31 @@ SECTIONS.forEach((sec,si)=>{
       deck.appendChild(s);allSlides.push(s);return;
     }
     // layout: 'placed' — PPTX-coordinate absolute positioning
-    // placedImages: [[src, left%, top%, width%, height%, optional_object-position], ...]
-    if(c.layout==='placed'&&c.placedImages){
-      const _mt=src=>{if(src.endsWith('.mp4')||src.endsWith('.webm'))return `<video src="${src}" autoplay loop muted playsinline>`;return `<img src="${src}" loading="lazy">`;};
-      const items=c.placedImages.map(([src,l,t,w,h,op])=>{const tag=_mt(src);const st=op?tag.replace(/>$/,` style="object-position:${op}">`):tag;return `<div class="placed-item" style="left:${l}%;top:${t}%;width:${w}%;height:${h}%">${st}</div>`;}).join('');
+    // Legacy: placedImages: [[src, left%, top%, width%, height%, optional_object-position], ...]
+    // New:    placedItems:  [{type:'img'|'mp4'|'arrow'|'qr-card', src?, x, y, w, h, label?, url?, year?}, ...]
+    if(c.layout==='placed'&&(c.placedImages||c.placedItems)){
+      let items='';
+      if(c.placedImages){
+        const _mt=src=>{if(src.endsWith('.mp4')||src.endsWith('.webm'))return `<video src="${src}" autoplay loop muted playsinline>`;return `<img src="${src}" loading="lazy">`;};
+        items=c.placedImages.map(([src,l,t,w,h,op])=>{const tag=_mt(src);const st=op?tag.replace(/>$/,` style="object-position:${op}">`):tag;return `<div class="placed-item" style="left:${l}%;top:${t}%;width:${w}%;height:${h}%">${st}</div>`;}).join('');
+      } else {
+        items=c.placedItems.map(it=>{
+          const st=`style="left:${it.x}%;top:${it.y}%;width:${it.w}%;height:${it.h}%"`;
+          if(it.type==='qr-card'){
+            const qrSrc='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(it.url||'');
+            return `<div class="placed-item placed-qr" ${st}><div class="qr-card placed-qr-card"><img src="${qrSrc}" alt="QR"><div class="qr-label">${it.label||''}</div>${it.year?`<div class="qr-badge b-teal">${it.year}</div>`:''}</div></div>`;
+          }
+          if(it.type==='arrow'){
+            return `<div class="placed-item placed-arrow" ${st}><svg viewBox="0 0 60 40" preserveAspectRatio="none"><path d="M5,20 L50,20 M40,8 L50,20 L40,32" stroke="rgba(245,158,11,.85)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;
+          }
+          if(it.type==='mp4'||(it.src&&(it.src.endsWith('.mp4')||it.src.endsWith('.webm')))){
+            const lbl=it.label?`<div class="placed-item-label">${it.label}</div>`:'';
+            return `<div class="placed-item" ${st}><video src="${it.src}" autoplay loop muted playsinline></video>${lbl}</div>`;
+          }
+          const lbl=it.label?`<div class="placed-item-label">${it.label}</div>`:'';
+          return `<div class="placed-item" ${st}><img src="${it.src}" loading="lazy">${lbl}</div>`;
+        }).join('');
+      }
       const head=(c.title||c.subtitle)?`<div class="placed-overlay">${c.title?`<h3 class="placed-title">${c.title.replace(/\n/g,'<br>')}</h3>`:''}${c.subtitle?`<p class="placed-sub">${c.subtitle}</p>`:''}</div>`:'';
       s.innerHTML=`<div class="placed-stage">${items}</div>${head}`;
       deck.appendChild(s);allSlides.push(s);return;
