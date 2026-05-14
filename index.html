@@ -2365,6 +2365,85 @@ if(_notesParam){
   const _origUH2=updateHUD;updateHUD=function(){_origUH2();_onSlideChange(current);};
 }
 
+// ── Fullscreen-on-click for images/videos ─────────────────────────────────
+// FLIP-style zoom: capture original rect, move element to a fullscreen overlay,
+// animate to viewport-fill. Click again or press Esc to return. Desktop only
+// (gated to hover-capable devices so mobile tap-to-advance isn't disrupted).
+// Skips QR codes, the cover logo, arrows, the media-cycler canvas, and
+// decorative UI chrome. Forked from nxtbld-2026-productizing-xr.
+(function(){
+  if(!window.matchMedia('(hover:hover)').matches)return;
+  let activeFs=null;
+  const FS_SKIP='.qr-card,.cover-logo-wrap,.placed-arrow,.media-cycler-mount,#anno-panel,#move-hud,#search-overlay,#export-modal,#notes-app,#presenter-popup';
+  function ensureOverlay(){
+    let ovl=document.getElementById('fx-fs-overlay');
+    if(ovl)return ovl;
+    ovl=document.createElement('div');ovl.id='fx-fs-overlay';document.body.appendChild(ovl);
+    const hint=document.createElement('div');hint.id='fx-fs-hint';hint.textContent='Click or press Esc to close';document.body.appendChild(hint);
+    ovl.addEventListener('click',function(e){if(e.target===ovl)exitFs();});
+    return ovl;
+  }
+  function exitFs(){
+    if(!activeFs)return;
+    const a=activeFs;activeFs=null;
+    const live=a.placeholder.getBoundingClientRect();
+    a.el.style.transition='top .4s cubic-bezier(.4,.2,.2,1),left .4s cubic-bezier(.4,.2,.2,1),width .4s cubic-bezier(.4,.2,.2,1),height .4s cubic-bezier(.4,.2,.2,1),box-shadow .4s';
+    a.el.style.top=live.top+'px';a.el.style.left=live.left+'px';
+    a.el.style.width=live.width+'px';a.el.style.height=live.height+'px';
+    document.getElementById('fx-fs-overlay').classList.remove('open');
+    document.body.classList.remove('fx-fs-active');
+    setTimeout(function(){
+      if(a.placeholder.parentNode)a.placeholder.parentNode.replaceChild(a.el,a.placeholder);
+      else document.body.appendChild(a.el);
+      if(a.origStyle)a.el.setAttribute('style',a.origStyle);else a.el.removeAttribute('style');
+      a.el.classList.remove('fx-fs-target');
+    },420);
+  }
+  function enterFs(el){
+    if(activeFs)return;
+    const r=el.getBoundingClientRect();
+    const origStyle=el.getAttribute('style');
+    const placeholder=document.createElement('div');
+    placeholder.className='fx-fs-placeholder';
+    placeholder.style.cssText='display:block;width:'+r.width+'px;height:'+r.height+'px;visibility:hidden';
+    const ovl=ensureOverlay();
+    el.parentNode.insertBefore(placeholder,el);
+    ovl.appendChild(el);
+    el.style.cssText='position:fixed;top:'+r.top+'px;left:'+r.left+'px;width:'+r.width+'px;height:'+r.height+'px;margin:0;object-fit:contain;border-radius:8px;z-index:10000;transition:none';
+    el.classList.add('fx-fs-target');
+    activeFs={el:el,placeholder:placeholder,origStyle:origStyle,origRect:r};
+    requestAnimationFrame(function(){
+      ovl.classList.add('open');document.body.classList.add('fx-fs-active');
+      const pad=Math.max(24,Math.min(window.innerWidth,window.innerHeight)*.04);
+      const vw=window.innerWidth-pad*2,vh=window.innerHeight-pad*2;
+      const ar=r.width/r.height;
+      let tw=vw,th=vh;
+      if(tw/th>ar)tw=th*ar;else th=tw/ar;
+      const tx=(window.innerWidth-tw)/2,ty=(window.innerHeight-th)/2;
+      el.style.transition='top .4s cubic-bezier(.2,.7,.3,1.05),left .4s cubic-bezier(.2,.7,.3,1.05),width .4s cubic-bezier(.2,.7,.3,1.05),height .4s cubic-bezier(.2,.7,.3,1.05),box-shadow .4s';
+      el.style.top=ty+'px';el.style.left=tx+'px';el.style.width=tw+'px';el.style.height=th+'px';
+    });
+  }
+  document.addEventListener('click',function(e){
+    if(window._moveMode)return;
+    if(document.body.classList.contains('annotate-mode'))return;
+    if(activeFs){
+      if(e.target===activeFs.el){e.preventDefault();e.stopPropagation();exitFs();}
+      return;
+    }
+    const t=e.target;
+    if(t.tagName!=='IMG'&&t.tagName!=='VIDEO')return;
+    if(!t.closest('.slide.active'))return;
+    if(t.closest(FS_SKIP))return;
+    e.preventDefault();e.stopPropagation();
+    enterFs(t);
+  },false);
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&activeFs)exitFs();});
+  // Exit fullscreen if slide changes underneath us
+  const _ogGoTo=window.goTo;
+  if(_ogGoTo){window.goTo=function(){if(activeFs)exitFs();return _ogGoTo.apply(this,arguments);};}
+})();
+
 // Init — ?edit with no hash → land on slide 0 (settings) so user can configure first
 updateHUD();
 {
