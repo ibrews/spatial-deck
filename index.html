@@ -480,6 +480,54 @@ body[data-bg-style="extreme"] .bg-overlay--extreme{display:block}
 .asset-belt-track{display:flex;gap:4vw;height:62%;align-items:center;position:absolute;left:100%;top:19%;will-change:transform;z-index:10}
 .asset-belt-item{height:100%;flex-shrink:0;border-radius:8px;overflow:hidden;box-shadow:0 6px 28px rgba(0,0,0,.55);background:rgba(6,8,16,.95)}
 .asset-belt-item img,.asset-belt-item video{height:100%;width:auto;display:block;object-fit:contain}
+
+/* ── Interactive flourish — hover/glow/grow across content tiles ─────────────
+   Per-section glow color via --fx-glow; defaults to teal. Hover effects gated
+   to (hover:hover) so they don't fire on touch devices (where tap=advance and
+   a sticky :hover would feel wrong). Add the .accent-* class to a slide to
+   override --fx-glow with that section's accent color.
+   Forked from nxtbld-2026-productizing-xr. */
+:root{--fx-glow:rgba(0,212,255,.45)}
+.accent-amber{--fx-glow:rgba(245,158,11,.5)}
+.accent-purple{--fx-glow:rgba(167,139,250,.5)}
+.accent-rose{--fx-glow:rgba(244,63,94,.5)}
+.accent-teal{--fx-glow:rgba(0,212,255,.5)}
+
+.placed-item:not(.placed-arrow):not(.placed-text--plain),
+.asset-belt-item,
+.qr-card,
+.placed-text:not(.placed-text--plain){
+  transition:transform .35s cubic-bezier(.2,.8,.2,1.05),box-shadow .35s,filter .35s,border-color .35s;
+}
+@media(hover:hover){
+  .placed-item:not(.placed-arrow):not(.placed-text--plain):hover,
+  .asset-belt-item:hover,
+  .qr-card:hover,
+  .placed-text:not(.placed-text--plain):hover{
+    transform:translateY(-6px) scale(1.025);
+    box-shadow:0 18px 40px rgba(0,0,0,.55),0 0 36px var(--fx-glow);
+    z-index:5;
+    cursor:pointer;
+  }
+  .placed-item:not(.placed-arrow):not(.placed-text--plain):hover img,
+  .placed-item:not(.placed-arrow):not(.placed-text--plain):hover video,
+  .asset-belt-item:hover img,
+  .asset-belt-item:hover video{filter:saturate(1.08)}
+}
+
+@keyframes fx-click-pulse{0%{filter:drop-shadow(0 0 0 var(--fx-glow))}45%{filter:drop-shadow(0 0 36px var(--fx-glow))}100%{filter:drop-shadow(0 0 0 var(--fx-glow))}}
+.fx-clicked{animation:fx-click-pulse .55s ease}
+
+/* ── Fullscreen-on-click for images/videos ──────────────────────────────────
+   Click any <img> or <video> inside a slide to zoom it to fullscreen with a
+   backdrop blur. Click again or press Esc to return. Desktop only — gated to
+   (hover:hover) so mobile tap-to-advance isn't disrupted. */
+#fx-fs-overlay{position:fixed;inset:0;background:rgba(2,4,10,0);backdrop-filter:blur(0px);-webkit-backdrop-filter:blur(0px);z-index:9999;pointer-events:none;opacity:0;transition:background .35s,backdrop-filter .35s,opacity .35s}
+#fx-fs-overlay.open{background:rgba(2,4,10,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);pointer-events:auto;opacity:1}
+.fx-fs-target{cursor:zoom-out!important;box-shadow:0 28px 80px rgba(0,0,0,.6),0 0 64px var(--fx-glow)!important}
+body.fx-fs-active{overflow:hidden}
+#fx-fs-hint{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);font-family:'Space Grotesk',sans-serif;font-size:.78rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.6);background:rgba(6,8,16,.7);padding:8px 18px;border-radius:999px;border:1px solid rgba(255,255,255,.12);z-index:10001;opacity:0;transition:opacity .35s;pointer-events:none}
+body.fx-fs-active #fx-fs-hint{opacity:1}
 </style>
 </head>
 <body>
