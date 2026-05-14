@@ -471,6 +471,15 @@ body[data-bg-style="extreme"] .bg-overlay--extreme{display:block}
 @keyframes bgExt2{0%{transform:translate(0,0)}25%{transform:translate(-40vw,-25vh)}50%{transform:translate(-60vw,15vh)}75%{transform:translate(-30vw,40vh)}100%{transform:translate(0,0)}}
 @keyframes bgExt3{0%{transform:translate(0,0)}25%{transform:translate(40vw,-30vh)}50%{transform:translate(60vw,-50vh)}75%{transform:translate(20vw,-30vh)}100%{transform:translate(0,0)}}
 @keyframes bgExt4{0%{transform:translate(0,0)}25%{transform:translate(-25vw,25vh)}50%{transform:translate(20vw,-25vh)}75%{transform:translate(35vw,15vh)}100%{transform:translate(0,0)}}
+.case-slide.layout-asset-belt{display:flex;align-items:center;justify-content:center;padding:0}
+.asset-belt-stage{position:relative;aspect-ratio:16/9;width:100%;height:auto;max-height:100%;max-width:calc(100vh*16/9);overflow:hidden;display:flex;align-items:center;justify-content:center}
+.asset-belt-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(18px,2.5vw,40px);padding:clamp(50px,5vw,110px);text-align:center;z-index:1;pointer-events:none;opacity:1;max-width:1300px;margin:0 auto;left:0;right:0}
+.asset-belt-overlay .big-eyebrow{font-size:clamp(1.4rem,2.6vw,2.4rem);font-weight:500;color:rgba(240,244,255,.78);letter-spacing:-.01em;line-height:1.2}
+.asset-belt-overlay .big-text{font-size:clamp(3rem,8vw,8rem);font-weight:700;letter-spacing:-.04em;line-height:1.15;background:linear-gradient(135deg,#fff 30%,#a5e8ff 70%,#00d4ff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0}
+.asset-belt-overlay .big-caption{font-size:clamp(1rem,1.6vw,1.55rem);color:rgba(240,244,255,.65);font-style:italic;line-height:1.45;max-width:900px}
+.asset-belt-track{display:flex;gap:4vw;height:62%;align-items:center;position:absolute;left:100%;top:19%;will-change:transform;z-index:10}
+.asset-belt-item{height:100%;flex-shrink:0;border-radius:8px;overflow:hidden;box-shadow:0 6px 28px rgba(0,0,0,.55);background:rgba(6,8,16,.95)}
+.asset-belt-item img,.asset-belt-item video{height:100%;width:auto;display:block;object-fit:contain}
 </style>
 </head>
 <body>
@@ -683,6 +692,59 @@ SECTIONS.forEach((sec,si)=>{
       const head=(c.title||c.subtitle)?`<div class="placed-overlay">${c.title?`<h3 class="placed-title">${c.title.replace(/\n/g,'<br>')}</h3>`:''}${c.subtitle?`<p class="placed-sub">${c.subtitle}</p>`:''}</div>`:'';
       s.innerHTML=`<div class="placed-stage">${items}</div>${head}`;
       deck.appendChild(s);allSlides.push(s);return;
+    }
+    // layout: 'asset-belt' — conveyor belt of images/videos scrolls right→left and stops with the last item centered.
+    // Each beltItem MUST include {w, h} (intrinsic px dimensions) so layout is deterministic before media loads.
+    // Options: beltDelay (ms before scroll starts, default 3500), overlayDelay (ms before overlay fades, default 1500),
+    //   beltLoop (boolean — infinite loop instead of stop), beltSpeed (px/s for loop, default 120),
+    //   overlayFront (boolean — overlay starts in front of images, then fades to 0 instead of 0.5).
+    if(c.layout==='asset-belt'&&c.beltItems){
+      let items=c.beltItems.map(it=>{
+        const ar=it.w&&it.h?` style="aspect-ratio:${it.w}/${it.h}"`:'';
+        if(it.type==='mp4'||(it.src&&(it.src.endsWith('.mp4')||it.src.endsWith('.webm')))){
+          return `<div class="asset-belt-item"${ar}><video src="${it.src}" autoplay loop muted playsinline></video></div>`;
+        }
+        return `<div class="asset-belt-item"${ar}><img src="${it.src}" loading="lazy"></div>`;
+      }).join('');
+      if(c.beltLoop)items=items+items;
+      const overlay=(c.title||c.bigText||c.bigCaption)?`<div class="asset-belt-overlay">${c.title?`<h2 class="big-eyebrow">${c.title}</h2>`:''}${c.bigText?`<h1 class="big-text">${c.bigText.replace(/\n/g,'<br>')}</h1>`:''}${c.bigCaption?`<div class="big-caption">${c.bigCaption}</div>`:''}</div>`:'';
+      s.innerHTML=`<div class="asset-belt-stage">${overlay}<div class="asset-belt-track"${c.beltLoop?' style="left:0"':''}>${items}</div></div>`;
+      deck.appendChild(s);allSlides.push(s);
+      setTimeout(()=>{
+        const stage=s.querySelector('.asset-belt-stage');const track=s.querySelector('.asset-belt-track');const ovl=s.querySelector('.asset-belt-overlay');const tItems=track.querySelectorAll('.asset-belt-item');const last=tItems[tItems.length-1];const penult=tItems[tItems.length-2];if(!stage||!track||!last||(!c.beltLoop&&!penult))return;
+        let beltAnim=null,lastAnim=null,ovlAnim=null;
+        const run=()=>{
+          if(beltAnim)beltAnim.cancel();if(lastAnim)lastAnim.cancel();if(ovlAnim)ovlAnim.cancel();
+          track.style.transform='translateX(0)';last.style.transform='translateX(0)';last.style.transition='';if(penult){penult.style.opacity='';penult.style.transition='';}if(ovl){ovl.style.opacity='1';if(c.overlayFront)ovl.style.zIndex='20';}track.offsetWidth;
+          const bDly=c.beltDelay!=null?c.beltDelay:3500;const oDly=c.overlayDelay!=null?c.overlayDelay:1500;
+          if(c.beltLoop){
+            const half=c.beltItems.length;const firstX=tItems[0].getBoundingClientRect().left;const dupX=tItems[half].getBoundingClientRect().left;const cycle=dupX-firstX;
+            const speed=c.beltSpeed||120;const loopDur=Math.max(1000,Math.round(cycle/speed*1000));
+            beltAnim=track.animate([{transform:'translateX(0)'},{transform:`translateX(-${cycle}px)`}],{duration:loopDur,iterations:Infinity,easing:'linear',delay:bDly});
+            if(ovl){const _tgt=c.overlayFront?0:.5;ovlAnim=ovl.animate([{opacity:1},{opacity:_tgt}],{duration:2000,delay:oDly,easing:'ease-in',fill:'forwards'});if(c.overlayFront)ovlAnim.onfinish=()=>{ovl.style.zIndex='1';};}
+            return;
+          }
+          const sr=stage.getBoundingClientRect();const lr=last.getBoundingClientRect();const pr=penult.getBoundingClientRect();
+          // centerShift: translateX needed so last-item center = stage center
+          const centerShift=(sr.left+sr.width/2)-(lr.left+lr.width/2);
+          // exitShift: translateX needed so penult right edge exits past stage left
+          const exitShift=sr.left-pr.right-20;
+          const trackShift=Math.min(centerShift,exitShift);
+          const dur=40000;
+          beltAnim=track.animate([{transform:'translateX(0)'},{transform:`translateX(${trackShift}px)`}],{duration:dur,delay:bDly,easing:'linear',fill:'forwards'});
+          // Counter-animation keeps last item at stage center once track passes centerShift
+          const tCenter=trackShift!==0?Math.min(1,centerShift/trackShift):1;
+          const counter=centerShift-trackShift;
+          lastAnim=last.animate([{offset:0,transform:'translateX(0)'},{offset:tCenter,transform:'translateX(0)'},{offset:1,transform:`translateX(${counter}px)`}],{duration:dur,delay:bDly,easing:'linear',fill:'forwards'});
+          // On finish: fresh-measure and snap last item to exact center; fade penult out
+          beltAnim.onfinish=()=>{const cx=new DOMMatrix(getComputedStyle(last).transform).m41;if(lastAnim)lastAnim.cancel();last.style.transform=`translateX(${cx}px)`;requestAnimationFrame(()=>{const sr2=stage.getBoundingClientRect();const lr2=last.getBoundingClientRect();const snap=(sr2.left+sr2.width/2)-(lr2.left+lr2.width/2);if(Math.abs(snap)>1){last.style.transition='transform 0.5s ease-out';last.style.transform=`translateX(${cx+snap}px)`;setTimeout(()=>{last.style.transition='';},500);}if(penult){penult.style.transition='opacity 0.4s';penult.style.opacity='0';}});};
+          if(ovl){const _tgt=c.overlayFront?0:.5;ovlAnim=ovl.animate([{opacity:1},{opacity:_tgt}],{duration:2000,delay:oDly,easing:'ease-in',fill:'forwards'});if(c.overlayFront)ovlAnim.onfinish=()=>{ovl.style.zIndex='1';};}
+        };
+        let wasActive=s.classList.contains('active');if(wasActive)run();
+        new MutationObserver(()=>{const isA=s.classList.contains('active');if(isA&&!wasActive)run();wasActive=isA;}).observe(s,{attributes:true,attributeFilter:['class']});
+        let rzT=null;window.addEventListener('resize',()=>{if(!s.classList.contains('active'))return;clearTimeout(rzT);rzT=setTimeout(run,150);});
+      },0);
+      return;
     }
     let imgHTML;
     if(c.img&&c.img.startsWith('IFRAME:')){
