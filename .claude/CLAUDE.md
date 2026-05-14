@@ -72,6 +72,13 @@ When the user pastes a `# Annotations` block (exported from the deck's annotatio
 - GIFs don't animate on canvas — convert to MP4 first.
 - Max 5 images per project in media cyclers (keeps file sizes reasonable).
 
+### Favicon — every fork gets its own
+- **As soon as a fork has a real title (i.e. its `BONUS.title` / cover / `<title>` is set to something other than the template default), generate a favicon for it.** A talk-specific favicon shows up in browser tabs, GitHub Pages link previews, bookmarks, presenter notes windows, AirPlay receivers — anywhere the page is referenced.
+- Generate `favicon.ico` (multi-resolution: 16, 32, 48), plus `favicon-16.png`, `favicon-32.png`, `favicon.svg` (if you have a vector source), and `apple-touch-icon.png` (180×180). Reference them with `<link rel="icon">` in `<head>`.
+- **Quick path (macOS):** start from a 512×512 PNG of the talk's signature glyph or wordmark. `sips -s format png --resampleHeightWidth 32 32 src.png --out favicon-32.png`, then use ImageMagick or Pillow to write the `.ico` (sips can't make `.ico` directly): `python3 -c "from PIL import Image; im=Image.open('src.png'); im.save('favicon.ico', sizes=[(16,16),(32,32),(48,48)])"`.
+- **Don't reuse the template favicon for a fork.** Even a fast color tweak of a base glyph beats showing the spatial-deck default in the talk's tab.
+- If the deck has section accent colors (`--teal`, `--amber`, etc.), pick the one that best matches the talk's identity for the favicon background or stroke.
+
 ### Git & GitHub
 - Commit after every meaningful change. Push frequently.
 - GitHub file size limit: 100MB. Transcode large videos before committing.
