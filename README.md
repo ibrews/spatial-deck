@@ -880,7 +880,9 @@ spatial-deck/
 
 ## 🎤 Built With Spatial Deck
 
-- **"10 Lessons from 10 Years"** — Alex Coulombe, Harvard XR Conference 2026 ([view](https://ibrews.github.io/harvardxr-keynote/))
+- **"Productizing XR for Architecture"** — Alex Coulombe & Yu-Jun Yeh, NXT BLD 2026 ([view](https://ibrews.github.io/nxtbld-2026-productizing-xr/) · [repo](https://github.com/ibrews/nxtbld-2026-productizing-xr))
+- **"Spatial Storytelling"** — Alex Coulombe & David Gochfeld, FMX 2026 ([view](https://ibrews.github.io/fmx-2026-spatial-storytelling/) · [repo](https://github.com/ibrews/fmx-2026-spatial-storytelling))
+- **"10 Lessons from 10 Years"** — Alex Coulombe, Harvard XR Conference 2026 ([view](https://ibrews.github.io/harvardxr-keynote/) · [repo](https://github.com/ibrews/harvardxr-keynote))
 - **"Is XR Right For Your Project?"** — Sample deck included in this repo
 - *Add yours — [open a PR](https://github.com/ibrews/spatial-deck/pulls)!*
 
