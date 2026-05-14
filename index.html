@@ -330,6 +330,11 @@ body.split-view .nav-arrows{bottom:calc(42vh + 4px)!important}
 .case-slide.layout-big .big-caption{font-size:clamp(1rem,1.6vw,1.55rem);color:rgba(240,244,255,.65);font-style:italic;line-height:1.45;max-width:900px}
 .accent-amber .case-slide.layout-big .big-text,.accent-amber.case-slide.layout-big .big-text{background:linear-gradient(135deg,#fff 30%,#ffe6a5 70%,#f59e0b 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .accent-purple .case-slide.layout-big .big-text,.accent-purple.case-slide.layout-big .big-text{background:linear-gradient(135deg,#fff 30%,#ddd2ff 70%,#a78bfa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.big-pill{display:inline-flex;align-items:center;padding:6px 22px;border-radius:999px;border:1.5px solid;font-size:clamp(.65rem,.85vw,.8rem);font-weight:700;letter-spacing:.22em;text-transform:uppercase;margin-bottom:4px}
+.big-pill.accent-amber{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.55);color:var(--amber)}
+.big-pill.accent-teal{background:rgba(0,212,255,.12);border-color:rgba(0,212,255,.55);color:var(--teal)}
+.big-pill.accent-rose{background:rgba(244,63,94,.12);border-color:rgba(244,63,94,.55);color:var(--rose)}
+.big-pill.accent-purple{background:rgba(167,139,250,.12);border-color:rgba(167,139,250,.55);color:var(--purple)}
 /* === LAYOUT GRID OVERLAY === */
 .layout-grid{position:absolute;inset:0;z-index:50;pointer-events:none;display:grid;grid-template:repeat(3,1fr)/repeat(4,1fr)}
 .layout-grid-cell{border:1px dashed rgba(0,212,255,.2);display:flex;align-items:center;justify-content:center;font:700 1.2rem 'Space Grotesk',sans-serif;color:rgba(0,212,255,.25);letter-spacing:.1em}
@@ -646,7 +651,7 @@ SECTIONS.forEach((sec,si)=>{
     const s=document.createElement('div');s.className=`slide case-slide${ac}${c.layout?' layout-'+c.layout:''}${c.gridCover?' grid-cover':''}`;s.dataset.type='case';s.dataset.year=sec.year;s.dataset.section=si;
     // layout: 'big' — full-slide statement text (bigText, optional title/subtitle/bigCaption)
     if(c.layout==='big'){
-      s.innerHTML=`<div class="big-stack">${c.title?`<h2 class="big-eyebrow">${c.title.replace(/\n/g,'<br>')}</h2>`:''}${c.subtitle?`<div class="big-sub">${c.subtitle}</div>`:''}${c.bigText?`<h1 class="big-text">${c.bigText.replace(/\n/g,'<br>')}</h1>`:''}${c.bigCaption?`<p class="big-caption">${c.bigCaption}</p>`:''}</div>`;
+      s.innerHTML=`<div class="big-stack">${c.pill&&c.title?`<div class="big-pill accent-${sec.accent||'teal'}">${c.title}</div>`:c.title?`<h2 class="big-eyebrow">${c.title.replace(/\n/g,'<br>')}</h2>`:''} ${c.subtitle?`<div class="big-sub">${c.subtitle}</div>`:''}${c.bigText?`<h1 class="big-text">${c.bigText.replace(/\n/g,'<br>')}</h1>`:''}${c.bigCaption?`<p class="big-caption">${c.bigCaption}</p>`:''}</div>`;
       deck.appendChild(s);allSlides.push(s);return;
     }
     // layout: 'placed' — PPTX-coordinate absolute positioning
