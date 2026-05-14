@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/alex/git/spatial-deck/.claude/hooks/validate-js.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
