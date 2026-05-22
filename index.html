@@ -766,7 +766,8 @@ SECTIONS.forEach((sec,si)=>{
           return `<div class="placed-item" ${st}><img src="${it.src}" loading="lazy">${lbl}</div>`;
         }).join('');
       }
-      const head=(c.title||c.subtitle)?`<div class="placed-overlay">${c.title?`<h3 class="placed-title">${c.title.replace(/\n/g,'<br>')}</h3>`:''}${c.subtitle?`<p class="placed-sub">${c.subtitle}</p>`:''}</div>`:'';
+      const ovS=c.overlayStyle?` style="${c.overlayStyle}"`:'';
+      const head=(c.title||c.subtitle)?`<div class="placed-overlay"${ovS}>${c.title?`<h3 class="placed-title">${c.title.replace(/\n/g,'<br>')}</h3>`:''}${c.subtitle?`<p class="placed-sub">${c.subtitle}</p>`:''}</div>`:'';
       s.innerHTML=`<div class="placed-stage">${items}</div>${head}`;
       deck.appendChild(s);allSlides.push(s);return;
     }
