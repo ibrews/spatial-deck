@@ -277,13 +277,18 @@ body.split-view #deck{bottom:42vh!important}
 body.split-view #notes-drawer{transform:none!important;pointer-events:all;max-height:42vh;height:42vh;overflow-y:auto}
 body.split-view #brand{bottom:calc(42vh + 6px)!important}
 body.split-view .nav-arrows{bottom:calc(42vh + 4px)!important}
-/* === ?present MODE — single-window presenter (slide ~80vh + compact script ribbon 20vh) === */
-body.present-mode #deck{bottom:20vh}
+/* === ?present MODE — single-window presenter (resizable slide + script ribbon) === */
+body.present-mode{--ribbon-vh:10;--present-scale:calc(1 - var(--ribbon-vh) * 0.01)}
+body.present-mode #deck{bottom:0}
+body.present-mode #deck>.slide{transform:scale(var(--present-scale));transform-origin:top center}
 body.present-mode #counter,body.present-mode #brand,body.present-mode #notes-drawer,body.present-mode #mobile-ui-toggle,body.present-mode #slide-grid-zone,body.present-mode #slide-grid,body.present-mode #search-overlay{display:none!important}
-body.present-mode .nav-arrows{bottom:calc(20vh + 8px);opacity:.7;z-index:600}
-body.present-mode #step-indicator{bottom:calc(20vh + 4px)}
-#present-ribbon{display:none;position:fixed;bottom:0;left:0;right:0;height:20vh;z-index:500;background:rgba(6,8,16,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid rgba(0,212,255,.25);flex-direction:column;font-family:var(--font);color:rgba(240,244,255,.85)}
+body.present-mode .nav-arrows{bottom:calc(var(--ribbon-vh) * 1vh + 8px);opacity:.7;z-index:600;transition:none}
+body.present-mode #step-indicator{bottom:calc(var(--ribbon-vh) * 1vh + 4px)}
+#present-ribbon{display:none;position:fixed;bottom:0;left:0;right:0;height:calc(var(--ribbon-vh,10) * 1vh);z-index:500;background:rgba(6,8,16,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid rgba(0,212,255,.25);flex-direction:column;font-family:var(--font);color:rgba(240,244,255,.85)}
 body.present-mode #present-ribbon{display:flex}
+.pr-grip{height:6px;flex-shrink:0;cursor:ns-resize;background:rgba(0,212,255,.18);border-bottom:1px solid rgba(0,212,255,.25);position:relative;transition:background .15s;touch-action:none}
+.pr-grip:hover,.pr-grip.dragging{background:rgba(0,212,255,.45)}
+.pr-grip:after{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:48px;height:2px;background:rgba(240,244,255,.4);border-radius:2px}
 .pr-head{display:flex;justify-content:space-between;align-items:center;padding:7px 22px;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0}
 .pr-meta{display:flex;align-items:center;gap:8px;font-size:.7rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(240,244,255,.5)}
 .pr-num{color:var(--teal)}
@@ -293,11 +298,12 @@ body.present-mode #present-ribbon{display:flex}
 .pr-tab{background:none;border:none;color:rgba(240,244,255,.5);font:inherit;font-size:.65rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:5px 12px;cursor:pointer;transition:background .15s,color .15s}
 .pr-tab.active{background:rgba(0,212,255,.18);color:var(--teal)}
 .pr-tab:not(.active):hover{color:rgba(240,244,255,.85)}
-.pr-body{flex:1;overflow-y:auto;padding:10px 22px 12px;font-size:1rem;line-height:1.5;white-space:pre-line;color:rgba(240,244,255,.88)}
+.pr-body{flex:1;overflow-y:auto;padding:10px 22px 12px;font-size:1rem;line-height:1.5;white-space:pre-line;color:rgba(240,244,255,.88);overscroll-behavior:contain}
 .pr-bullets{list-style:none;padding:0;margin:0;white-space:normal}
 .pr-bullets li{padding:4px 0 4px 18px;position:relative;font-size:.96rem;line-height:1.45}
 .pr-bullets li:before{content:'';position:absolute;left:0;top:.65em;width:5px;height:5px;border-radius:50%;background:var(--teal);opacity:.7}
 .pr-empty{opacity:.5;font-style:italic;font-size:.9rem}
+body.pr-dragging,body.pr-dragging *{user-select:none!important;-webkit-user-select:none!important;cursor:ns-resize!important}
 @media (max-width:640px){.pr-body{font-size:.92rem;padding:8px 14px;line-height:1.45}.pr-head{padding:5px 14px}.pr-meta{font-size:.62rem;letter-spacing:.12em}}
 /* === CURRENT SLIDE PREVIEW (?notes companion) === */
 #na-slide-preview{overflow:hidden;transition:max-height .28s ease,opacity .28s ease,padding .28s ease;max-height:0;opacity:0;padding:0 14px;flex:0 0 auto}
@@ -2483,12 +2489,33 @@ updateHUD();
 
 // =====================================================================
 // FEATURE: ?present MODE — single-window presenter view
-// Slide preview (~80vh) + compact 20vh speaker ribbon at the bottom.
-// Activated by ?present URL flag. Works on desktop and mobile.
+// Slide preview (scales to fit) + compact resizable speaker ribbon.
+// ?present[&ribbon=N] — N is ribbon height in vh, clamped to 5..80, default 10.
+// Drag the top edge of the ribbon to resize live; URL + localStorage update.
 // =====================================================================
 (function(){
-  if(!new URLSearchParams(location.search).has('present'))return;
+  const params=new URLSearchParams(location.search);
+  if(!params.has('present'))return;
   document.body.classList.add('present-mode');
+
+  const RIBBON_MIN=5, RIBBON_MAX=80, RIBBON_DEFAULT=10;
+  function clampRibbon(v){v=Number(v);if(!isFinite(v))return RIBBON_DEFAULT;return Math.max(RIBBON_MIN,Math.min(RIBBON_MAX,Math.round(v)));}
+  function readInitialRibbon(){
+    const urlV=params.get('ribbon');
+    if(urlV!==null)return clampRibbon(urlV);
+    try{const lsV=localStorage.getItem('sd-present-ribbon');if(lsV!==null)return clampRibbon(lsV);}catch(_){}
+    return RIBBON_DEFAULT;
+  }
+  function applyRibbon(vh){document.body.style.setProperty('--ribbon-vh',String(vh));}
+  function persistRibbon(vh){
+    try{localStorage.setItem('sd-present-ribbon',String(vh));}catch(_){}
+    const u=new URL(location.href);u.searchParams.set('present','');u.searchParams.set('ribbon',String(vh));
+    const qs=u.searchParams.toString().replace(/(^|&)present=(&|$)/,'$1present$2');
+    history.replaceState(null,'',u.pathname+'?'+qs+u.hash);
+  }
+  let ribbonVh=readInitialRibbon();
+  applyRibbon(ribbonVh);
+
   let prMode=(()=>{try{return localStorage.getItem('sd-present-mode')||'script';}catch(_){return'script';}})();
   function getSectionName(idx){const sl=allSlides[idx];if(!sl)return'';const sec=SECTIONS[+sl.dataset.section];return sec?.lesson?.short||sl.dataset.year||'';}
   function renderRibbon(){
@@ -2511,11 +2538,51 @@ updateHUD();
     document.querySelectorAll('.pr-tab').forEach(t=>t.classList.toggle('active',t.dataset.mode===m));
     renderRibbon();
   }
+
   const r=document.createElement('div');r.id='present-ribbon';
-  r.innerHTML='<div class="pr-head"><span class="pr-meta"><span class="pr-num" id="pr-num">--</span><span class="pr-sep">·</span><span class="pr-section" id="pr-section">--</span></span><div class="pr-toggle"><button class="pr-tab" data-mode="script">Script</button><button class="pr-tab" data-mode="bullets">Bullets</button></div></div><div class="pr-body" id="pr-body"></div>';
+  r.innerHTML='<div class="pr-grip" id="pr-grip" title="Drag to resize · double-click to reset"></div><div class="pr-head"><span class="pr-meta"><span class="pr-num" id="pr-num">--</span><span class="pr-sep">·</span><span class="pr-section" id="pr-section">--</span></span><div class="pr-toggle"><button class="pr-tab" data-mode="script">Script</button><button class="pr-tab" data-mode="bullets">Bullets</button></div></div><div class="pr-body" id="pr-body"></div>';
   document.body.appendChild(r);
   r.querySelectorAll('.pr-tab').forEach(t=>t.addEventListener('click',()=>setMode(t.dataset.mode)));
   setMode(prMode);
+
+  // Drag-resize on grip (mouse + touch via pointer events)
+  const grip=r.querySelector('#pr-grip');
+  let dragStartY=0, dragStartVh=0, dragging=false;
+  function onDown(e){
+    dragging=true;dragStartY=(e.clientY!=null?e.clientY:e.touches?.[0]?.clientY)||0;dragStartVh=ribbonVh;
+    grip.classList.add('dragging');document.body.classList.add('pr-dragging');
+    if(e.pointerId!=null&&grip.setPointerCapture){try{grip.setPointerCapture(e.pointerId);}catch(_){}}
+    e.preventDefault();
+  }
+  function onMove(e){
+    if(!dragging)return;
+    const y=(e.clientY!=null?e.clientY:e.touches?.[0]?.clientY)||0;
+    const dy=dragStartY-y;
+    const dVh=(dy/window.innerHeight)*100;
+    ribbonVh=clampRibbon(dragStartVh+dVh);
+    applyRibbon(ribbonVh);
+  }
+  function onUp(){
+    if(!dragging)return;
+    dragging=false;grip.classList.remove('dragging');document.body.classList.remove('pr-dragging');
+    persistRibbon(ribbonVh);
+  }
+  if(window.PointerEvent){
+    grip.addEventListener('pointerdown',onDown);
+    window.addEventListener('pointermove',onMove);
+    window.addEventListener('pointerup',onUp);
+    window.addEventListener('pointercancel',onUp);
+  }else{
+    grip.addEventListener('mousedown',onDown);
+    window.addEventListener('mousemove',onMove);
+    window.addEventListener('mouseup',onUp);
+    grip.addEventListener('touchstart',onDown,{passive:false});
+    window.addEventListener('touchmove',onMove,{passive:false});
+    window.addEventListener('touchend',onUp);
+  }
+  // Double-click grip → reset to default
+  grip.addEventListener('dblclick',()=>{ribbonVh=RIBBON_DEFAULT;applyRibbon(ribbonVh);persistRibbon(ribbonVh);});
+
   // Hook slide changes so ribbon refreshes on next/prev
   const _prevUH=updateHUD;updateHUD=function(){_prevUH();renderRibbon();};
 })();
