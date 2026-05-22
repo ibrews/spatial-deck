@@ -747,7 +747,7 @@ SECTIONS.forEach((sec,si)=>{
       let items='';
       if(c.placedImages){
         const _mt=src=>{if(src.endsWith('.mp4')||src.endsWith('.webm'))return `<video src="${src}" autoplay loop muted playsinline>`;return `<img src="${src}" loading="lazy">`;};
-        items=c.placedImages.map(([src,l,t,w,h,op])=>{const tag=_mt(src);const st=op?tag.replace(/>$/,` style="object-position:${op}">`):tag;return `<div class="placed-item" style="left:${l}%;top:${t}%;width:${w}%;height:${h}%">${st}</div>`;}).join('');
+        items=c.placedImages.map(([src,l,t,w,h,op])=>{const tag=_mt(src);const st=op?tag.replace('>',` style="object-position:${op}">`):tag;return `<div class="placed-item" style="left:${l}%;top:${t}%;width:${w}%;height:${h}%">${st}</div>`;}).join('');
       } else {
         items=c.placedItems.map(it=>{
           const st=`style="left:${it.x}%;top:${it.y}%;width:${it.w}%;height:${it.h}%"`;
