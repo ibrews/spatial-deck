@@ -277,6 +277,28 @@ body.split-view #deck{bottom:42vh!important}
 body.split-view #notes-drawer{transform:none!important;pointer-events:all;max-height:42vh;height:42vh;overflow-y:auto}
 body.split-view #brand{bottom:calc(42vh + 6px)!important}
 body.split-view .nav-arrows{bottom:calc(42vh + 4px)!important}
+/* === ?present MODE — single-window presenter (slide ~80vh + compact script ribbon 20vh) === */
+body.present-mode #deck{bottom:20vh}
+body.present-mode #counter,body.present-mode #brand,body.present-mode #notes-drawer,body.present-mode #mobile-ui-toggle,body.present-mode #slide-grid-zone,body.present-mode #slide-grid,body.present-mode #search-overlay{display:none!important}
+body.present-mode .nav-arrows{bottom:calc(20vh + 8px);opacity:.7;z-index:600}
+body.present-mode #step-indicator{bottom:calc(20vh + 4px)}
+#present-ribbon{display:none;position:fixed;bottom:0;left:0;right:0;height:20vh;z-index:500;background:rgba(6,8,16,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid rgba(0,212,255,.25);flex-direction:column;font-family:var(--font);color:rgba(240,244,255,.85)}
+body.present-mode #present-ribbon{display:flex}
+.pr-head{display:flex;justify-content:space-between;align-items:center;padding:7px 22px;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0}
+.pr-meta{display:flex;align-items:center;gap:8px;font-size:.7rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(240,244,255,.5)}
+.pr-num{color:var(--teal)}
+.pr-section{color:rgba(240,244,255,.7)}
+.pr-sep{opacity:.4}
+.pr-toggle{display:flex;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:6px;overflow:hidden}
+.pr-tab{background:none;border:none;color:rgba(240,244,255,.5);font:inherit;font-size:.65rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:5px 12px;cursor:pointer;transition:background .15s,color .15s}
+.pr-tab.active{background:rgba(0,212,255,.18);color:var(--teal)}
+.pr-tab:not(.active):hover{color:rgba(240,244,255,.85)}
+.pr-body{flex:1;overflow-y:auto;padding:10px 22px 12px;font-size:1rem;line-height:1.5;white-space:pre-line;color:rgba(240,244,255,.88)}
+.pr-bullets{list-style:none;padding:0;margin:0;white-space:normal}
+.pr-bullets li{padding:4px 0 4px 18px;position:relative;font-size:.96rem;line-height:1.45}
+.pr-bullets li:before{content:'';position:absolute;left:0;top:.65em;width:5px;height:5px;border-radius:50%;background:var(--teal);opacity:.7}
+.pr-empty{opacity:.5;font-style:italic;font-size:.9rem}
+@media (max-width:640px){.pr-body{font-size:.92rem;padding:8px 14px;line-height:1.45}.pr-head{padding:5px 14px}.pr-meta{font-size:.62rem;letter-spacing:.12em}}
 /* === CURRENT SLIDE PREVIEW (?notes companion) === */
 #na-slide-preview{overflow:hidden;transition:max-height .28s ease,opacity .28s ease,padding .28s ease;max-height:0;opacity:0;padding:0 14px;flex:0 0 auto}
 #na-slide-preview.open{max-height:200px;opacity:1;padding:8px 14px 0}
@@ -2452,6 +2474,45 @@ updateHUD();
   const _isEdit=new URLSearchParams(location.search).has('edit');
   if(!_hasHash&&_isEdit){goTo(0);}else{goToFromHash();}
 }
+
+// =====================================================================
+// FEATURE: ?present MODE — single-window presenter view
+// Slide preview (~80vh) + compact 20vh speaker ribbon at the bottom.
+// Activated by ?present URL flag. Works on desktop and mobile.
+// =====================================================================
+(function(){
+  if(!new URLSearchParams(location.search).has('present'))return;
+  document.body.classList.add('present-mode');
+  let prMode=(()=>{try{return localStorage.getItem('sd-present-mode')||'script';}catch(_){return'script';}})();
+  function getSectionName(idx){const sl=allSlides[idx];if(!sl)return'';const sec=SECTIONS[+sl.dataset.section];return sec?.lesson?.short||sl.dataset.year||'';}
+  function renderRibbon(){
+    const num=document.getElementById('pr-num');const sec=document.getElementById('pr-section');const body=document.getElementById('pr-body');
+    if(!num||!body)return;
+    num.textContent=(current+1)+' / '+total;
+    sec.textContent=getSectionName(current);
+    if(prMode==='bullets'){
+      const bl=(typeof bulletsForSlide==='function')?bulletsForSlide(current):(typeof autoBullets==='function'?autoBullets(getSlideNotes(current)):[]);
+      body.innerHTML=bl.length?'<ul class="pr-bullets">'+bl.map(b=>'<li>'+String(b).replace(/</g,'&lt;')+'</li>').join('')+'</ul>':'<em class="pr-empty">(no bullets — script empty)</em>';
+    }else{
+      const s=(typeof scriptForSlide==='function')?scriptForSlide(current):(getSlideNotes(current)||'');
+      body.textContent=s||'(no notes for this slide)';
+    }
+    body.scrollTop=0;
+  }
+  function setMode(m){
+    prMode=m;
+    try{localStorage.setItem('sd-present-mode',m);}catch(_){}
+    document.querySelectorAll('.pr-tab').forEach(t=>t.classList.toggle('active',t.dataset.mode===m));
+    renderRibbon();
+  }
+  const r=document.createElement('div');r.id='present-ribbon';
+  r.innerHTML='<div class="pr-head"><span class="pr-meta"><span class="pr-num" id="pr-num">--</span><span class="pr-sep">·</span><span class="pr-section" id="pr-section">--</span></span><div class="pr-toggle"><button class="pr-tab" data-mode="script">Script</button><button class="pr-tab" data-mode="bullets">Bullets</button></div></div><div class="pr-body" id="pr-body"></div>';
+  document.body.appendChild(r);
+  r.querySelectorAll('.pr-tab').forEach(t=>t.addEventListener('click',()=>setMode(t.dataset.mode)));
+  setMode(prMode);
+  // Hook slide changes so ribbon refreshes on next/prev
+  const _prevUH=updateHUD;updateHUD=function(){_prevUH();renderRibbon();};
+})();
 </script>
 </body>
 </html>
