@@ -651,7 +651,7 @@ const slideSteps=new Map();
 // SFX
 const _activeAudioCtxs=new Set();
 {const _OAC=window.AudioContext||window.webkitAudioContext;const _PAC=function(...a){const c=new _OAC(...a);_activeAudioCtxs.add(c);const oc=c.close.bind(c);c.close=function(){_activeAudioCtxs.delete(c);return oc();};return c;};_PAC.prototype=_OAC.prototype;window.AudioContext=_PAC;if(window.webkitAudioContext)window.webkitAudioContext=_PAC;}
-window._killAllSfx=function(){_activeAudioCtxs.forEach(c=>{try{c.close();}catch(e){}});_activeAudioCtxs.clear();};
+window._killAllSfx=function(){_activeAudioCtxs.forEach(c=>{try{c.close();}catch(e){}});_activeAudioCtxs.clear();_sfxCtx=null;(window._sfxKillHooks||[]).forEach(fn=>{try{fn();}catch(e){}});};window._sfxKillHooks=[];
 let _sfxCtx=null;
 function sfxCtx(){if(!_sfxCtx)_sfxCtx=new(window.AudioContext||window.webkitAudioContext)();if(_sfxCtx.state==='suspended')_sfxCtx.resume();return _sfxCtx;}
 function playWhoosh(){try{const c=sfxCtx(),t=c.currentTime;const bufLen=c.sampleRate*0.25;const buf=c.createBuffer(1,bufLen,c.sampleRate);const d=buf.getChannelData(0);for(let i=0;i<bufLen;i++)d[i]=Math.random()*2-1;const s=c.createBufferSource();s.buffer=buf;const bp=c.createBiquadFilter();bp.type='bandpass';bp.frequency.value=900;bp.Q.value=0.6;const g=c.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.08,t+0.04);g.gain.exponentialRampToValueAtTime(0.001,t+0.22);s.connect(bp);bp.connect(g);g.connect(c.destination);s.start(t);s.stop(t+0.25);}catch(e){}}
