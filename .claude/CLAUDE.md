@@ -69,7 +69,7 @@ When the user pastes a `# Annotations` block (exported from the deck's annotatio
 - Store in `media/` subdirectories. Use relative paths.
 - Resize images to ≤2560px: `sips --resampleWidth 2560 file.jpg`
 - Videos over 100MB: `ffmpeg -i in.mp4 -vf "scale=1280:-2" -crf 28 out.mp4`
-- GIFs don't animate on canvas — convert to MP4 first.
+- GIFs animate correctly in the media cycler — `buildMediaCycler` auto-detects `.gif` items and uses a cross-fading `<img>` path instead of canvas. Converting to MP4 is no longer required.
 - Max 5 images per project in media cyclers (keeps file sizes reasonable).
 
 ### Favicon — every fork gets its own

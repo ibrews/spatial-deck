@@ -65,6 +65,12 @@ open index.html
 
 ---
 
+## 📚 Full Documentation
+
+**[→ docs/wiki/](docs/wiki/index.md)** — comprehensive wiki covering content authoring, media, move mode, themes, presenter tools, animations, import/export tools, AI workflow, keyboard shortcuts, and troubleshooting.
+
+---
+
 ## Things to Try
 
 1. **Open `index.html` in any browser** — the cover slide loads instantly with no build step; press `→` or `Space` to advance through the sample presentation.
@@ -133,6 +139,31 @@ Case studies show an image/media area alongside the title, subtitle, and bullet 
 | `close` | Hardcoded | QR codes + contact info |
 | `settings` | Auto-generated | Hidden slide 0 with live controls |
 
+### Case Study Layout Types
+
+Set `layout:` on a case study entry:
+
+| Layout | Description |
+|--------|------------|
+| *(default)* | 48% media left, 52% content right |
+| `placed` | Full-bleed slide with absolutely positioned images/videos at `left:X%, top:Y%, w:Z%, h:W%` |
+| `big` | Full-screen typographic statement with `bigText` field |
+
+**`placed` example:**
+```javascript
+{ layout: 'placed', title: 'Optional overlay',
+  placedImages: [
+    ['media/bg.jpg', 0, 0, 100, 100],       // [src, left%, top%, w%, h%]
+    ['media/clip.mp4', 50, 20, 45, 60],     // .mp4 → <video muted loop autoplay>
+  ] }
+```
+
+**`big` example:**
+```javascript
+{ layout: 'big', bigText: 'The constraint\nis the design.',
+  title: 'Optional eyebrow', bigCaption: 'Optional small caption below' }
+```
+
 ---
 
 ## 🎮 Keyboard Shortcuts
@@ -149,6 +180,7 @@ Case studies show an image/media area alongside the title, subtitle, and bullet 
 | `Cmd/Ctrl + F` or `/` | Search all slide text |
 | `N` | Open presenter popup (speaker notes) |
 | `Shift + N` | Toggle inline notes drawer |
+| `Shift + P` | Split presenter view (deck top 58%, notes pinned bottom 42%) |
 | `👁` button (mobile) | Toggle UI chrome on touch devices |
 
 ### URL Sharing Modes
@@ -160,7 +192,9 @@ Case studies show an image/media area alongside the title, subtitle, and bullet 
 | `yoursite.com/?view` | Explicit view mode (same as default) |
 | `yoursite.com/?landscape` | Shows "rotate to landscape" prompt on portrait phones |
 | `yoursite.com/?vertical` | Vertical scroll mode — slides flow down the page (long-form / web-doc reading) |
+| `yoursite.com/?edit` | Edit mode — lands on Settings slide (slide 0) so you can configure first |
 | `yoursite.com/?edit#15` | Edit mode, starting at slide 15 |
+| `yoursite.com/?notes` | Phone speaker companion — notes-only view for your phone |
 
 ### Mobile Support
 
@@ -268,6 +302,21 @@ Choose your transition style from the Settings dropdown:
 | **Fade** | Simple opacity crossfade |
 | **Zoom** | Scale + fade (zoom in forward, zoom out backward) |
 | **None** | Instant swap, no animation |
+
+### Background Styles
+
+A visual layer behind your slides — purely aesthetic, never interferes with content. Set in the Settings dropdown:
+
+| Style | Effect |
+|-------|--------|
+| **None** (default) | Clean dark background |
+| **Aurora** | Soft drifting color clouds |
+| **Ember** | Warm glowing embers rising |
+| **Ghost** | Subtle floating wisps |
+| **Nebula** | Deep-space star field with color haze |
+| **Extreme** | High-intensity version of the current style |
+
+A **Background Blend Mode** picker controls how the layer mixes with slide content (Screen, Soft Light, Overlay, and more). All styles are GPU-only — no layout cost. Preview at `tools/bg-preview.html`.
 
 ### Auto-Save & Restore
 
@@ -401,6 +450,22 @@ Opens a second window showing:
 - Elapsed time (MM:SS)
 - Estimated remaining time
 - Pacing indicator (🟢 on pace / 🟡 running long / 🔴 over time)
+
+### Split Presenter View (`Shift+P`)
+
+Deck shrinks to the top 58% of the window; notes drawer pins to the bottom 42%. Good for single-screen setups. Toggle again to exit.
+
+### Phone Speaker Companion (`?notes`)
+
+Open `index.html?notes` on your phone for a touch-optimized speaker view:
+- ▶/⏸ timer, ⟲ reset, slide navigation buttons, notes in bullets or script view
+- **Padlock clicker** (🔒): when locked, tapping advances the main deck remotely
+- Calibration sweep captures slide thumbnails + video durations for the notes view
+- Cloud sync via Google Apps Script lets notes edits propagate across devices — see `tools/SETUP_NOTES_SYNC.md`
+
+On mobile, **haptic pacing alerts** fire silently:
+- Light pulse (120ms) once per minute when running >110% of estimated time
+- Hard double-pulse every 10 seconds during the final minute
 
 ### Duration Estimation
 
