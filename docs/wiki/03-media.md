@@ -168,15 +168,20 @@ allow="autoplay; fullscreen; xr-spatial-tracking"
 
 ## GIFs
 
-GIFs work in both direct and cycler contexts:
+GIFs animate correctly in both direct and cycler contexts — `buildMediaCycler` auto-detects `.gif` items and uses a cross-fading `<img>` rendering path (not canvas) so the animation plays.
 
-- **Direct `img: 'media/animation.gif'`**: renders as a normal `<img>` — GIF animates natively.
-- **In a media cycler**: `buildMediaCycler` auto-detects `.gif` items and uses a cross-fading `<img>` rendering path (not canvas), so the GIF animates correctly.
+That said, **convert large GIFs to MP4** before committing. GIFs compress poorly compared to H.264 — a 20MB GIF is often under 2MB as MP4, loads faster, and won't push you toward Git LFS. Rule of thumb: anything over ~5MB should be converted.
+
+```bash
+ffmpeg -i animation.gif -vf "scale=trunc(iw/2)*2:-2" -c:v libx264 -crf 22 \
+  -pix_fmt yuv420p -movflags +faststart -an animation.mp4
+```
+
+Then use `{type: 'video', src: 'media/animation.mp4', loop: true}` in the cycler. For small GIFs (icons, short loops under 5MB) just use them as-is:
 
 ```javascript
 buildMediaCycler(slide, [
   {type: 'image', src: 'media/animation.gif'},
-  {type: 'image', src: 'media/static.jpg'},
 ], {imageDuration: 4000});
 ```
 
