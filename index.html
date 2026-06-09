@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>(function(){var m=document.querySelector('meta[name="viewport"]');if(m&&window.matchMedia('(pointer:coarse)').matches&&window.innerWidth>window.innerHeight)m.content='width=1280,initial-scale=1.0';}());</script>
 <title>Is XR Right For Your Project? — A Spatial Deck Presentation</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta name="description" content="A framework for spatial decisions — before you pick a headset or a studio. Built with Spatial Deck.">
@@ -1022,6 +1023,9 @@ document.getElementById('mobile-ui-toggle')?.addEventListener('click',e=>{e.stop
 _mobileBtn();
 if(_paramMode!=='edit'){const at=document.getElementById('anno-toggle');if(at)at.style.display='none';const mt=document.getElementById('move-toggle');if(mt)mt.style.display='none';}
 if(_wantLandscape){const lo=document.createElement('div');lo.id='landscape-prompt';lo.innerHTML='<div style="text-align:center"><div style="font-size:2.5rem;margin-bottom:12px">\ud83d\udcf1\u2194\ufe0f</div><div style="font-size:1.1rem;font-weight:600;letter-spacing:.1em">Please rotate your device<br>to landscape mode</div></div>';lo.style.cssText='position:fixed;inset:0;z-index:9999;background:var(--bg,#060810);color:var(--text,#f0f4ff);display:none;align-items:center;justify-content:center;font-family:var(--font)';document.body.appendChild(lo);function checkO(){lo.style.display=window.innerHeight>window.innerWidth?'flex':'none';}checkO();window.addEventListener('resize',checkO);screen.orientation?.addEventListener('change',checkO);}
+// Mobile landscape: set viewport to 1280px wide so the deck renders at desktop
+// resolution and the browser scales it uniformly to fit \u2014 matching 16:9 desktop look
+(function(){const m=document.querySelector('meta[name="viewport"]');if(!m||!window.matchMedia('(pointer:coarse)').matches)return;function u(){m.content=window.innerWidth>window.innerHeight?'width=1280,initial-scale=1.0':'width=device-width,initial-scale=1.0';}window.addEventListener('resize',u);screen.orientation?.addEventListener('change',()=>setTimeout(u,120));})();
 
 // Slide grid
 function buildGrid(){const g=document.getElementById('slide-grid');g.innerHTML='';allSlides.forEach((s,i)=>{const t=document.createElement('div');const ty=s.dataset.type||'slide';let c='sg-thumb';if(i===current)c+=' active';if(s.dataset.hidden==='1')c+=' slide-hidden';if(ty==='bonus')c+=' sg-bonus';t.className=c;const lb=ty==='lesson'?(s.dataset.ln?`L${s.dataset.ln}`:'LESSON'):ty==='case'?`${s.dataset.year}`:ty.toUpperCase();t.innerHTML=`<span class="sg-num">${String(i).padStart(2,'0')}</span><span class="sg-label">${lb}</span>`;t.addEventListener('click',e=>{if(e.ctrlKey||e.metaKey){s.dataset.hidden=s.dataset.hidden==='1'?'':'1';buildGrid();return;}goTo(i);});g.appendChild(t);});const a=g.querySelector('.active');if(a)a.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});}
