@@ -213,7 +213,7 @@ body[data-bg-style]:not([data-bg-style="none"]) .cfg-panel{background:rgba(8,10,
 @keyframes qrP2{0%,100%{opacity:.7;transform:rotate(2.5deg) scale(1)}50%{opacity:1;transform:rotate(2.5deg) scale(1.08)}}
 #counter{position:fixed;top:32px;right:48px;z-index:20;font-size:clamp(.72rem,1vw,.95rem);font-weight:500;letter-spacing:.12em;color:rgba(255,255,255,.25)}
 #brand{position:fixed;bottom:28px;left:48px;z-index:20;font-size:clamp(.68rem,.95vw,.9rem);font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.18)}
-.nav-arrows{position:fixed;bottom:24px;right:160px;z-index:20;display:flex;gap:10px;align-items:center}
+.nav-arrows{position:fixed;bottom:24px;right:160px;z-index:100;display:flex;gap:10px;align-items:center}
 .nav-playing{width:20px;height:20px;border:2px solid rgba(0,212,255,.3);border-top-color:var(--teal);border-radius:50%;opacity:0;transition:opacity .2s;pointer-events:none}
 .nav-playing.active{opacity:1;animation:navSpin .8s linear infinite}
 @keyframes navSpin{to{transform:rotate(360deg)}}
@@ -992,7 +992,7 @@ document.addEventListener('keydown',e=>{
 });
 let touchX=0,touchY=0,touchT=0,lastTapT=0;
 document.addEventListener('touchstart',e=>{if(document.body.classList.contains('notes-mode'))return;touchX=e.touches[0].clientX;touchY=e.touches[0].clientY;touchT=Date.now();},{passive:true});
-document.addEventListener('touchend',e=>{if(document.body.classList.contains('notes-mode'))return;const dx=e.changedTouches[0].clientX-touchX;const dy=e.changedTouches[0].clientY-touchY;const dt=Date.now()-touchT;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){lastTapT=0;dx<0?(window._arrowSubstep!==false&&advanceStep()?0:goNext()):goPrev();}else if(Math.abs(dx)<15&&Math.abs(dy)<15&&dt<300){lastTapT=Date.now();if(window._arrowSubstep!==false&&advanceStep())return;goNext();}},{passive:true});
+document.addEventListener('touchend',e=>{if(document.body.classList.contains('notes-mode'))return;const dx=e.changedTouches[0].clientX-touchX;const dy=e.changedTouches[0].clientY-touchY;const dt=Date.now()-touchT;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){lastTapT=0;dx<0?(window._arrowSubstep!==false&&advanceStep()?0:goNext()):goPrev();}else if(Math.abs(dx)<15&&Math.abs(dy)<15&&dt<300){const now=Date.now();const dbl=now-lastTapT<300;lastTapT=now;if(dbl){lastTapT=0;goNext();}else if(window._arrowSubstep!==false&&advanceStep())return;else goNext();}},{passive:true});
 // Double-click (desktop): advance substep or next event — same as arrow/tap
 document.addEventListener('dblclick',e=>{
   if(window._moveMode)return;
