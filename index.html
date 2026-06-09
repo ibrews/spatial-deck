@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script>(function(){var m=document.querySelector('meta[name="viewport"]');if(m&&window.matchMedia('(pointer:coarse)').matches&&window.innerWidth>window.innerHeight)m.content='width=1280,initial-scale=1.0';}());</script>
+<script>(function(){var m=document.querySelector('meta[name="viewport"]');if(m&&window.matchMedia('(pointer:coarse)').matches&&window.innerWidth>window.innerHeight)m.content='width=1280,initial-scale=1.0,minimum-scale=0.3,user-scalable=yes';}());</script>
 <title>Is XR Right For Your Project? — A Spatial Deck Presentation</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta name="description" content="A framework for spatial decisions — before you pick a headset or a studio. Built with Spatial Deck.">
@@ -991,9 +991,9 @@ document.addEventListener('keydown',e=>{
   if((e.key==='h'||e.key==='H')&&!e.target.closest('input,textarea,[contenteditable]')){e.preventDefault();document.body.classList.toggle('presentation-mode');_mobileBtn();}
   if((e.key==='/'||(e.metaKey&&e.key==='f')||(e.ctrlKey&&e.key==='f'))&&!e.target.closest('input,textarea')){e.preventDefault();openSearch();}
 });
-let touchX=0,touchY=0,touchT=0,lastTapT=0;
-document.addEventListener('touchstart',e=>{if(document.body.classList.contains('notes-mode'))return;touchX=e.touches[0].clientX;touchY=e.touches[0].clientY;touchT=Date.now();},{passive:true});
-document.addEventListener('touchend',e=>{if(document.body.classList.contains('notes-mode'))return;const dx=e.changedTouches[0].clientX-touchX;const dy=e.changedTouches[0].clientY-touchY;const dt=Date.now()-touchT;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){lastTapT=0;dx<0?(window._arrowSubstep!==false&&advanceStep()?0:goNext()):goPrev();}else if(Math.abs(dx)<15&&Math.abs(dy)<15&&dt<300){const now=Date.now();const dbl=now-lastTapT<300;lastTapT=now;if(dbl){lastTapT=0;goNext();}else if(window._arrowSubstep!==false&&advanceStep())return;else goNext();}},{passive:true});
+let touchX=0,touchY=0,touchT=0,lastTapT=0,wasPinch=false;
+document.addEventListener('touchstart',e=>{if(document.body.classList.contains('notes-mode'))return;if(e.touches.length>1){wasPinch=true;return;}touchX=e.touches[0].clientX;touchY=e.touches[0].clientY;touchT=Date.now();},{passive:true});
+document.addEventListener('touchend',e=>{if(document.body.classList.contains('notes-mode'))return;if(wasPinch){if(e.touches.length===0)wasPinch=false;return;}const dx=e.changedTouches[0].clientX-touchX;const dy=e.changedTouches[0].clientY-touchY;const dt=Date.now()-touchT;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){lastTapT=0;dx<0?(window._arrowSubstep!==false&&advanceStep()?0:goNext()):goPrev();}else if(Math.abs(dx)<15&&Math.abs(dy)<15&&dt<300){if(window._arrowSubstep!==false&&advanceStep())return;goNext();}},{passive:true});
 // Double-click (desktop): advance substep or next event — same as arrow/tap
 document.addEventListener('dblclick',e=>{
   if(window._moveMode)return;
@@ -1025,7 +1025,7 @@ if(_paramMode!=='edit'){const at=document.getElementById('anno-toggle');if(at)at
 if(_wantLandscape){const lo=document.createElement('div');lo.id='landscape-prompt';lo.innerHTML='<div style="text-align:center"><div style="font-size:2.5rem;margin-bottom:12px">\ud83d\udcf1\u2194\ufe0f</div><div style="font-size:1.1rem;font-weight:600;letter-spacing:.1em">Please rotate your device<br>to landscape mode</div></div>';lo.style.cssText='position:fixed;inset:0;z-index:9999;background:var(--bg,#060810);color:var(--text,#f0f4ff);display:none;align-items:center;justify-content:center;font-family:var(--font)';document.body.appendChild(lo);function checkO(){lo.style.display=window.innerHeight>window.innerWidth?'flex':'none';}checkO();window.addEventListener('resize',checkO);screen.orientation?.addEventListener('change',checkO);}
 // Mobile landscape: set viewport to 1280px wide so the deck renders at desktop
 // resolution and the browser scales it uniformly to fit \u2014 matching 16:9 desktop look
-(function(){const m=document.querySelector('meta[name="viewport"]');if(!m||!window.matchMedia('(pointer:coarse)').matches)return;function u(){m.content=window.innerWidth>window.innerHeight?'width=1280,initial-scale=1.0':'width=device-width,initial-scale=1.0';}window.addEventListener('resize',u);screen.orientation?.addEventListener('change',()=>setTimeout(u,120));})();
+(function(){const m=document.querySelector('meta[name="viewport"]');if(!m||!window.matchMedia('(pointer:coarse)').matches)return;function u(){m.content=window.innerWidth>window.innerHeight?'width=1280,initial-scale=1.0,minimum-scale=0.3,user-scalable=yes':'width=device-width,initial-scale=1.0';}window.addEventListener('resize',u);screen.orientation?.addEventListener('change',()=>setTimeout(u,120));})();
 
 // Slide grid
 function buildGrid(){const g=document.getElementById('slide-grid');g.innerHTML='';allSlides.forEach((s,i)=>{const t=document.createElement('div');const ty=s.dataset.type||'slide';let c='sg-thumb';if(i===current)c+=' active';if(s.dataset.hidden==='1')c+=' slide-hidden';if(ty==='bonus')c+=' sg-bonus';t.className=c;const lb=ty==='lesson'?(s.dataset.ln?`L${s.dataset.ln}`:'LESSON'):ty==='case'?`${s.dataset.year}`:ty.toUpperCase();t.innerHTML=`<span class="sg-num">${String(i).padStart(2,'0')}</span><span class="sg-label">${lb}</span>`;t.addEventListener('click',e=>{if(e.ctrlKey||e.metaKey){s.dataset.hidden=s.dataset.hidden==='1'?'':'1';buildGrid();return;}goTo(i);});g.appendChild(t);});const a=g.querySelector('.active');if(a)a.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});}
@@ -1394,7 +1394,10 @@ document.getElementById('pn-elapsed').textContent=d.elapsed;
 document.getElementById('pn-remain').textContent=d.remaining;
 document.getElementById('pn-pace-icon').textContent=d.paceIcon;
 }};
-<\/script></body></html>`);
+<\/script><style>#fs-btn{display:none;position:fixed;top:12px;left:12px;z-index:1001;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:rgba(255,255,255,.5);font-size:18px;cursor:pointer;backdrop-filter:blur(6px);align-items:center;justify-content:center}@media(pointer:coarse){#fs-btn{display:flex}}body.presentation-mode #fs-btn{opacity:.15}</style>
+<button id="fs-btn" title="Fullscreen">⛶</button>
+<script>(function(){const btn=document.getElementById('fs-btn');if(!btn)return;function showToast(msg){let t=document.getElementById('anno-toast')||document.getElementById('_fs-toast');if(!t){t=document.createElement('div');t.id='_fs-toast';t.style.cssText='position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#00d4ff;color:#060810;padding:10px 18px;border-radius:6px;font-size:.72rem;font-weight:600;z-index:10003;opacity:0;transition:opacity .3s;pointer-events:none;font-family:sans-serif';document.body.appendChild(t);}t.textContent=msg;t.style.opacity=1;setTimeout(()=>t.style.opacity=0,3500);}btn.addEventListener('click',async()=>{if(document.fullscreenElement){await document.exitFullscreen().catch(()=>{});return;}try{await document.documentElement.requestFullscreen({navigationUI:'hide'});}catch(e){showToast('Add to Home Screen for fullscreen');}});document.addEventListener('fullscreenchange',()=>{btn.textContent=document.fullscreenElement?'✕':'⛶';});}());</script>
+</body></html>`);
   _notesWin.document.close();
   sendNotesUpdate();
 }
