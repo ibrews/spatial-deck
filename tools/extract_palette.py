@@ -27,7 +27,7 @@ from pathlib import Path
 from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).parent))
-from fleet_client import ENDPOINTS  # noqa: E402
+from fleet_client import ENDPOINTS, call_vision  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -183,7 +183,6 @@ def assign_tokens(centroids: list[tuple[int, int, int]]) -> dict[str, str]:
 
 
 def vibe_phrase(img_path: Path, model: str = "gemma3:12b", host: str = "lenny") -> str | None:
-    import urllib.request
     try:
         blob = img_path.read_bytes()
     except Exception:
@@ -192,21 +191,13 @@ def vibe_phrase(img_path: Path, model: str = "gemma3:12b", host: str = "lenny") 
     prompt = ("Describe the mood of this image in a single short phrase (3-6 words). "
               "Examples: 'warm dusk warehouse', 'cold neon diner', 'arctic minimalism'. "
               "No punctuation. No preamble.")
-    payload = json.dumps({
-        "model": model, "prompt": prompt, "images": [b64],
-        "stream": False, "options": {"temperature": 0.3},
-    }).encode()
-    req = urllib.request.Request(
-        f"{ENDPOINTS[host]}/api/generate",
-        data=payload, headers={"Content-Type": "application/json"},
-    )
     try:
-        with urllib.request.urlopen(req, timeout=60) as r:
-            body = json.loads(r.read())
+        raw = call_vision(prompt, b64, model=model, endpoint=ENDPOINTS.get(host),
+                          timeout=60, temperature=0.3)
     except Exception as e:
         print(f"[vibe] call failed: {e}", file=sys.stderr)
         return None
-    text = (body.get("response") or "").strip().strip('."\'').split("\n", 1)[0]
+    text = raw.strip().strip('."\'').split("\n", 1)[0]
     # Strip any leading preamble punctuation/quotes.
     return text[:60] if text else None
 

@@ -29,7 +29,7 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from fleet_client import ENDPOINTS, call  # noqa: E402
+from fleet_client import ENDPOINTS, call_vision as _provider_vision  # noqa: E402
 from lint_deck import extract_sections  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -52,23 +52,11 @@ Requirements:
 
 
 def call_vision(model: str, host: str, image_b64: str, timeout: int = 120) -> str:
-    """POST image + prompt to /api/generate."""
-    import urllib.request
-    payload = json.dumps({
-        "model": model,
-        "prompt": PROMPT,
-        "images": [image_b64],
-        "stream": False,
-        "options": {"temperature": 0.2},
-    }).encode()
-    req = urllib.request.Request(
-        f"{ENDPOINTS[host]}/api/generate",
-        data=payload,
-        headers={"Content-Type": "application/json"},
-    )
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        body = json.loads(r.read())
-    text = (body.get("response") or "").strip()
+    """Send image + prompt through the provider chain (Anthropic/OpenAI/Ollama).
+    model/host are hints for the Ollama/fleet tier."""
+    text = _provider_vision(PROMPT, image_b64, model=model,
+                            endpoint=ENDPOINTS.get(host), timeout=timeout,
+                            temperature=0.2).strip()
     text = text.replace("**", "").strip()
 
     # Drop any leading preamble line that ends with ":" (e.g. "Here's a short

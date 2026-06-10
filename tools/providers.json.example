@@ -1,0 +1,23 @@
+{
+  "_comment": "Copy this file to tools/providers.json (gitignored) to pin LLM providers explicitly. Providers are tried in order; the first one that works wins. api_key_env is the NAME of an environment variable holding your key — never paste the key itself into this file. Without this file, fleet_client auto-detects: ANTHROPIC_API_KEY, then OPENAI_API_KEY, then OLLAMA_HOST, then a local Ollama at localhost:11434. For Ollama entries, 'model' is optional (auto-picks from installed models) and 'vision_model' pins the model used for image calls (alt-text, palette --vibe).",
+  "providers": [
+    {
+      "type": "anthropic",
+      "base_url": "https://api.anthropic.com",
+      "model": "claude-haiku-4-5-20251001",
+      "api_key_env": "ANTHROPIC_API_KEY"
+    },
+    {
+      "type": "openai",
+      "base_url": "https://api.openai.com/v1",
+      "model": "gpt-4o-mini",
+      "api_key_env": "OPENAI_API_KEY"
+    },
+    {
+      "type": "ollama",
+      "base_url": "http://localhost:11434",
+      "model": "llama3.1:8b",
+      "vision_model": "gemma3:12b"
+    }
+  ]
+}

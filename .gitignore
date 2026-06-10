@@ -14,3 +14,6 @@ notes-config.json
 source/deck.pptx
 source/deck.pptx.tmp
 source/media/
+
+# fleet_client.py — local LLM provider config (copy from tools/providers.json.example)
+tools/providers.json

@@ -85,6 +85,18 @@ Defaults `--template` to the repo's own `index.html`. Output is a single self-co
 
 ## Fleet endpoints (confirmed working 2026-04-18)
 
+> **Provider resolution (2026-06-09):** `fleet_client.py` no longer assumes the
+> Tailscale fleet. It resolves providers in order: (1) `tools/providers.json`
+> explicit config (gitignored — see `providers.json.example`), (2) env
+> auto-detect (`ANTHROPIC_API_KEY` → Claude Haiku, `OPENAI_API_KEY` →
+> gpt-4o-mini with `OPENAI_BASE_URL` override, `OLLAMA_HOST`), (3) a probe of
+> local Ollama at `localhost:11434`, (4) the fleet table below as last
+> fallback, (5) `NoProviderError` + a stderr hint — importers catch it and fall
+> back to deterministic output (`--no-llm` paths). The `model`/`endpoint` args
+> importers pass are honored when an Ollama endpoint serves the call and
+> ignored by hosted APIs. Vision calls (`call_vision`) ride the same chain.
+> Diagnostic: `python3 tools/fleet_client.py --probe-only`.
+
 ```
 sam    100.127.46.63:11434   llama3.1:8b        — structured JSON, classification (fleet winner for these)
 archie 100.103.192.41:11434  qwen2.5-coder:14b  — code parsing, HTML/XML
