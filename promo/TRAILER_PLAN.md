@@ -6,19 +6,30 @@ No git, no terminal, no "deck as code" in the buyer-facing cut. (The existing
 `spatial-deck-promo.mp4` is a 17s dev-flavored typography teaser — keep for
 GitHub/social; `footage/draft-cut.mp4` was a mechanics draft, superseded.)
 
-**Status: v1 SHIPPED — `trailer-capafy.mp4` (33.7s, silent).** Structure:
-beige "Q3 Strategy Update" cold open → "Every deck looks the same." →
-**Harvard keynote real footage** (cover + transitions) → "Meet Spatial Deck"
-(real stages: Harvard · FMX · NXT BLD) → media-rich case slides (Body of
-Mine) → "Start with what you already have" (notes · PDF · old PowerPoint) →
-"Get back one file" (double-click · live link · PDF) → constellation map with
-the pixel avatar walking the ring → "Works offline. No lock-in. Yours
-forever." → CTA: "Spatial Deck Maker on Capafy" + repo URL.
+**Status: v2 SHIPPED — `trailer-capafy.mp4` (33.1s, with soundtrack).**
+Structure: beige "Q3 Strategy Update" cold open → "Every deck looks the
+same." → **Harvard keynote real footage** → "Meet Spatial Deck" (real stages:
+Harvard · FMX · NXT BLD) → media-rich cases (Body of Mine pixel-reveal,
+Vodafone) → "Start with what you already have" → "Get back one file" →
+constellation map → "Works offline. No lock-in. Yours forever." → CTA
+"Spatial Deck Maker on Capafy" + repo URL.
 
-**Remaining for v2:** music bed (the #1 missing piece), optional VO, a
-9:16/1:1 crop for social, and possibly re-capturing select Harvard moments at
-slower dwell for smoother holds. Sources in `trailer-src/` (card template +
-assemble.py); footage regenerates with
+**v2 design decisions:**
+- **Narrator cards are LIGHT** (ink-on-paper, `card-light.html.tmpl`); real
+  deck footage stays dark and carries a "● REAL TALK FOOTAGE · HARVARD XR
+  KEYNOTE" pill (`footage-chip.png`, PIL-rendered) — sell-voice vs product
+  footage is unmistakable.
+- **Soundtrack is synthesized** (`make_music.py`, numpy → WAV): dull 55Hz
+  drone + clock ticks under the boring open, whoosh at the Spatial Deck
+  reveal, then a building 116 BPM groove (kick → hats → bass → arp → pad,
+  Am–F–C–G), thinning under the constellation map, resolving with the deck's
+  bell register over the CTA. Boring = flat & quiet; Spatial Deck = alive.
+- Window B avoids the Four Seasons slide (its video recorded as a black box —
+  media didn't load in headless capture; re-record or pick around such slides).
+
+**Remaining for v3 (optional):** VO, a real (licensed) music track if the
+synth bed isn't enough, 9:16/1:1 social crops, re-capture at slower dwell for
+longer holds. Footage regenerates with
 `python3 tools/export_video.py --html ~/harvardxr-keynote/index.html --keep-webm …`.
 
 ## Beat structure
