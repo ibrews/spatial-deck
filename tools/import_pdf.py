@@ -240,8 +240,12 @@ def main() -> int:
 
     out_path = args.out or (REPO_ROOT / "tools" / f"imported-{stem}-{digest}.json")
     out_path.write_text(json.dumps(chapter, indent=2, ensure_ascii=False))
-    print(f"[done] Wrote {out_path.relative_to(REPO_ROOT)} ({len(cases)} cases)", file=sys.stderr)
-    print(f"[next] python3 tools/merge_sections.py {out_path.relative_to(REPO_ROOT)}", file=sys.stderr)
+    try:
+        rel = str(out_path.relative_to(REPO_ROOT))
+    except ValueError:
+        rel = str(out_path)
+    print(f"[done] Wrote {rel} ({len(cases)} cases)", file=sys.stderr)
+    print(f"[next] python3 tools/merge_sections.py {rel}", file=sys.stderr)
     return 0
 
 
