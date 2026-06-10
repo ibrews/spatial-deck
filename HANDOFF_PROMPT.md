@@ -97,6 +97,12 @@ index.html
 - `?view` = explicit view mode
 - `?landscape` = portrait-orientation prompt overlay on mobile
 
+### Export Modes (`?print` / `?shot=N`) — 2026-06-09
+- `?print` = all visible slides stacked as static 16:9 pages (print CSS near the vertical-mode block; `@page` 13.333×7.5in). Hidden slides excluded. Appends `#sd-print-manifest` (JSON: per-slide type/title/degradation flags) to `<body>` for the export tooling.
+- `?shot=N` = slide N alone (absolute index, settings=0), full-viewport, chrome hidden — for per-slide screenshot capture.
+- Both modes run synchronously at parse time: mode class applied, `slideSteps` run to completion (two chained `setTimeout`s later), `document.getAnimations().finish()`, media cyclers replaced by static first item (patch installed after the GIF wrapper), iframes → `.sd-iframe-ph` placeholder panels, videos frozen on an early frame.
+- Driven by `tools/capture_slides.py` (headless Chrome; **treats the output artifact, not process exit, as completion** — Chrome 149/macOS often never exits after `--dump-dom`/`--screenshot`) and `tools/export_pdf.py` (PNG→JPEG→stdlib PDF writer, fidelity report).
+
 ### Mobile
 - Auto-detect via `(max-width:900px)` or `(pointer:coarse)`
 - Auto-enter presentation mode; 👁 button toggles chrome
@@ -283,6 +289,7 @@ The default deck is "Is XR Right For Your Project?" with 3 chapters and 6 case s
 
 ## Known Quirks
 
+- **Any `</script>` inside a JS string MUST be written `<\/script>`.** The HTML parser ends the script block at the literal sequence regardless of JS string context. The presenter-popup `document.write(\`...\`)` template is the danger zone — an unescaped closer there (commit 67c8a1a) terminated the main runtime script mid-template-literal and the whole deck failed to boot until efdebf0. The PostToolUse validate-js hook catches this; don't bypass it with raw python file writes.
 - `file://` URLs in Chrome trigger same-origin warnings for Three.js imports — harmless, or serve via `python3 -m http.server`
 - AudioContext requires user interaction before first sound plays (browser policy)
 - GIFs don't animate on canvas-rendered MEDIA_CYCLER — but as of 2026-05-06, `buildMediaCycler` auto-detects `.gif` items and switches to a cross-fading `<img>` rendering path so they animate. For non-cycler use (img tag), GIFs always animate. The "convert to MP4" workaround only matters if you're using the canvas pipeline explicitly.

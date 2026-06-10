@@ -189,16 +189,35 @@ Requires `yt-dlp` and `ffmpeg` on PATH.
 
 ## Export Tools
 
-Round-trip your deck to other formats:
+### Pixel-faithful exports (PDF, visual PPTX, PNGs)
+
+The deck itself is the renderer: headless Chrome drives the built-in `?print` / `?shot=N` modes, so layouts, themes, placed media, and move-mode tweaks export exactly as presented. Requires Google Chrome (or `CHROME_BIN`); no Python deps on macOS.
+
+```bash
+python3 tools/export_pdf.py  --out talk.pdf             # one 16:9 page per slide
+python3 tools/export_pdf.py  --print-css --out talk.pdf # vector-text alternative
+python3 tools/export_pptx.py --visual --out talk.pptx   # full-bleed slide images + notes
+python3 tools/capture_slides.py --out-dir shots/        # just the per-slide PNGs
+```
+
+What degrades (and is listed in the post-export **fidelity report**): media cyclers freeze on their first item, iframes become a placeholder panel showing the URL, videos freeze on an early frame, the constellation map captures as-rendered. Hidden slides are excluded, matching the live deck.
+
+You can also just open `index.html?print` in a browser and File → Print.
+
+### Structural exports (editable, content-only)
+
+Round-trip your deck's *content* to other formats — presentation is approximated:
 
 ```bash
 python3 tools/export_md.py --out outline.md            # full deck → markdown
 python3 tools/export_md.py --chapter 1 --out ch1.md    # single chapter
 python3 tools/export_html.py --out deck-outline.html   # static no-JS HTML
-python3 tools/export_pptx.py --out deck.pptx           # .pptx (requires python-pptx)
+python3 tools/export_pptx.py --out deck.pptx           # editable two-column .pptx
 ```
 
 `export_md.py` ↔ `import_md.py` is a verified 0-diff round-trip (uses `<!-- spatial-deck ... -->` metadata blocks to preserve year, accent, short, tags, multi-line titles).
+
+Structural exporters print a fidelity report too: advanced layouts (`big`/`placed`/grid) collapse to the two-column approximation, cyclers/iframes/videos are placeholders or dropped — the report tells you exactly which slides are affected.
 
 ---
 

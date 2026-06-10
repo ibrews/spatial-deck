@@ -2,11 +2,11 @@
 
 **The presentation framework for people who think spatially.**
 
-A single-file HTML presentation system built for XR professionals, creative technologists, and anyone who wants more control over their slides than PowerPoint will ever give you. Zero dependencies. Zero build process. One file to rule them all.
+One HTML file that runs anywhere, forever — no cloud, no build process, no lock-in. A deck an AI can edit with you right up until showtime. Presenter tooling PowerPoint never gave you. Draft your content wherever it's easiest, make it spectacular here, then hand back a pixel-faithful PDF when someone asks for "the deck."
 
 > *Designed at [Agile Lens](https://agilelens.com) — a 10-year-old immersive design studio that has given talks at Harvard, SIGGRAPH, the Kennedy Center, and everywhere in between.*
 
-![Cover Slide](docs/screenshot-cover.png)
+![Spatial Deck in motion — real slides, live transitions, media reveals](docs/hero.gif)
 
 ---
 
@@ -65,6 +65,18 @@ open index.html
 
 ---
 
+## 🔁 The Full Loop
+
+Draft dumb, make it amazing, ship it back out — every leg is tooled:
+
+1. **Draft anywhere** — Google Slides, PowerPoint, Markdown, a PDF, rough notes. Whatever's lowest-friction.
+2. **Pull it in** — `tools/sync_gslides.py pull` keeps a living Google Slides draft synced (diff-aware, per-slide state); `import_pptx.py` / `import_md.py` / `import_pdf.py` / `import_html.py` handle one-shots.
+3. **Make it amazing** — move mode, keyframe animations, media cyclers, live themes, Web Audio, the constellation map.
+4. **Share it live** — a GitHub Pages link, a `?vertical` scroll doc, or offline from a USB stick.
+5. **Hand back the file they asked for** — `tools/export_pdf.py` renders a pixel-faithful PDF *using the deck itself as the renderer*; `tools/export_pptx.py --visual` does the same for PowerPoint. Every exporter prints a fidelity report, so anything that degraded (a cycler frozen to its first frame, an iframe to a URL panel) is informed loss, never silent loss.
+
+---
+
 ## 📚 Full Documentation
 
 **[→ docs/wiki/](docs/wiki/index.md)** — comprehensive wiki covering content authoring, media, move mode, themes, presenter tools, animations, import/export tools, AI workflow, keyboard shortcuts, and troubleshooting.
@@ -79,6 +91,7 @@ open index.html
 4. **Open slide 0 (Settings, accessible via the slide grid) and change the font family or accent color** — the entire deck re-themes live without a reload; settings persist across browser restarts.
 5. **Press `N` to open the Presenter Popup, then navigate a few slides** — a second window tracks speaker notes, elapsed time, next-slide preview, and a pacing indicator (green / yellow / red).
 6. **Append `?vertical` to the URL (or toggle "Vertical Scroll Mode" in Settings)** — slides flip from step-through presentation to a long-form scrollable page; great for sharing a deck as a readable web doc. Toggle off (or remove `?vertical`) to return to presentation mode.
+7. **Run `python3 tools/export_pdf.py`** — every visible slide captured pixel-faithfully into a 16:9 PDF, rendered by the deck itself (needs Google Chrome installed), ending with a fidelity report of anything that degraded.
 
 ---
 
@@ -195,6 +208,8 @@ Set `layout:` on a case study entry:
 | `yoursite.com/?edit` | Edit mode — lands on Settings slide (slide 0) so you can configure first |
 | `yoursite.com/?edit#15` | Edit mode, starting at slide 15 |
 | `yoursite.com/?notes` | Phone speaker companion — notes-only view for your phone |
+| `yoursite.com/?print` | Print mode — all slides as static 16:9 pages (File → Print works; `tools/export_pdf.py` drives it headlessly) |
+| `yoursite.com/?shot=5` | Shot mode — slide 5 alone, full-viewport, chrome hidden (per-slide screenshot capture) |
 
 ### Mobile Support
 
@@ -650,7 +665,18 @@ The handoff prompt covers: file structure, SECTIONS config format, media cycler 
 
 Spatial Deck pairs well with [Claude Design](https://claude.ai/design) as the **presenter's companion**: Claude Design generates beautiful visuals, Spatial Deck gives you keyframe animation, scrubber timeline, Web Audio SFX, offline-safe presenting, and mobile touch support — things Claude Design doesn't.
 
-The `tools/` directory holds small Python scripts that use a **local LLM fleet** (Ollama over Tailscale) to normalize inbound content — so you don't spend frontier-model tokens on structural glue work.
+The `tools/` directory holds small Python scripts that can use an LLM to normalize inbound content — tighten slide text, draft alt-text, review decks — so you don't spend frontier-model tokens on structural glue work.
+
+### LLM provider setup (optional)
+
+The tools work with whatever you have — resolved in this order:
+
+1. `tools/providers.json` — explicit config (copy `tools/providers.json.example`)
+2. `ANTHROPIC_API_KEY` (Claude Haiku) or `OPENAI_API_KEY` (gpt-4o-mini; set `OPENAI_BASE_URL` for any OpenAI-compatible server) or `OLLAMA_HOST`
+3. A local [Ollama](https://ollama.com) at `localhost:11434` (`ollama pull llama3.1:8b`; add a vision model like `gemma3:12b` for alt-text)
+4. The author's Tailscale fleet (fails fast for everyone else)
+
+No provider? Everything still works — pass `--no-llm` (or skip `--tighten`) for deterministic output. Check what resolves: `python3 tools/fleet_client.py`
 
 ### Design token import
 
@@ -832,18 +858,32 @@ python3 tools/diff_decks.py index.html tools/imported-foo.json --json
 
 Reports what changed between two `SECTIONS` snapshots — chapters added/removed, cases added/removed/changed, field-level diffs for title/subtitle/img/notes, and a bullet-level diff via `difflib.SequenceMatcher`. Chapters pair by `year`; cases pair by `title` within each chapter. Works on `.html` (SECTIONS extracted via node) or chapter-JSON output from any importer. Useful before re-merging an importer or pulling template updates.
 
-### Reverse importers (Markdown, HTML, PPTX)
+### Exporters (PDF, PPTX, Markdown, HTML)
 
-Every importer has a matching exporter for round-trip handoff to collaborators, printers, or backup:
+Two kinds of export, for two kinds of ask:
+
+**Pixel-faithful** — the deck itself is the renderer (headless Chrome drives the built-in `?print` / `?shot=N` modes), so layouts, themes, placed media, and move-mode tweaks come out exactly as presented:
+
+```bash
+python3 tools/export_pdf.py  --out talk.pdf              # one 16:9 page per slide
+python3 tools/export_pptx.py --visual --out talk.pptx    # full-bleed slide images + speaker notes
+python3 tools/capture_slides.py --out-dir shots/         # just the per-slide PNGs
+```
+
+Requires Google Chrome (or `CHROME_BIN`); no Python deps on macOS. `--print-css` on `export_pdf.py` gives a vector-text alternative via Chrome's print engine.
+
+**Structural / editable** — content round-trips, presentation is approximated:
 
 ```bash
 python3 tools/export_md.py   --out outline.md            # full deck → markdown
 python3 tools/export_html.py --out deck-outline.html     # static, no-JS HTML page
-python3 tools/export_pptx.py --out deck.pptx             # .pptx (python-pptx)
+python3 tools/export_pptx.py --out deck.pptx             # editable two-column .pptx
 python3 tools/export_md.py --chapter 1 --out ch1.md      # single chapter
 ```
 
 `export_md.py` ↔ `import_md.py` round-trip is **0-diff verified** — a YAML-ish `<!-- spatial-deck ... -->` metadata block preserves `year`, `accent`, `short`, `tags`, and multi-line titles. `export_pptx.py` round-trips through `import_pptx.py` cleanly as well.
+
+**Every exporter ends with a fidelity report** — anything that degraded is listed per slide (media cycler → first of N items, iframe → URL placeholder panel, video → frozen frame, advanced layout → two-column approximation in structural mode). Loss is informed, never silent.
 
 ### Peer-review harness
 
@@ -867,9 +907,9 @@ Concatenates SECTIONS from multiple sources (HTML or chapter-JSON), detects year
 
 [`tools/layouts/preview.html`](tools/layouts/preview.html) shows three new layouts — `split-50` (true 50/50), `bleed` (full-bleed media + overlay), `trio` (three-column comparison) — alongside the existing 48/52 default. [`tools/layouts/PATCH.md`](tools/layouts/PATCH.md) has the exact CSS + build-loop diff to splice in when you want them. Default behaviour is unchanged if you never set `layout:` on a case.
 
-### Fleet endpoints
+### Fleet endpoints (the author's setup)
 
-[`tools/fleet_client.py`](tools/fleet_client.py) wraps Ollama's HTTP API with JSON-parsing and `<think>` block stripping. Endpoints are Tailscale IPs; edit the `ENDPOINTS` table at the top if your fleet differs. No auth — Tailscale is the perimeter.
+[`tools/fleet_client.py`](tools/fleet_client.py) wraps every provider behind one call surface, with JSON-parsing and `<think>` block stripping. The Tailscale fleet below is the *last* fallback in the provider chain — outside users get Anthropic/OpenAI/local-Ollama first (see "LLM provider setup" above).
 
 Current task → model assignments (from nightly evals):
 
@@ -930,9 +970,12 @@ spatial-deck/
 │   ├── merge_sections.py  ← Splice imported chapter into index.html
 │   ├── merge_decks.py     ← Merge N decks + flag conflicts
 │   ├── peer_review.py     ← Two-reviewer fleet critique w/ merge-vote
+│   ├── capture_slides.py  ← Headless-Chrome per-slide PNG capture (?shot=N)
+│   ├── export_pdf.py      ← Pixel-faithful PDF (deck-rendered) + fidelity report
 │   ├── export_md.py       ← SECTIONS → markdown (round-trips via import_md)
 │   ├── export_html.py     ← SECTIONS → static, no-JS HTML outline
-│   ├── export_pptx.py     ← SECTIONS → .pptx (round-trips via import_pptx)
+│   ├── export_pptx.py     ← SECTIONS → .pptx (editable default, --visual pixel-faithful)
+│   ├── providers.json.example ← LLM provider config template
 │   ├── layouts/           ← Optional: 3 new case layouts (preview + splice patch)
 │   └── samples/           ← Example input files
 ├── social.html      ← Social sharing card (1200×630)
