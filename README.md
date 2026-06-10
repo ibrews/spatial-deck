@@ -867,10 +867,13 @@ Two kinds of export, for two kinds of ask:
 ```bash
 python3 tools/export_pdf.py  --out talk.pdf              # one 16:9 page per slide
 python3 tools/export_pptx.py --visual --out talk.pptx    # full-bleed slide images + speaker notes
+python3 tools/export_video.py --out walkthrough.mp4      # the LIVE deck auto-played end to end
 python3 tools/capture_slides.py --out-dir shots/         # just the per-slide PNGs
 ```
 
-Requires Google Chrome (or `CHROME_BIN`); no Python deps on macOS. `--print-css` on `export_pdf.py` gives a vector-text alternative via Chrome's print engine.
+`export_video.py` records the deck like a presenter would step through it — transitions, multi-step builds, media-cycler reveals, videos, the constellation map, 3D content, all live (`--dwell` controls pacing; `--gif` emits a compact GIF too; works against a local file or any `--url`). Web Audio SFX aren't captured — lay a music bed on with ffmpeg afterwards.
+
+PDF/PPTX/PNG export requires Google Chrome (or `CHROME_BIN`); no Python deps on macOS. Video export additionally needs `node` + `ffmpeg` (its one npm package auto-installs to `~/.cache/spatial-deck/`, never into this repo). `--print-css` on `export_pdf.py` gives a vector-text alternative via Chrome's print engine.
 
 **Structural / editable** — content round-trips, presentation is approximated:
 

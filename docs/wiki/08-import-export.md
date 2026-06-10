@@ -197,8 +197,11 @@ The deck itself is the renderer: headless Chrome drives the built-in `?print` / 
 python3 tools/export_pdf.py  --out talk.pdf             # one 16:9 page per slide
 python3 tools/export_pdf.py  --print-css --out talk.pdf # vector-text alternative
 python3 tools/export_pptx.py --visual --out talk.pptx   # full-bleed slide images + notes
+python3 tools/export_video.py --out walkthrough.mp4     # the live deck auto-played, as MP4
 python3 tools/capture_slides.py --out-dir shots/        # just the per-slide PNGs
 ```
+
+`export_video.py` is the only exporter that captures the deck *in motion* — transitions, step builds, cycler reveals, videos, map, 3D — by auto-advancing through every slide and substep while recording (needs `node` + `ffmpeg` in addition to Chrome; pacing via `--dwell`/`--step-dwell`; `--url` records a live deployed deck). Audio is not captured.
 
 What degrades (and is listed in the post-export **fidelity report**): media cyclers freeze on their first item, iframes become a placeholder panel showing the URL, videos freeze on an early frame, the constellation map captures as-rendered. Hidden slides are excluded, matching the live deck.
 

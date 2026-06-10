@@ -102,6 +102,7 @@ index.html
 - `?shot=N` = slide N alone (absolute index, settings=0), full-viewport, chrome hidden — for per-slide screenshot capture.
 - Both modes run synchronously at parse time: mode class applied, `slideSteps` run to completion (two chained `setTimeout`s later), `document.getAnimations().finish()`, media cyclers replaced by static first item (patch installed after the GIF wrapper), iframes → `.sd-iframe-ph` placeholder panels, videos frozen on an early frame.
 - Driven by `tools/capture_slides.py` (headless Chrome; **treats the output artifact, not process exit, as completion** — Chrome 149/macOS often never exits after `--dump-dom`/`--screenshot`) and `tools/export_pdf.py` (PNG→JPEG→stdlib PDF writer, fidelity report).
+- `tools/export_video.py` records the LIVE deck (no export mode — normal runtime) by auto-pressing ArrowRight through every slide/substep via playwright-core + system Chrome, then ffmpeg→MP4. End detection: hash + `#step-indicator` fingerprint unchanged for 2 presses at the last visible slide. ESM gotcha: `NODE_PATH` is ignored by `import` — the runner uses `createRequire(import.meta.url)` with an absolute path. playwright-core auto-installs to `~/.cache/spatial-deck/video-deps`.
 
 ### Mobile
 - Auto-detect via `(max-width:900px)` or `(pointer:coarse)`
