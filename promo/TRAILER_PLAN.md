@@ -1,12 +1,25 @@
 # Spatial Deck Trailer — Production Plan
 
-**Goal:** a 45–60s trailer built on **real product footage** (the existing
-`spatial-deck-promo.mp4` is a 17s typography teaser with no product shots —
-keep it as a social teaser; this is the full trailer).
+**Goal:** a trailer built on **real product footage** that SELLS — targeted at
+the Capafy marketplace audience (e-commerce/marketing buyers, non-developers).
+No git, no terminal, no "deck as code" in the buyer-facing cut. (The existing
+`spatial-deck-promo.mp4` is a 17s dev-flavored typography teaser — keep for
+GitHub/social; `footage/draft-cut.mp4` was a mechanics draft, superseded.)
 
-**Status:** raw footage captured + a 29s silent draft cut assembled
-(`footage/draft-cut.mp4`). Beats 1 and 5 below need the typography treatment
-(HyperFrames, matching `hyperframes-auto/DESIGN.md`); VO + music not started.
+**Status: v1 SHIPPED — `trailer-capafy.mp4` (33.7s, silent).** Structure:
+beige "Q3 Strategy Update" cold open → "Every deck looks the same." →
+**Harvard keynote real footage** (cover + transitions) → "Meet Spatial Deck"
+(real stages: Harvard · FMX · NXT BLD) → media-rich case slides (Body of
+Mine) → "Start with what you already have" (notes · PDF · old PowerPoint) →
+"Get back one file" (double-click · live link · PDF) → constellation map with
+the pixel avatar walking the ring → "Works offline. No lock-in. Yours
+forever." → CTA: "Spatial Deck Maker on Capafy" + repo URL.
+
+**Remaining for v2:** music bed (the #1 missing piece), optional VO, a
+9:16/1:1 crop for social, and possibly re-capturing select Harvard moments at
+slower dwell for smoother holds. Sources in `trailer-src/` (card template +
+assemble.py); footage regenerates with
+`python3 tools/export_video.py --html ~/harvardxr-keynote/index.html --keep-webm …`.
 
 ## Beat structure
 
