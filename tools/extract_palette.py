@@ -251,8 +251,12 @@ def main() -> int:
     css = emit_css(tokens, vibe, args.image.name)
     out_path = args.out or (REPO_ROOT / "tools" / f"palette-{args.image.stem}.css")
     out_path.write_text(css)
-    print(f"[done] Wrote {out_path.relative_to(REPO_ROOT)}", file=sys.stderr)
-    print(f"[next] python3 tools/import_tokens.py {out_path.relative_to(REPO_ROOT)}", file=sys.stderr)
+    try:
+        rel = str(out_path.relative_to(REPO_ROOT))
+    except ValueError:
+        rel = str(out_path)
+    print(f"[done] Wrote {rel}", file=sys.stderr)
+    print(f"[next] python3 tools/import_tokens.py {rel}", file=sys.stderr)
     sys.stdout.write(css)
     return 0
 
