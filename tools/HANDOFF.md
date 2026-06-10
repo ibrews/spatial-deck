@@ -41,6 +41,19 @@ If the user is here for **something CLAUDE-first** (judgment, UX, narrative) —
 | **Showcase chapter in sample deck** | `index.html` SECTIONS now includes CH 4 "Your Deck Is Data. Treat It Like Code." (rose accent, 3 cases showcasing the tool suite). | this session |
 | **KB-deck importer (`import_kb_deck.py`)** | New importer for the per-slide-frontmatter format produced by overnight AI agents (SECTIONS.json + slides/NN-*.md). Reads design tokens, generates a self-contained HTML deck with speaker notes embedded as `window._deckSpeakerNotes` and slides color-coded by `_speaker` via `_kb_speaker_styling.css`. Different from `import_md.py` — see below. | (this session) |
 
+## Export fidelity story (2026-06-09)
+
+The deck is no longer the only thing that knows what it looks like. Three layers, bottom-up:
+
+1. **`index.html` export modes** (commit 7a98dff): `?shot=N` renders slide N full-viewport for screenshots; `?print` stacks all visible slides and appends a JSON fidelity manifest (`#sd-print-manifest`) — per-slide `{i, type, title, hidden, cycler?, iframes?, videos?}` flags for anything the static render degraded (cycler → first of N items, iframe → URL placeholder, video → frozen frame).
+2. **`tools/capture_slides.py`** — the shared headless-Chrome layer all visual exporters build on: `find_chrome()`, `read_manifest()`, `shoot()`/`shoot_all()`, `parse_slide_spec()`. Handles the Chrome-writes-but-never-exits quirk (the artifact, not the exit code, is the completion signal). Stdlib only.
+3. **The exporters**, now split along an honest fidelity axis:
+   - **`export_pdf.py`** — pixel-faithful PDF from per-slide screenshots (deck renders itself); `--print-css` alt path for vector text.
+   - **`export_pptx.py --visual`** — pixel-faithful PPTX: each slide is the full-bleed 16:9 screenshot, with SECTIONS speaker notes attached to the notes placeholder (alignment is cross-checked against the manifest's type/title sequence; ambiguous slides get *no* notes rather than wrong notes). This is the Gamma/Pitch-style "give me the PowerPoint." Requires Chrome.
+   - **`export_pptx.py` (default)** stays the *editable* structural two-column approximation; `export_html.py` / `export_md.py` stay linearized outlines.
+
+**Every exporter now prints a fidelity report after writing** — what was dropped or degraded, per slide. Structural modes derive it from SECTIONS data (no Chrome needed: advanced layouts collapsed, cyclers/iframes skipped, videos dropped, SVGs not embeddable in PPTX, theme reduced to 4 accent RGBs); `--visual`/PDF modes derive it from the deck's own manifest (cycler frozen, iframe placeholder, video frozen). All four exporters take `--no-report` and `--json` consistently. When `export_md.py`/`export_html.py` write the document to stdout, the report moves to stderr so the output stays well-formed. Loss is informed, never silent.
+
 ## `import_kb_deck.py` — when to use it
 
 `import_md.py` consumes a **single** markdown file (the SECTIONS-as-prose convention). `import_kb_deck.py` consumes a **directory** with this layout:

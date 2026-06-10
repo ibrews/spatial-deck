@@ -5,6 +5,12 @@ NOT the spatial-deck runtime: that's `index.html`. This is for handoff —
 a collaborator who wants to skim the deck in email, a reviewer who doesn't
 want to run the interactive version, or a print-to-PDF moment.
 
+The outline is honest about what it can't carry: a fidelity report after
+export lists, per slide, anything the linearization dropped or degraded
+(advanced layouts flattened, media cyclers/iframes reduced to notes,
+videos that won't play). Silence it with --no-report; machine-read it
+with --json.
+
 Usage:
     python3 tools/export_html.py --out /tmp/deck.html
     python3 tools/export_html.py --chapter 1 --out /tmp/ch1.html
@@ -13,6 +19,7 @@ Usage:
 from __future__ import annotations
 import argparse
 import html
+import json
 import sys
 from pathlib import Path
 
@@ -131,12 +138,87 @@ def render(sections: list[dict], title: str) -> str:
 """
 
 
+# ── Fidelity report (derived from SECTIONS — no Chrome needed) ──────────────
+
+VIDEO_EXTS = (".mp4", ".webm", ".mov", ".m4v")
+
+
+def _extra_media(c: dict) -> tuple[int, int]:
+    """(item_count, video_count) across placedImages/placedItems/beltItems."""
+    srcs: list[str] = []
+    for it in c.get("placedImages") or []:
+        if isinstance(it, (list, tuple)) and it:
+            srcs.append(str(it[0]))
+    for it in (c.get("placedItems") or []) + (c.get("beltItems") or []):
+        if isinstance(it, dict):
+            srcs.append(str(it.get("src") or it.get("type") or ""))
+    vids = sum(1 for s in srcs if s.lower().endswith(VIDEO_EXTS) or s == "mp4")
+    return len(srcs), vids
+
+
+def structural_fidelity(sections: list[dict]) -> tuple[list[dict], list[str]]:
+    """Per-case degradations the linearized outline introduces, plus
+    deck-level notes."""
+    drops = []
+    any_relative_img = False
+    for si, ch in enumerate(sections):
+        for ci, c in enumerate(ch.get("cases") or []):
+            notes = []
+            layout = (c.get("layout") or "").strip()
+            if layout:
+                notes.append(f"layout '{layout}' linearized to heading + bullets")
+            big_fields = [k for k in ("bigText", "bigCaption") if (c.get(k) or "").strip()]
+            if big_fields:
+                notes.append(f"fields dropped: {', '.join(big_fields)}")
+            n_items, n_vids = _extra_media(c)
+            if n_items:
+                vid_note = f", {n_vids} of them video(s)" if n_vids else ""
+                notes.append(f"{n_items} placed/belt item(s) dropped{vid_note}")
+            img = (c.get("img") or "").strip()
+            if img.startswith("MEDIA_CYCLER"):
+                notes.append("media cycler -> placeholder note (no media embedded)")
+            elif img.startswith("IFRAME:"):
+                notes.append(f"iframe -> URL note, content not embedded ({img[7:]})")
+            elif img.lower().endswith(VIDEO_EXTS):
+                notes.append("video referenced via <img> tag — will not play in the outline")
+            elif img and not img.startswith(("http://", "https://", "data:", "/")):
+                any_relative_img = True
+            if notes:
+                title = (c.get("title") or "(untitled)").replace("\n", " ").strip()
+                drops.append({"slide": f"ch{si}.case{ci}", "title": title, "degraded": notes})
+    deck_notes = ["cover/bonus/map/close slides not exported (SECTIONS chapters+cases only)"]
+    if any_relative_img:
+        deck_notes.append("image paths are repo-relative — keep the outline inside the repo (or copy media/) for images to resolve")
+    return drops, deck_notes
+
+
+def print_fidelity(drops: list[dict], n_slides: int, deck_notes: list[str],
+                   as_json=False, stream=None):
+    stream = stream or sys.stdout
+    if as_json:
+        print(json.dumps({"slides": n_slides, "degraded": drops,
+                          "deck": deck_notes}, indent=2), file=stream)
+        return
+    print(f"\n── Fidelity report ── {n_slides} slides exported (HTML outline)", file=stream)
+    if not drops:
+        print("  nothing degraded per-slide — no advanced layouts/cyclers/iframes/videos in these chapters",
+              file=stream)
+    for d in drops:
+        print(f"  {d['slide']:>10}  {d['title'][:48]}", file=stream)
+        for n in d["degraded"]:
+            print(f"            · {n}", file=stream)
+    for n in deck_notes:
+        print(f"  ({n})", file=stream)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--html", type=Path, default=DEFAULT_HTML)
     ap.add_argument("--out", type=Path, default=None)
     ap.add_argument("--chapter", type=int, default=None)
     ap.add_argument("--title", default="Spatial Deck — Outline")
+    ap.add_argument("--json", action="store_true", help="fidelity report as JSON")
+    ap.add_argument("--no-report", action="store_true", help="skip the fidelity report")
     args = ap.parse_args()
 
     sections = extract_sections(args.html)
@@ -152,6 +234,13 @@ def main() -> int:
         print(f"[done] Wrote {args.out}", file=sys.stderr)
     else:
         sys.stdout.write(out)
+    if not args.no_report:
+        # When the document itself goes to stdout, the report moves to stderr
+        # so the outline stays well-formed.
+        n_slides = len(sections) + sum(len(ch.get("cases") or []) for ch in sections)
+        drops, deck_notes = structural_fidelity(sections)
+        print_fidelity(drops, n_slides, deck_notes, args.json,
+                       stream=sys.stdout if args.out else sys.stderr)
     return 0
 
 

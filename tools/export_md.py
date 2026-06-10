@@ -15,6 +15,13 @@ Useful for:
   - Handing a static outline to a human reviewer or an AI collaborator.
   - Diffing deck content in a format `git diff` renders nicely.
 
+Markdown can't carry everything the live deck does: a fidelity report
+after export lists, per slide, what the round-trip loses (advanced
+layouts flattened, media cyclers and iframes skipped entirely, videos
+reduced to image references). Silence it with --no-report; machine-read
+it with --json. When the document goes to stdout, the report goes to
+stderr so the markdown stays clean.
+
 Usage:
     python3 tools/export_md.py > my-deck.md
     python3 tools/export_md.py --html other.html --out outline.md
@@ -22,6 +29,7 @@ Usage:
 """
 from __future__ import annotations
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -95,11 +103,82 @@ def emit_chapter(ch: dict) -> list[str]:
     return lines
 
 
+# ── Fidelity report (derived from SECTIONS — no Chrome needed) ──────────────
+
+VIDEO_EXTS = (".mp4", ".webm", ".mov", ".m4v")
+
+
+def _extra_media(c: dict) -> tuple[int, int]:
+    """(item_count, video_count) across placedImages/placedItems/beltItems."""
+    srcs: list[str] = []
+    for it in c.get("placedImages") or []:
+        if isinstance(it, (list, tuple)) and it:
+            srcs.append(str(it[0]))
+    for it in (c.get("placedItems") or []) + (c.get("beltItems") or []):
+        if isinstance(it, dict):
+            srcs.append(str(it.get("src") or it.get("type") or ""))
+    vids = sum(1 for s in srcs if s.lower().endswith(VIDEO_EXTS) or s == "mp4")
+    return len(srcs), vids
+
+
+def structural_fidelity(sections: list[dict]) -> tuple[list[dict], list[str]]:
+    """Per-case degradations the markdown round-trip loses, plus deck-level
+    notes. MEDIA_CYCLER and IFRAME: values are dropped from the .md entirely —
+    a re-import will not restore them."""
+    drops = []
+    for si, ch in enumerate(sections):
+        for ci, c in enumerate(ch.get("cases") or []):
+            notes = []
+            layout = (c.get("layout") or "").strip()
+            if layout:
+                notes.append(f"layout '{layout}' linearized to heading + bullets (field lost on re-import)")
+            big_fields = [k for k in ("bigText", "bigCaption") if (c.get(k) or "").strip()]
+            if big_fields:
+                notes.append(f"fields dropped: {', '.join(big_fields)}")
+            n_items, n_vids = _extra_media(c)
+            if n_items:
+                vid_note = f", {n_vids} of them video(s)" if n_vids else ""
+                notes.append(f"{n_items} placed/belt item(s) dropped{vid_note}")
+            img = (c.get("img") or "").strip()
+            if img.startswith("MEDIA_CYCLER"):
+                notes.append("media cycler -> skipped (not representable in markdown)")
+            elif img.startswith("IFRAME:"):
+                notes.append(f"iframe -> skipped, URL not exported ({img[7:]})")
+            elif img.lower().endswith(VIDEO_EXTS):
+                notes.append("video emitted as image reference — won't play")
+            if notes:
+                title = (c.get("title") or "(untitled)").replace("\n", " ").strip()
+                drops.append({"slide": f"ch{si}.case{ci}", "title": title, "degraded": notes})
+    deck_notes = ["cover/bonus/map/close slides not exported (SECTIONS chapters+cases only)"]
+    return drops, deck_notes
+
+
+def print_fidelity(drops: list[dict], n_slides: int, deck_notes: list[str],
+                   as_json=False, stream=None):
+    stream = stream or sys.stdout
+    if as_json:
+        print(json.dumps({"slides": n_slides, "degraded": drops,
+                          "deck": deck_notes}, indent=2), file=stream)
+        return
+    print(f"\n── Fidelity report ── {n_slides} slides exported (markdown outline)", file=stream)
+    if not drops:
+        print("  nothing degraded per-slide — no advanced layouts/cyclers/iframes/videos in these chapters",
+              file=stream)
+    for d in drops:
+        print(f"  {d['slide']:>10}  {d['title'][:48]}", file=stream)
+        for n in d["degraded"]:
+            print(f"            · {n}", file=stream)
+    for n in deck_notes:
+        print(f"  ({n})", file=stream)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--html", type=Path, default=DEFAULT_HTML)
     ap.add_argument("--out", type=Path, default=None, help="write to file (default: stdout)")
     ap.add_argument("--chapter", type=int, default=None, help="index of single chapter to export")
+    ap.add_argument("--json", action="store_true", help="fidelity report as JSON")
+    ap.add_argument("--no-report", action="store_true", help="skip the fidelity report")
     args = ap.parse_args()
 
     sections = extract_sections(args.html)
@@ -124,6 +203,13 @@ def main() -> int:
         print(f"[done] Wrote {args.out}", file=sys.stderr)
     else:
         sys.stdout.write(text)
+    if not args.no_report:
+        # When the document itself goes to stdout, the report moves to stderr
+        # so the markdown stays clean.
+        n_slides = len(chapters) + sum(len(ch.get("cases") or []) for ch in chapters)
+        drops, deck_notes = structural_fidelity(chapters)
+        print_fidelity(drops, n_slides, deck_notes, args.json,
+                       stream=sys.stdout if args.out else sys.stderr)
     return 0
 
 
