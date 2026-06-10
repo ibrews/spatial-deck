@@ -96,6 +96,17 @@ body.vertical-mode .slide{position:relative;inset:auto;height:100vh;width:100%;o
 body.vertical-mode #deck{scroll-snap-type:y proximity}
 body.vertical-mode .slide[data-hidden="1"]{display:none}
 body.vertical-mode .bg{position:fixed}
+/* Print Mode (?print) — static paged render for PDF export. Shot Mode (?shot=N) — single-slide screenshot capture */
+body.print-mode{overflow:auto!important;height:auto!important}
+body.print-mode #deck{height:auto;overflow:visible}
+body.print-mode .slide{position:relative;inset:auto;width:100%;height:100vh;opacity:1!important;pointer-events:all!important;transform:none!important;animation:none!important;overflow:hidden;break-after:page;background:radial-gradient(ellipse 80% 60% at 15% 50%,rgba(124,58,237,.18) 0%,transparent 55%),radial-gradient(ellipse 60% 70% at 85% 20%,rgba(0,212,255,.12) 0%,transparent 55%),linear-gradient(180deg,var(--bg-dark) 0%,#0b0820 50%,var(--bg-dark) 100%)}
+body.print-mode .slide:last-child{break-after:auto}
+body.print-mode .slide[data-hidden="1"]{display:none}
+body.print-mode .bg,body.print-mode #counter,body.print-mode #brand,body.print-mode #step-indicator,body.print-mode .nav-arrows,body.print-mode #mobile-ui-toggle,body.print-mode #slide-grid-zone,body.print-mode #slide-grid,body.print-mode #anno-toggle,body.print-mode #move-toggle,body.print-mode #move-hud,body.print-mode #notes-drawer,body.print-mode #search-overlay,body.print-mode #anno-panel,body.print-mode #anno-toast{display:none!important}
+@media print{@page{size:13.333in 7.5in;margin:0}body.print-mode,body.print-mode *{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+body.shot-mode #counter,body.shot-mode #brand,body.shot-mode #step-indicator,body.shot-mode .nav-arrows,body.shot-mode #mobile-ui-toggle,body.shot-mode #slide-grid-zone,body.shot-mode #anno-toggle,body.shot-mode #move-toggle,body.shot-mode #move-hud{display:none!important}
+.sd-iframe-ph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;width:100%;height:100%;min-height:200px;border:1px dashed rgba(255,255,255,.25);border-radius:14px;background:rgba(255,255,255,.04);color:rgba(255,255,255,.55);font-size:.8rem;letter-spacing:.08em;text-align:center;padding:18px;word-break:break-all}
+.sd-iframe-ph .ph-kicker{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.35)}
 @keyframes slideInFwd{from{opacity:0;transform:translateX(6%) scale(.97)}to{opacity:1;transform:none}}
 @keyframes slideInBwd{from{opacity:0;transform:translateX(-6%) scale(.97)}to{opacity:1;transform:none}}
 @keyframes slideOutFwd{from{opacity:1;transform:none}to{opacity:0;transform:translateX(-6%) scale(.97)}}
@@ -1682,6 +1693,33 @@ setTimeout(updateDurationDisplay,100);
 })();
 
 // =====================================================================
+// FEATURE: EXPORT-MODE STATIC MEDIA (?print / ?shot=N)
+// =====================================================================
+// In export modes the media cycler renders its first item as a static
+// element (no canvas animation, no reveal, no auto-advance) so headless
+// captures are deterministic. Installed after the GIF wrapper so it wins
+// for every custom cycler IIFE below.
+(function(){
+  const q=new URLSearchParams(location.search);
+  if(!q.has('print')&&!q.has('shot'))return;
+  window._sdExportMode=true;
+  window.buildMediaCycler=function(sl,items,opts){
+    const mount=sl.querySelector('.media-cycler-mount');if(!mount||!Array.isArray(items)||!items.length)return;
+    const it=items.find(x=>x&&x.type==='image')||items[0];
+    const portrait=opts&&opts.portrait;
+    mount.innerHTML='';
+    mount.style.cssText='position:relative;width:100%;border-radius:18px;overflow:hidden;'+(portrait?'aspect-ratio:338/600':'aspect-ratio:16/10');
+    let el;
+    if(it.type==='image'){el=document.createElement('img');el.src=it.src;if(it.flipH)el.style.transform='scaleX(-1)';}
+    else if(it.type==='video'){el=document.createElement('video');el.src=it.src;el.muted=true;el.playsInline=true;el.preload='auto';el.addEventListener('loadedmetadata',()=>{try{el.currentTime=Math.min(0.1,(el.duration||1)/2);}catch(_){}});try{el.load();}catch(_){}}
+    else{el=document.createElement('div');el.style.cssText='display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,'+(it.color1||'rgba(0,212,255,.18)')+','+(it.color2||'rgba(6,8,16,.4)')+')';if(it.label){el.textContent=it.label;el.style.color='rgba(255,255,255,.18)';el.style.font='600 .85rem var(--font)';el.style.letterSpacing='.1em';el.style.textTransform='uppercase';}}
+    el.style.cssText+=';position:absolute;inset:0;width:100%;height:100%;object-fit:cover';
+    mount.appendChild(el);
+    sl.dataset.exportCycler=String(items.length);
+  };
+})();
+
+// =====================================================================
 // FEATURE: PACING MATH UPGRADES
 // (over video) marker · adaptive WPM · projected wall-clock finish
 // =====================================================================
@@ -2593,6 +2631,59 @@ updateHUD();
 
   // Hook slide changes so ribbon refreshes on next/prev
   const _prevUH=updateHUD;updateHUD=function(){_prevUH();renderRibbon();};
+})();
+
+// =====================================================================
+// FEATURE: PRINT / SHOT EXPORT MODES
+// =====================================================================
+// ?print  → all visible slides stacked as 16:9 pages (print CSS at top of
+//           file), steps run to completion, animations settled, iframes
+//           swapped for placeholders. Browser File>Print or headless
+//           Chrome --print-to-pdf both work; tools/export_pdf.py drives it.
+// ?shot=N → single slide N (absolute index, settings=0) full-viewport with
+//           chrome hidden, for per-slide screenshot capture.
+// Both modes append a JSON fidelity manifest (#sd-print-manifest) that the
+// export tools read via --dump-dom: per-slide type/title/flags for anything
+// that degraded (cycler→first frame, iframe→placeholder, video→frozen).
+(function(){
+  const q=new URLSearchParams(location.search);
+  const isPrint=q.has('print');
+  const shotRaw=q.get('shot');
+  if(!isPrint&&shotRaw===null)return;
+  // Everything below runs SYNCHRONOUSLY at parse time (the deck is fully
+  // built by this point in the script) so that even the earliest headless
+  // capture — Chrome dumps/shoots at the load event — sees the final state.
+  document.body.classList.remove('vertical-mode');window._verticalMode=false;
+  if(isPrint){document.body.classList.add('print-mode');}
+  else{
+    const n=Math.max(0,Math.min(allSlides.length-1,parseInt(shotRaw,10)||0));
+    document.body.classList.add('shot-mode');
+    try{const prev=allSlides[current];if(prev&&prev!==allSlides[n]){prev.classList.remove('active');}current=n;const tgt=allSlides[n];tgt.classList.add('active');tgt.style.animation='none';tgt.style.opacity='1';_primeSlideMedia(n);try{updateHUD();}catch(_){}}catch(_){try{goTo(n);}catch(__){}}
+    if(window.kfOnSlideEnter)try{window.kfOnSlideEnter();}catch(_){}
+  }
+  // Freeze videos on an early frame; swap iframes for placeholder panels.
+  document.querySelectorAll('#deck video').forEach(v=>{try{v.muted=true;v.autoplay=false;v.removeAttribute('autoplay');v.preload='auto';v.addEventListener('loadedmetadata',()=>{try{v.pause();v.currentTime=Math.min(0.1,(v.duration||1)/2);}catch(_){}});v.load();}catch(_){}});
+  document.querySelectorAll('#deck iframe').forEach(f=>{const src=f.src||'';const ph=document.createElement('div');ph.className='sd-iframe-ph';const k=document.createElement('span');k.className='ph-kicker';k.textContent='embedded content';const u=document.createElement('span');u.textContent=src;ph.appendChild(k);ph.appendChild(u);ph.style.minHeight=Math.max(200,f.offsetHeight||0)+'px';f.replaceWith(ph);});
+  // Fidelity manifest — read by tools/capture_slides.py via --dump-dom.
+  const slides=allSlides.map((sl,i)=>{
+    const o={i,type:sl.dataset.type||'',title:(sl.querySelector('.case-title,.lesson-title,.cover-title,h1,h2')?.textContent||sl.dataset.type||'').trim().slice(0,120),hidden:sl.dataset.hidden==='1'};
+    if(sl.dataset.exportCycler)o.cycler=+sl.dataset.exportCycler;
+    const ifr=sl.querySelectorAll('.sd-iframe-ph').length;if(ifr)o.iframes=ifr;
+    const vids=sl.querySelectorAll('video').length;if(vids)o.videos=vids;
+    return o;
+  });
+  const tag=document.createElement('script');tag.type='application/json';tag.id='sd-print-manifest';
+  tag.textContent=JSON.stringify({total:allSlides.length,visible:slides.filter(s=>!s.hidden).map(s=>s.i),slides});
+  document.body.appendChild(tag);
+  // Multi-step animations register via setTimeout(fn,0) — run them to
+  // completion one macrotask later, then settle any in-flight animations.
+  function finishAnims(){try{document.getAnimations().forEach(a=>{try{a.finish();}catch(_){try{a.cancel();}catch(__){}}});}catch(_){}}
+  setTimeout(()=>{setTimeout(()=>{
+    try{slideSteps.forEach((st)=>{if(!st||!Array.isArray(st.steps))return;for(let i=st.current||0;i<st.steps.length;i++){try{st.steps[i]();}catch(_){}}st.current=st.steps.length;});}catch(_){}
+    finishAnims();
+    document.title='SD-EXPORT-READY';
+  },30);},30);
+  window.addEventListener('load',()=>{setTimeout(finishAnims,400);});
 })();
 </script>
 </body>
