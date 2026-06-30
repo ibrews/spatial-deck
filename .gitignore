@@ -5,6 +5,7 @@
 .idea/
 .vscode/
 .claude/launch.json
+.codex/
 node_modules/
 __pycache__/
 *.pyc
@@ -18,3 +19,8 @@ source/media/
 
 # fleet_client.py — local LLM provider config (copy from tools/providers.json.example)
 tools/providers.json
+
+# deck import/roundtrip tool outputs — regenerated on demand
+media/
+tools/imported-*.json
+tools/palette-*.css
