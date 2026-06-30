@@ -4,6 +4,7 @@
 *~
 .idea/
 .vscode/
+.claude/launch.json
 node_modules/
 __pycache__/
 *.pyc
