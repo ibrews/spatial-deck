@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<title>Spatial Deck — Promo (Auto)</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+/* Local captured fonts — avoids Google Fonts runtime dependency.
+   TTF files are real; family names are what we render with. */
+@font-face{
+  font-family:'Space Grotesk';
+  src:url('capture/assets/fonts/V8mQoQDjQSkFtoMM3T6r8E7mF71Q-gOoraIAEj42Vksj.ttf') format('truetype');
+  font-weight:400;font-style:normal;font-display:block;
+}
+@font-face{
+  font-family:'Space Grotesk';
+  src:url('capture/assets/fonts/V8mQoQDjQSkFtoMM3T6r8E7mF71Q-gOoraIAEj4PVksj.ttf') format('truetype');
+  font-weight:700;font-style:normal;font-display:block;
+}
+@font-face{
+  font-family:'JetBrains Mono';
+  src:url('capture/assets/fonts/tDbY2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8-qxjPQ.ttf') format('truetype');
+  font-weight:400;font-style:normal;font-display:block;
+}
+@font-face{
+  font-family:'JetBrains Mono';
+  src:url('capture/assets/fonts/tDbY2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKxjPQ.ttf') format('truetype');
+  font-weight:700;font-style:normal;font-display:block;
+}
+
+:root{
+  --bg1:#0b0820; --bg2:#060810;
+  --teal:#00d4ff; --purple:#a78bfa; --amber:#f59e0b; --rose:#f43f5e; --green:#22c55e;
+  --ink:#f0f4ff;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1920px;height:1080px;overflow:hidden;background:#000;font-family:'Space Grotesk','Inter',system-ui,sans-serif;color:var(--ink)}
+
+.scene{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,#1a1238 0%,var(--bg1) 45%,var(--bg2) 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:120px;text-align:center;overflow:hidden}
+.scene .aura{position:absolute;inset:-10%;background:radial-gradient(circle at 50% 50%,rgba(244,63,94,.18),transparent 55%);pointer-events:none;mix-blend-mode:screen;z-index:0;opacity:.35}
+.scene .scan{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0,transparent 2px,rgba(255,255,255,.012) 2px,rgba(255,255,255,.012) 3px);z-index:6;mix-blend-mode:overlay}
+.scene > *:not(.aura):not(.scan){position:relative;z-index:1}
+
+.kicker{font-family:'JetBrains Mono',monospace;font-size:22px;letter-spacing:7px;color:rgba(240,244,255,.55);text-transform:uppercase;margin-bottom:40px}
+
+/* ── Beat 1 ── */
+.hero-title{font-size:148px;font-weight:700;line-height:.95;letter-spacing:-.025em;max-width:1600px}
+.hero-title .word{display:inline-block}
+.hero-title .gradient-word{display:inline-block;background:linear-gradient(90deg,var(--rose),var(--purple),var(--teal),var(--rose));background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* ── Beat 2 ── */
+.term{width:1200px;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.14);border-radius:20px;padding:40px 48px;font-family:'JetBrains Mono',monospace;font-size:28px;box-shadow:0 24px 80px rgba(0,0,0,.6);text-align:left}
+.term .bar{display:flex;gap:10px;margin-bottom:26px}
+.term .bar i{width:16px;height:16px;border-radius:50%;display:inline-block}
+.term .bar i:nth-child(1){background:#ff5f57}.term .bar i:nth-child(2){background:#febc2e}.term .bar i:nth-child(3){background:#28c840}
+.term .line{color:rgba(240,244,255,.92);line-height:1.6}
+.term .line .prompt{color:var(--rose)}.term .line .cmd{color:var(--teal)}.term .line .arg{color:var(--amber)}
+.term .out{color:var(--green);margin-top:16px;line-height:1.6;opacity:0}
+.swatches{display:flex;gap:22px;margin-top:36px;justify-content:center}
+.sw{width:84px;height:84px;border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.45);opacity:0}
+
+/* ── Beat 3 ── */
+.scale-wrap{display:flex;flex-direction:column;align-items:center;gap:50px;width:100%}
+.device{position:relative;width:1300px;height:560px;border-radius:18px;border:2px solid rgba(244,63,94,.45);overflow:hidden;box-shadow:0 30px 100px rgba(0,0,0,.7);background:#0b0820;opacity:0}
+.device img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center}
+.device .device-grade{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 30%,rgba(11,8,32,.65) 100%);pointer-events:none;z-index:3}
+.device .device-badge{position:absolute;top:20px;left:20px;padding:8px 16px;background:rgba(244,63,94,.95);color:#fff;font-family:'JetBrains Mono',monospace;font-size:16px;letter-spacing:4px;border-radius:6px;z-index:4}
+.stat-row{display:flex;gap:80px;align-items:flex-end;font-family:'JetBrains Mono',monospace}
+.stat{display:flex;flex-direction:column;align-items:center;gap:10px}
+.stat .num{font-size:220px;font-weight:700;line-height:.9;letter-spacing:-.02em}
+.stat.teal .num{color:var(--teal)}
+.stat.amber .num{color:var(--amber)}
+.stat .lbl{font-size:22px;letter-spacing:6px;color:rgba(240,244,255,.65);text-transform:uppercase}
+.stat-sep{font-size:180px;color:rgba(240,244,255,.25);font-weight:300;line-height:.9}
+.chips{display:flex;flex-wrap:wrap;gap:20px;justify-content:center}
+.chip{padding:16px 30px;border-radius:999px;border:2px solid;font-family:'JetBrains Mono',monospace;font-size:20px;letter-spacing:3px;font-weight:600;opacity:0}
+.chip.teal{border-color:var(--teal);color:var(--teal);background:rgba(0,212,255,.1)}
+.chip.purple{border-color:var(--purple);color:var(--purple);background:rgba(167,139,250,.1)}
+.chip.amber{border-color:var(--amber);color:var(--amber);background:rgba(245,158,11,.1)}
+.chip.rose{border-color:var(--rose);color:var(--rose);background:rgba(244,63,94,.1)}
+
+/* ── Beat 4 ── */
+.verbs{display:flex;gap:60px;justify-content:center;font-size:140px;font-weight:700;letter-spacing:-.02em;line-height:1}
+.verbs .v{opacity:0}
+.verbs .v.rose{color:var(--rose)}
+.verbs .v.teal{color:var(--teal)}
+.verbs .v.purple{color:var(--purple)}
+.logo{font-size:148px;font-weight:700;letter-spacing:-.025em;margin-top:40px;opacity:0}
+.logo .gradient{background:linear-gradient(90deg,var(--rose),var(--purple),var(--teal),var(--rose));background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block}
+.tagline{font-family:'JetBrains Mono',monospace;font-size:24px;letter-spacing:7px;color:rgba(240,244,255,.6);margin-top:24px;opacity:0}
+.url{font-family:'JetBrains Mono',monospace;font-size:34px;color:var(--teal);padding:18px 36px;border:2px solid var(--teal);border-radius:14px;display:inline-block;box-shadow:0 0 40px rgba(0,212,255,.3);margin-top:36px;opacity:0}
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="17" data-width="1920" data-height="1080">
+
+  <!-- BEAT 1 — Hook (0 - 3.5) -->
+  <div id="b1" class="scene clip" data-start="0" data-duration="3.5" data-track-index="1">
+    <div class="aura"></div>
+    <div class="scan"></div>
+    <div class="kicker">SPATIAL DECK · PROMO</div>
+    <h1 class="hero-title">
+      <span class="word">Your</span> <span class="word">deck</span> <span class="word">is</span> <span class="word gradient-word">data.</span><br/>
+      <span class="word">Treat</span> <span class="word">it</span> <span class="word">like</span> <span class="word gradient-word">code.</span>
+    </h1>
+  </div>
+
+  <!-- BEAT 2 — Handoff (3.5 - 8) -->
+  <div id="b2" class="scene clip" data-start="3.5" data-duration="4.5" data-track-index="1">
+    <div class="aura"></div>
+    <div class="scan"></div>
+    <div class="kicker" style="color:var(--purple)">HAND OFF FROM CLAUDE DESIGN →</div>
+    <div class="term">
+      <div class="bar"><i></i><i></i><i></i></div>
+      <div class="line"><span class="prompt">$</span> <span class="cmd">python</span> <span class="arg">tools/import_tokens.py</span> claude-design.css</div>
+      <div class="out b2-out">→ palette synced · 5 tokens</div>
+      <div class="out b2-out">→ fonts mapped (Space Grotesk, JetBrains Mono)</div>
+      <div class="out b2-out">✓ deck restyled in 0.4s</div>
+    </div>
+    <div class="swatches">
+      <div class="sw b2-sw" style="background:#00d4ff"></div>
+      <div class="sw b2-sw" style="background:#a78bfa"></div>
+      <div class="sw b2-sw" style="background:#f43f5e"></div>
+      <div class="sw b2-sw" style="background:#f59e0b"></div>
+      <div class="sw b2-sw" style="background:#22c55e"></div>
+    </div>
+  </div>
+
+  <!-- BEAT 3 — 18 slides · 4 chapters (8 - 12.5) -->
+  <div id="b3" class="scene clip" data-start="8" data-duration="4.5" data-track-index="1">
+    <div class="aura"></div>
+    <div class="scan"></div>
+    <div class="kicker" style="color:var(--rose)">LIVE DECK</div>
+    <div class="scale-wrap">
+      <div class="device">
+        <span class="device-badge">HERO</span>
+        <img src="capture/screenshots/scroll-000.png" alt="Spatial Deck hero screenshot"/>
+        <div class="device-grade"></div>
+      </div>
+      <div class="stat-row">
+        <div class="stat teal"><span class="num" data-target="18">0</span><span class="lbl">Slides</span></div>
+        <div class="stat-sep">·</div>
+        <div class="stat amber"><span class="num" data-target="4">0</span><span class="lbl">Chapters</span></div>
+      </div>
+      <div class="chips">
+        <div class="chip teal b3-chip">CH 1 · DEFINE THE SPATIAL</div>
+        <div class="chip purple b3-chip">CH 2 · MATCH THE PLATFORM</div>
+        <div class="chip amber b3-chip">CH 3 · ITERATION SPEED</div>
+        <div class="chip rose b3-chip">CH 4 · DECK AS CODE</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BEAT 4 — Closer (12.5 - 17) -->
+  <div id="b4" class="scene clip" data-start="12.5" data-duration="4.5" data-track-index="1">
+    <div class="aura"></div>
+    <div class="scan"></div>
+    <div class="verbs">
+      <span class="v rose">Merge.</span>
+      <span class="v teal">Diff.</span>
+      <span class="v purple">Ship.</span>
+    </div>
+    <div class="logo"><span class="gradient">Spatial Deck</span></div>
+    <div class="tagline">ZERO BUILD · ONE FILE · YOURS TO FORK</div>
+    <div class="url">github.com/ibrews/spatial-deck</div>
+  </div>
+
+</div>
+
+<script>
+window.__timelines = window.__timelines || {};
+const tl = gsap.timeline({ paused: true });
+
+// ── Ambient aura breath — 128 BPM, attached to master tl so hyperframes scrubs it.
+// 17s / (0.469s half-beat) ≈ 36 half-beats.
+const BEAT = 0.469;
+for (let i = 0; i < 36; i++) {
+  const t = i * BEAT / 2;
+  tl.to('.scene .aura', { opacity: 0.75, scale: 1.06, duration: BEAT/2, ease: 'sine.inOut' }, t);
+  tl.to('.scene .aura', { opacity: 0.35, scale: 1.00, duration: BEAT/2, ease: 'sine.inOut' }, t + BEAT/2);
+}
+
+// ── Kicker helper (uniform for every beat)
+function kickerIn(sel, t){
+  tl.fromTo(sel + ' .kicker', {y:-24, opacity:0}, {y:0, opacity:1, duration:0.45, ease:'power2.out'}, t);
+}
+
+// ── BEAT 1 (0 - 3.5) ──
+kickerIn('#b1', 0);
+tl.fromTo('#b1 .word', {y:60, opacity:0}, {y:0, opacity:1, duration:0.45, stagger:0.09, ease:'back.out(1.4)'}, 0.35);
+tl.fromTo('#b1 .gradient-word', {backgroundPosition:'0% 0%'}, {backgroundPosition:'300% 0%', duration:3.15, ease:'none'}, 0.35);
+// Exit (velocity up)
+tl.to('#b1', {y:-80, opacity:0, filter:'blur(16px)', duration:0.4, ease:'power2.in'}, 3.1);
+
+// ── BEAT 2 (3.5 - 8) ──
+kickerIn('#b2', 3.5);
+tl.fromTo('#b2 .term', {y:50, opacity:0}, {y:0, opacity:1, duration:0.6, ease:'power3.out'}, 3.6);
+tl.fromTo('#b2 .b2-out', {x:-16, opacity:0}, {x:0, opacity:1, duration:0.35, stagger:0.4, ease:'power2.out'}, 4.4);
+tl.fromTo('#b2 .b2-sw', {scale:0.3, rotate:-12, opacity:0}, {scale:1, rotate:0, opacity:1, duration:0.4, stagger:0.12, ease:'back.out(1.6)'}, 5.9);
+// Terminal breath (on child — no transform collision with y-entrance)
+tl.fromTo('#b2 .term .bar', {scale:1}, {scale:1.015, duration:4.3, ease:'sine.inOut'}, 3.6);
+// Exit (blur-through)
+tl.to('#b2', {opacity:0, filter:'blur(16px)', duration:0.35, ease:'power2.in'}, 7.65);
+
+// ── BEAT 3 (8 - 12.5) ──
+kickerIn('#b3', 8);
+tl.fromTo('#b3 .device', {opacity:0, rotationY:-20, transformPerspective:1200}, {opacity:1, rotationY:-8, duration:0.6, ease:'power2.out'}, 8.1);
+// Ken Burns on image (child of device — avoids collision with device rotationY)
+tl.fromTo('#b3 .device img', {scale:1.02, x:-8}, {scale:1.08, x:8, duration:4.3, ease:'none'}, 8.2);
+// Count-up on stats
+const countTargets = [
+  { sel:'#b3 .stat.teal .num', target:18 },
+  { sel:'#b3 .stat.amber .num', target:4 }
+];
+countTargets.forEach(({sel,target})=>{
+  const obj = { v:0 };
+  tl.to(obj, { v:target, duration:0.9, ease:'power2.out',
+    onUpdate(){ document.querySelectorAll(sel).forEach(n=> n.textContent = Math.round(obj.v)); }
+  }, 8.5);
+});
+tl.fromTo('#b3 .b3-chip', {y:20, scale:0.75, opacity:0}, {y:0, scale:1, opacity:1, duration:0.35, stagger:0.18, ease:'back.out(1.6)'}, 10.2);
+// Chip pulse
+tl.to('#b3 .b3-chip', {scale:1.06, duration:0.22, stagger:{each:0.15, repeat:3, yoyo:true}, ease:'sine.inOut'}, 11.5);
+// Exit (zoom-through on a wrapper — animate child to avoid clobbering device transforms)
+tl.to('#b3 .scale-wrap', {scale:1.12, opacity:0, filter:'blur(20px)', duration:0.35, ease:'power3.in'}, 12.15);
+
+// ── BEAT 4 (12.5 - 17) ──
+tl.fromTo('#b4 .verbs .v', {x:-80, opacity:0}, {x:0, opacity:1, duration:0.3, stagger:0.22, ease:'power3.out'}, 12.6);
+tl.fromTo('#b4 .logo', {scale:1.05, opacity:0}, {scale:1, opacity:1, duration:0.55, ease:'power2.out'}, 13.5);
+tl.fromTo('#b4 .logo .gradient', {backgroundPosition:'0% 0%'}, {backgroundPosition:'300% 0%', duration:3.5, ease:'none'}, 13.5);
+tl.fromTo('#b4 .tagline', {y:14, opacity:0}, {y:0, opacity:1, duration:0.4, ease:'power2.out'}, 13.9);
+tl.fromTo('#b4 .url', {y:20, opacity:0}, {y:0, opacity:1, duration:0.5, ease:'power2.out'}, 14.3);
+tl.to('#b4 .url', {boxShadow:'0 0 70px rgba(0,212,255,0.65)', duration:0.6, repeat:3, yoyo:true, ease:'sine.inOut'}, 14.9);
+
+// Deterministic end-state kill for b1 (caption-style exit safety)
+tl.set('#b1', { opacity:0, visibility:'hidden' }, 3.5);
+tl.set('#b2', { opacity:0, visibility:'hidden' }, 8.0);
+tl.set('#b3 .scale-wrap', { opacity:0, visibility:'hidden' }, 12.5);
+
+window.__timelines['main'] = tl;
+</script>
+</body>
+</html>

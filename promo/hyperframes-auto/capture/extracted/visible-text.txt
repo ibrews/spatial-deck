@@ -1,0 +1,43 @@
+[div] replay ·
+[div] sound
+[div] Spatial Deck
+[h1] Your deck is
+[span] data.
+[h1] Treat it like
+[span] code.
+[div] Hand off from Claude Design →
+[span] python tools/import_tokens.py claude-design.css
+[div] ✓ palette synced · 5 tokens
+[div] LIVE DECK
+[div] 18 SLIDES · 4 CHAPTERS
+[span] python tools/import_pptx.py talk.pptx
+[div] ✓ 4 chapters · 18 cases · merged
+[div] CH 1 · DEFINE THE SPATIAL
+[div] CH 2 · MATCH THE PLATFORM
+[div] CH 3 · ITERATION SPEED
+[div] CH 4 · DECK AS CODE
+[div] FEATURES
+[div] Claude Design
+[div] TOKENS
+[div] STYLES
+[div] HANDOFF
+[div] Spatial Deck
+[div] LIVING DECK
+[div] ZERO BUILD
+[div] YOURS TO FORK
+[div] The deck runtime for
+[b] Claude Design
+[div] output.
+[span] Merge.
+[span] Diff.
+[span] Ship.
+[span] Spatial Deck
+[div] ZERO BUILD · ONE FILE · YOURS TO FORK
+[div] github.com/ibrews/spatial-deck
+[span] .md
+[span] .html
+[span] .pptx
+[span] .pdf
+[span] .css
+[div] Complements
+[b] Claude Design

@@ -1,0 +1,12 @@
+[
+  {
+    "url": "http://localhost:8765/images/ch4-case3-mergediff.svg",
+    "type": "Image",
+    "contexts": [
+      "img[src]"
+    ],
+    "notes": null,
+    "sectionClasses": "hero",
+    "aboveFold": true
+  }
+]
