@@ -1004,3 +1004,7 @@ spatial-deck/
 MIT — use it for anything.
 
 Built with 🎭 by [Alex Coulombe](https://twitter.com/ibrews) at [Agile Lens](https://agilelens.com).
+
+## Support
+
+If you like seeing this kind of thing get built and shared, [donations are always welcome](https://www.alexcoulombepresents.com/support) — they buy hardware, render time, and the freedom to keep giving most of this away.
