@@ -1003,7 +1003,7 @@ spatial-deck/
 
 MIT — use it for anything.
 
-Built with 🎭 by [Alex Coulombe](https://twitter.com/ibrews) at [Agile Lens](https://agilelens.com).
+Built with 🎭 by [Alex Coulombe Presents](https://github.com/ibrews).
 
 ## Support
 
