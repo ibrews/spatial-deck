@@ -224,6 +224,8 @@ Set `layout:` on a case study entry:
 
 *Move mode shows a HUD with modifier hints. Drag any element to reposition it. Transforms are auto-saved as annotations (type: 'move'). The animation scrubber at the bottom lets you replay slide animations and set keyframe animations.*
 
+Accidental micro-drags are treated as no-ops: translations under 5px, scale changes under 0.02, and rotations under 1° restore the element's exact original transform without adding undo history or annotations. Changes at those thresholds are committed normally.
+
 | Key/Action | Effect |
 |------------|--------|
 | `Drag` | Translate element |
