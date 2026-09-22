@@ -2,19 +2,19 @@
 """
 import_kb_deck.py — Import a knowledge-base-style deck folder into Spatial Deck.
 
-A purpose-built importer for the per-slide markdown + SECTIONS.json format
-produced by overnight AI agents. Different from import_md.py (which expects a
-flat single-file markdown convention) in three ways:
+A purpose-built importer for the two knowledge-base deck formats produced by
+AI agents. Different from import_md.py (which expects a flat single-file
+markdown convention) in three ways:
 
-  1. Source is a *directory* with `SECTIONS.json` + `slides/NN-*.md` files.
-  2. Each slide carries YAML frontmatter (slide, section, speaker, layout, ...)
-     and a `## Speaker Notes` block.
-  3. SECTIONS.json carries `design_tokens` (variant-specific colours/fonts) and
-     a canonical `sections` array. We use that for grouping order, not the
-     frontmatter `section:` value (frontmatter still feeds per-slide metadata).
+  1. KB mode uses `SECTIONS.json` + `slides/NN-*.md` files. Each slide carries
+     YAML frontmatter and a `## Speaker Notes` block.
+  2. FMX mode uses one numbered `slides.md`; its fully formed SECTIONS.json is
+     overlaid with canonical slide order, titles, speakers, and notes.
+  3. Both modes fail closed on malformed manifests or missing slide sources.
 
 CLI:
   python3 tools/import_kb_deck.py <deck_dir> --out <out.html>
+                                   [--format auto|kb|fmx]
                                    [--title "..."] [--template /path/to/index.html]
 
 Defaults:
@@ -49,6 +49,7 @@ is fine — Spatial Deck supports arbitrary section/case counts.
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import re
 import sys
@@ -62,8 +63,23 @@ SPEAKER_NOTES_RE = re.compile(
     re.DOTALL | re.MULTILINE | re.IGNORECASE,
 )
 BULLET_RE = re.compile(r"^[\s]*(?:[-*+]|\d+\.)\s+(.+?)\s*$", re.MULTILINE)
+FMX_SLIDE_RE = re.compile(r"^##\s+(\d+)\.\s+(.+?)\s*$", re.MULTILINE)
+FMX_ROLE_RE = re.compile(
+    r"^CH\s*(\d+)\s+(Lesson|Case\s+(\d+))(?:\s+[—–-]\s+(.+))?$",
+    re.IGNORECASE,
+)
+FMX_NOTES_RE = re.compile(
+    r"^\*\*Speaker\s+notes(?:\s*\(([^)]+)\))?:\*\*\s*(.*)$",
+    re.IGNORECASE,
+)
+FMX_SPEAKER_RE = re.compile(r"^\*\*Speaker:\*\*\s*(.+?)\s*$", re.IGNORECASE)
+FMX_FIELD_RE = re.compile(r"^\*\*[^*]+:\*\*")
 
 ACCENT_CYCLE = ["teal", "purple", "amber", "rose"]
+
+
+class ImportInputError(ValueError):
+    """Input is incomplete or malformed and must not be imported."""
 
 
 # ---------------------------------------------------------------------------
@@ -181,6 +197,267 @@ def _strip_md(text: str, keep_newlines: bool = False) -> str:
     if not keep_newlines:
         text = re.sub(r"\s+", " ", text)
     return text.strip()
+
+
+# ---------------------------------------------------------------------------
+# FMX single-file parsing
+# ---------------------------------------------------------------------------
+
+def _fmx_blockquote(lines: list[str]) -> str:
+    """Normalize a speaker-note block while preserving paragraph breaks."""
+    out: list[str] = []
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith(">"):
+            stripped = stripped[1:].lstrip()
+        out.append(stripped)
+    return _strip_md("\n".join(out).strip(), keep_newlines=True)
+
+
+def _fmx_notes_and_speaker(body: str) -> tuple[str, str]:
+    """Read labeled speaker notes, or a standalone blockquote as fallback."""
+    lines = body.splitlines()
+    speaker = ""
+    notes: list[str] = []
+
+    for line in lines:
+        match = FMX_SPEAKER_RE.match(line.strip())
+        if match:
+            speaker = match.group(1).strip()
+            break
+
+    for index, line in enumerate(lines):
+        match = FMX_NOTES_RE.match(line.strip())
+        if not match:
+            continue
+        if match.group(1) and not speaker:
+            speaker = match.group(1).strip()
+        chunk: list[str] = []
+        if match.group(2).strip():
+            chunk.append(match.group(2).strip())
+        for following in lines[index + 1:]:
+            stripped = following.strip()
+            if stripped == "---" or FMX_FIELD_RE.match(stripped):
+                break
+            chunk.append(following)
+        value = _fmx_blockquote(chunk)
+        if value:
+            notes.append(value)
+
+    if notes:
+        return "\n\n".join(notes), speaker
+
+    # Some early FMX drafts used an otherwise-unlabeled blockquote for notes.
+    # Only accept it when the block has no labeled fields, avoiding confusion
+    # with `Big text:` and other quoted display copy.
+    if not any(FMX_FIELD_RE.match(line.strip()) for line in lines):
+        quoted = [line for line in lines if line.strip().startswith(">")]
+        if quoted:
+            return _fmx_blockquote(quoted), speaker
+    return "", speaker
+
+
+def _fmx_big_text(body: str) -> str:
+    lines = body.splitlines()
+    for index, line in enumerate(lines):
+        if line.strip().lower() != "**big text:**":
+            continue
+        quoted: list[str] = []
+        for following in lines[index + 1:]:
+            if not following.strip().startswith(">"):
+                break
+            quoted.append(following)
+        return "<br>".join(
+            line.strip()[1:].lstrip() for line in quoted if line.strip()[1:].strip()
+        )
+    return ""
+
+
+def _fmx_subtitle(body: str) -> str:
+    match = re.search(r"^\*\*Sub:?\*\*\s*(.+?)\s*$", body, re.MULTILINE)
+    return _strip_md(match.group(1)) if match else ""
+
+
+def parse_fmx_slides(text: str) -> list[dict]:
+    """Parse numbered FMX `## N. Title` blocks in declared slide order."""
+    matches = list(FMX_SLIDE_RE.finditer(text))
+    if not matches:
+        raise ImportInputError(
+            "slides.md has no numbered slide headings (expected '## N. Title')"
+        )
+
+    slides: list[dict] = []
+    for index, match in enumerate(matches):
+        number = int(match.group(1))
+        expected = int(matches[0].group(1)) + index
+        if number != expected:
+            raise ImportInputError(
+                f"slides.md numbering is not contiguous: expected {expected}, got {number}"
+            )
+        body_end = matches[index + 1].start() if index + 1 < len(matches) else len(text)
+        body = text[match.end():body_end].strip()
+        heading = match.group(2).strip()
+        role = FMX_ROLE_RE.match(heading)
+        notes, speaker = _fmx_notes_and_speaker(body)
+        slides.append({
+            "number": number,
+            "heading": heading,
+            "body": body,
+            "chapter": int(role.group(1)) if role else None,
+            "kind": role.group(2).lower() if role else "special",
+            "case": int(role.group(3)) if role and role.group(3) else None,
+            "title": (role.group(4).strip() if role and role.group(4)
+                      else _fmx_big_text(body) or heading),
+            "subtitle": _fmx_subtitle(body),
+            "notes": notes,
+            "speaker": speaker,
+        })
+    return slides
+
+
+def validate_kb_manifest(manifest: object) -> dict:
+    if not isinstance(manifest, dict):
+        raise ImportInputError("KB SECTIONS.json must be a JSON object")
+    sections = manifest.get("sections")
+    if not isinstance(sections, list) or not sections:
+        raise ImportInputError("KB SECTIONS.json 'sections' must be a non-empty array")
+    for index, section in enumerate(sections):
+        if not isinstance(section, dict):
+            raise ImportInputError(f"KB section {index} must be an object")
+        slide_ids = section.get("slides")
+        if (not isinstance(slide_ids, list) or not slide_ids
+                or not all(isinstance(sid, str) and sid.strip() for sid in slide_ids)):
+            raise ImportInputError(
+                f"KB section {index} 'slides' must be a non-empty array of slide ids"
+            )
+    return manifest
+
+
+def validate_fmx_manifest(manifest: object) -> tuple[list[dict], dict]:
+    metadata = manifest if isinstance(manifest, dict) else {}
+    sections = manifest.get("sections") if isinstance(manifest, dict) else manifest
+    if not isinstance(sections, list) or not sections:
+        raise ImportInputError(
+            "FMX SECTIONS.json must be a non-empty Spatial Deck array "
+            "(or an object containing that array as 'sections')"
+        )
+    for index, section in enumerate(sections):
+        if not isinstance(section, dict):
+            raise ImportInputError(f"FMX section {index} must be an object")
+        lesson = section.get("lesson")
+        cases = section.get("cases")
+        if not isinstance(lesson, dict) or not isinstance(lesson.get("title"), str):
+            raise ImportInputError(
+                f"FMX section {index} requires lesson.title"
+            )
+        if (not isinstance(cases, list)
+                or not all(isinstance(case, dict) for case in cases)):
+            raise ImportInputError(f"FMX section {index} 'cases' must be an array")
+        for case_index, case in enumerate(cases):
+            if not isinstance(case.get("title"), str):
+                raise ImportInputError(
+                    f"FMX section {index} case {case_index} requires title"
+                )
+    return copy.deepcopy(sections), metadata
+
+
+def build_fmx_sections(manifest: object, slides_text: str) -> tuple[list, dict, dict, dict]:
+    """Overlay an FMX manifest with canonical order/copy from slides.md."""
+    sections, _ = validate_fmx_manifest(manifest)
+    editorial = parse_fmx_slides(slides_text)
+    chapters: dict[int, dict] = {}
+    chapter_order: list[int] = []
+    for slide in editorial:
+        chapter = slide["chapter"]
+        if chapter is None:
+            continue
+        if chapter not in chapters:
+            chapters[chapter] = {"lesson": None, "cases": []}
+            chapter_order.append(chapter)
+        if slide["kind"] == "lesson":
+            if chapters[chapter]["lesson"] is not None:
+                raise ImportInputError(f"slides.md has duplicate CH{chapter} Lesson")
+            chapters[chapter]["lesson"] = slide
+        else:
+            chapters[chapter]["cases"].append(slide)
+
+    if len(chapter_order) != len(sections):
+        raise ImportInputError(
+            "FMX slide/manifest mismatch: slides.md has "
+            f"{len(chapter_order)} chapters but SECTIONS.json has {len(sections)}"
+        )
+
+    sections_by_chapter: dict[int, dict] = {}
+    for section in sections:
+        year_match = re.fullmatch(r"CH\s*(\d+)", str(section.get("year", "")), re.I)
+        if not year_match:
+            sections_by_chapter = {}
+            break
+        chapter = int(year_match.group(1))
+        if chapter in sections_by_chapter:
+            raise ImportInputError(f"FMX SECTIONS.json has duplicate CH{chapter}")
+        sections_by_chapter[chapter] = section
+    if sections_by_chapter and set(sections_by_chapter) != set(chapter_order):
+        raise ImportInputError(
+            "FMX chapter ids differ between slides.md and SECTIONS.json"
+        )
+
+    ordered_sections: list[dict] = []
+    notes_map: dict[str, str] = {}
+    speakers_map: dict[str, str] = {}
+    for section_index, chapter in enumerate(chapter_order):
+        section = (sections_by_chapter.get(chapter)
+                   if sections_by_chapter else sections[section_index])
+        group = chapters[chapter]
+        lesson_slide = group["lesson"]
+        if lesson_slide is None:
+            raise ImportInputError(f"slides.md is missing CH{chapter} Lesson")
+        case_slides = sorted(group["cases"], key=lambda slide: slide["case"])
+        case_numbers = [slide["case"] for slide in case_slides]
+        if case_numbers != list(range(1, len(case_slides) + 1)):
+            raise ImportInputError(
+                f"slides.md CH{chapter} case numbers must be contiguous from 1"
+            )
+        if len(case_slides) != len(section["cases"]):
+            raise ImportInputError(
+                f"FMX CH{chapter} has {len(case_slides)} cases in slides.md but "
+                f"{len(section['cases'])} in SECTIONS.json"
+            )
+
+        lesson = section["lesson"]
+        lesson["title"] = lesson_slide["title"]
+        if lesson_slide["notes"]:
+            lesson["notes"] = lesson_slide["notes"]
+        if lesson_slide["speaker"]:
+            lesson["_speaker"] = lesson_slide["speaker"]
+        lesson_key = f"slide-{lesson_slide['number']}"
+        notes_map[lesson_key] = lesson.get("notes", "")
+        speakers_map[lesson_key] = lesson_slide["speaker"]
+
+        ordered_cases: list[dict] = []
+        for case, slide in zip(section["cases"], case_slides):
+            case["title"] = slide["title"]
+            if slide["subtitle"]:
+                case["subtitle"] = slide["subtitle"]
+            if slide["notes"]:
+                case["notes"] = slide["notes"]
+            if slide["speaker"]:
+                case["_speaker"] = slide["speaker"]
+            case["_id"] = f"slide-{slide['number']}"
+            ordered_cases.append(case)
+            key = case["_id"]
+            notes_map[key] = case.get("notes", "")
+            speakers_map[key] = slide["speaker"]
+        section["cases"] = ordered_cases
+        ordered_sections.append(section)
+
+    cover = next((slide for slide in editorial if slide["number"] == 0), None)
+    cover_info = {
+        "title": cover["title"] if cover else "",
+        "subtitle": cover["subtitle"] if cover else "",
+        "editorial_count": len(editorial),
+    }
+    return ordered_sections, notes_map, speakers_map, cover_info
 
 
 # ---------------------------------------------------------------------------
@@ -325,6 +602,7 @@ def parse_slide(path: Path) -> dict:
 
 def build_sections(deck_dir: Path, manifest: dict) -> tuple[list, dict, dict]:
     """Build the SECTIONS list plus speaker_notes/speakers dicts."""
+    validate_kb_manifest(manifest)
     slides_dir = deck_dir / "slides"
     # Index every slide file by stem
     slide_files = {p.stem: p for p in sorted(slides_dir.glob("*.md"))}
@@ -342,11 +620,16 @@ def build_sections(deck_dir: Path, manifest: dict) -> tuple[list, dict, dict]:
             if not p:
                 # Try fuzzy match (e.g. id without leading zero or extension)
                 matches = [v for k, v in slide_files.items() if k.startswith(sid)]
-                if matches:
+                if len(matches) == 1:
                     p = matches[0]
+                elif len(matches) > 1:
+                    raise ImportInputError(
+                        f"KB slide id '{sid}' is ambiguous ({len(matches)} matches)"
+                    )
             if not p:
-                print(f"  [warn] slide '{sid}' referenced in section '{section_name}' not found", file=sys.stderr)
-                continue
+                raise ImportInputError(
+                    f"KB section '{section_name}' references missing slide '{sid}'"
+                )
             slides.append(parse_slide(p))
 
         if not slides:
@@ -372,6 +655,10 @@ def build_sections(deck_dir: Path, manifest: dict) -> tuple[list, dict, dict]:
             "short":   re.sub(r"-", " ", section_name).upper(),
             "tagline": first["subtitle"] or first["title"],
             "tags":    " · ".join(speakers_in_sec) if speakers_in_sec else "",
+            "notes":   first["notes"],
+            "_speaker": first["_speaker"],
+            "_layout": first["_layout"],
+            "_id": first["id"],
         }
         cases = []
         for s in slides[1:]:
@@ -449,7 +736,9 @@ def patch_template(template_html: str, *,
     # 3. Update cover slide title (cov.innerHTML = `...<h1 class="talk-title">...`)
     if cover_title:
         # Replace the first .talk-title content. We use a multiline regex.
-        cover_title_html = _html_escape(cover_title).replace("<br>", "<br>")
+        cover_title_html = "<br>".join(
+            _html_escape(part) for part in cover_title.split("<br>")
+        )
         html = re.sub(
             r'(<h1 class="talk-title">)[^<]*(?:<br>[^<]*)*(</h1>)',
             lambda m: f'{m.group(1)}{cover_title_html}{m.group(2)}',
@@ -521,10 +810,47 @@ def _html_escape(s: str) -> str:
     )
 
 
+def detect_source_format(deck_dir: Path, requested: str) -> str:
+    has_kb = (deck_dir / "slides").is_dir()
+    has_fmx = (deck_dir / "slides.md").is_file()
+    if requested == "kb":
+        if not has_kb:
+            raise ImportInputError("KB format requires a slides/ directory")
+        return "kb"
+    if requested == "fmx":
+        if not has_fmx:
+            raise ImportInputError("FMX format requires slides.md")
+        return "fmx"
+    if has_kb and has_fmx:
+        raise ImportInputError(
+            "both slides/ and slides.md exist; pass --format kb or --format fmx"
+        )
+    if has_kb:
+        return "kb"
+    if has_fmx:
+        return "fmx"
+    raise ImportInputError(
+        "could not detect deck format (expected slides/ or slides.md)"
+    )
+
+
+def load_manifest(path: Path) -> object:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as error:
+        raise ImportInputError(
+            f"malformed SECTIONS.json at line {error.lineno}, "
+            f"column {error.colno}: {error.msg}"
+        ) from error
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[1])
-    ap.add_argument("deck_dir", type=Path, help="Path to deck dir containing SECTIONS.json + slides/")
+    ap.add_argument("deck_dir", type=Path,
+                    help="Deck dir containing SECTIONS.json and slides/ or slides.md")
     ap.add_argument("--out", required=True, type=Path, help="Output HTML path")
+    ap.add_argument("--format", choices=("auto", "kb", "fmx"), default="auto",
+                    help="Input format (default: auto-detect from slides/ or slides.md)")
     ap.add_argument("--title", default=None, help="Override deck title (defaults to manifest title)")
     ap.add_argument("--template", type=Path, default=None,
                     help="Spatial Deck template index.html (defaults to repo's index.html)")
@@ -538,7 +864,16 @@ def main() -> int:
     if not manifest_path.is_file():
         print(f"error: missing SECTIONS.json in {deck_dir}", file=sys.stderr)
         return 2
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    try:
+        source_format = detect_source_format(deck_dir, args.format)
+        manifest = load_manifest(manifest_path)
+        if source_format == "kb":
+            validate_kb_manifest(manifest)
+        else:
+            validate_fmx_manifest(manifest)
+    except (ImportInputError, OSError) as error:
+        print(f"error: {error}", file=sys.stderr)
+        return 2
 
     template_path: Path
     if args.template:
@@ -550,14 +885,31 @@ def main() -> int:
         return 2
     template_html = template_path.read_text(encoding="utf-8")
 
-    title = args.title or manifest.get("title") or deck_dir.name
-    subtitle = manifest.get("subtitle") or ""
-    variant = manifest.get("variant") or deck_dir.name
+    metadata = manifest if isinstance(manifest, dict) else {}
+    title = args.title or metadata.get("title") or deck_dir.name
+    subtitle = metadata.get("subtitle") or ""
+    variant = metadata.get("variant") or deck_dir.name
 
-    sections, notes_map, speakers_map = build_sections(deck_dir, manifest)
+    try:
+        if source_format == "kb":
+            sections, notes_map, speakers_map = build_sections(deck_dir, manifest)
+            cover_title = metadata.get("title") or ""
+            editorial_count = sum(1 + len(section["cases"]) for section in sections)
+        else:
+            slides_path = deck_dir / "slides.md"
+            sections, notes_map, speakers_map, cover = build_fmx_sections(
+                manifest, slides_path.read_text(encoding="utf-8")
+            )
+            cover_title = cover["title"]
+            subtitle = subtitle or cover["subtitle"]
+            title = args.title or cover_title.replace("<br>", " — ") or deck_dir.name
+            editorial_count = cover["editorial_count"]
+    except (ImportInputError, OSError) as error:
+        print(f"error: {error}", file=sys.stderr)
+        return 2
 
     sections_js = render_sections_js(sections)
-    tokens_css  = build_design_token_css(manifest.get("design_tokens") or {})
+    tokens_css  = build_design_token_css(metadata.get("design_tokens") or {})
     speaker_data_js = build_speaker_notes_js(notes_map, speakers_map)
 
     # Speaker styling CSS — read from sibling file if present
@@ -566,8 +918,6 @@ def main() -> int:
     if styling_path.is_file():
         styling_css = styling_path.read_text(encoding="utf-8")
 
-    # Cover title: use first H1 of slide 01 (commonly the talk title)
-    cover_title = manifest.get("title") or ""
     # If title is the long form, split on ":" to get the headline + subtitle
     if cover_title and ":" in cover_title:
         head, _, tail = cover_title.partition(":")
@@ -590,7 +940,11 @@ def main() -> int:
     args.out.write_text(out_html, encoding="utf-8")
 
     total_slides = sum(1 + len(s["cases"]) for s in sections)
-    print(f"[ok] variant={variant}  sections={len(sections)}  slides={total_slides}  -> {args.out}")
+    print(
+        f"[ok] format={source_format}  variant={variant}  "
+        f"sections={len(sections)}  slides={total_slides}  "
+        f"editorial={editorial_count}  -> {args.out}"
+    )
     return 0
 
 

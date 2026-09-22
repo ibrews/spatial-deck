@@ -753,6 +753,11 @@ python3 tools/merge_sections.py tools/imported-<deck>-<hash>.json
 
 Convention: `#` = deck title (and tagline from the next paragraph), `##` = slide, first paragraph after `##` = subtitle, `-` / `*` / `+` = bullets, `![alt](media/x.png)` = image (alt becomes subtitle if none set), `>` = speaker notes. The parse is deterministic regex — `--tighten` is optional and routes through Sam (`llama3.1:8b`) with MBP (`qwen3:8b`) as fallback.
 
+For KB-authored decks, `tools/import_kb_deck.py` accepts either the per-slide
+`slides/*.md` layout or the FMX single-file `slides.md` layout. It auto-detects
+the format (or accepts `--format kb|fmx`), preserves numbered FMX slide order,
+and treats malformed `SECTIONS.json` or missing slide references as fatal errors.
+
 ### HTML import (Claude Design handoff)
 
 Got an HTML deck export (e.g. from Claude Design, Framer, or hand-written)? Same flow:

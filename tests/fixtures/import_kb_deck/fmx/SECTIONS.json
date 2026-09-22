@@ -1,0 +1,33 @@
+[
+  {
+    "year": "CH 1",
+    "accent": "teal",
+    "lesson": {
+      "title": "Stale opening",
+      "short": "OPEN",
+      "tagline": "Begin with the audience.",
+      "tags": "Alex",
+      "notes": "Stale opening note."
+    },
+    "cases": [
+      {
+        "title": "Stale signal",
+        "subtitle": "Let the space answer.",
+        "bullets": ["Observe", "Respond"],
+        "notes": "Stale signal note."
+      }
+    ]
+  },
+  {
+    "year": "CH 2",
+    "accent": "purple",
+    "lesson": {
+      "title": "Stale ending",
+      "short": "CLOSE",
+      "tagline": "Return to the opening question.",
+      "tags": "Both",
+      "notes": "Stale ending note."
+    },
+    "cases": []
+  }
+]

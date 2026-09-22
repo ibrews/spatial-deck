@@ -1,0 +1,14 @@
+{
+  "title": "Importer fixture",
+  "variant": "per-slide",
+  "sections": [
+    {
+      "section": "Opening",
+      "slides": ["00-open", "01-signal"]
+    },
+    {
+      "section": "Closing",
+      "slides": ["02-ending"]
+    }
+  ]
+}
