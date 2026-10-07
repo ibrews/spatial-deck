@@ -159,8 +159,27 @@ Set `layout:` on a case study entry:
 | Layout | Description |
 |--------|------------|
 | *(default)* | 48% media left, 52% content right |
+| `full` | Full-bleed image, video or iframe from `img`, with an optional caption overlay |
+| `grid` | N-up grid of images/videos from an `images` array (2–9 cells) |
 | `placed` | Full-bleed slide with absolutely positioned images/videos at `left:X%, top:Y%, w:Z%, h:W%` |
 | `big` | Full-screen typographic statement with `bigText` field |
+
+**`full` example:**
+```javascript
+{ layout: 'full', img: 'media/hero.jpg',          // .mp4/.webm → autoplaying <video>
+  title: 'Optional caption', subtitle: 'Optional sub' }
+{ layout: 'full', img: 'IFRAME:https://example.com/anim.html' }   // embed a URL or local page
+```
+
+**`grid` example:**
+```javascript
+{ layout: 'grid', title: 'Optional caption', gridCover: true,  // cover instead of contain
+  images: [
+    'media/a.png',                                   // plain path
+    { src: 'media/b.mp4', label: 'Corner label' },   // .mp4/.webm autoplay muted
+    { src: 'media/c.png', href: 'https://…' },       // href makes the cell a link
+  ] }
+```
 
 **`placed` example:**
 ```javascript

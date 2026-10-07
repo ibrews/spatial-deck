@@ -24,7 +24,9 @@
    CASE LAYOUTS (c.layout):
    (default)  Two-pane: image left, title + bullets right
    'full'     Full-bleed image or video (img path, or ends in .mp4/.webm)
-   'grid'     Multi-image grid (images:[...] array, optional gridCover:true)
+   'grid'     Multi-image grid. images: array of 'path' strings or
+              {src, label?, href?} objects (href makes the cell a link).
+              Videos (.mp4/.webm) autoplay muted. optional gridCover:true
    'big'      Full-slide statement. Fields: bigText (huge gradient headline),
               title (eyebrow), subtitle (italic), bigCaption (footnote)
    'placed'   PPTX-coordinate absolute layout. Two supported field shapes:
@@ -376,9 +378,40 @@ body.pr-dragging,body.pr-dragging *{user-select:none!important;-webkit-user-sele
 .big-pill.accent-teal{background:rgba(0,212,255,.12);border-color:rgba(0,212,255,.55);color:var(--teal)}
 .big-pill.accent-rose{background:rgba(244,63,94,.12);border-color:rgba(244,63,94,.55);color:var(--rose)}
 .big-pill.accent-purple{background:rgba(167,139,250,.12);border-color:rgba(167,139,250,.55);color:var(--purple)}
-/* === LAYOUT GRID OVERLAY === */
-.layout-grid{position:absolute;inset:0;z-index:50;pointer-events:none;display:grid;grid-template:repeat(3,1fr)/repeat(4,1fr)}
-.layout-grid-cell{border:1px dashed rgba(0,212,255,.2);display:flex;align-items:center;justify-content:center;font:700 1.2rem 'Space Grotesk',sans-serif;color:rgba(0,212,255,.25);letter-spacing:.1em}
+/* === LAYOUT: FULL (full-bleed image, video or iframe) + GRID (N-up media grid) === */
+.case-slide.layout-full,.case-slide.layout-grid{padding:0;display:block;z-index:auto}
+.full-stage{position:absolute;inset:0;overflow:hidden;background:#05060a}
+.full-stage .full-media{width:100%;height:100%;display:block;border:0}
+.full-stage video.full-media,.full-stage img.full-media{object-fit:contain}
+.full-cover .full-media{object-fit:cover!important}
+.full-overlay{position:absolute;left:0;right:0;top:0;z-index:5;pointer-events:none;
+  padding:clamp(18px,2.4vw,40px) clamp(26px,3.6vw,62px) clamp(34px,4.4vw,78px);
+  background:linear-gradient(to bottom,rgba(6,8,16,.92),rgba(6,8,16,.5) 60%,transparent)}
+.full-overlay h2{font-size:clamp(1.5rem,2.8vw,2.7rem);font-weight:600;letter-spacing:-.02em;line-height:1.14}
+.full-overlay .full-sub{font-size:clamp(.95rem,1.45vw,1.4rem);color:rgba(240,244,255,.74);margin-top:.35em;line-height:1.35}
+.grid-stage{position:absolute;inset:0;display:grid;gap:12px;padding:12px}
+.grid-stage[data-n="2"]{grid-template-columns:1fr 1fr}
+.grid-stage[data-n="3"]{grid-template-columns:repeat(3,1fr)}
+.grid-stage[data-n="4"]{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
+.grid-stage[data-n="5"],.grid-stage[data-n="6"]{grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr}
+.grid-stage[data-n="7"],.grid-stage[data-n="8"]{grid-template-columns:repeat(4,1fr);grid-template-rows:1fr 1fr}
+.grid-stage[data-n="9"]{grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr)}
+.grid-cell{position:relative;overflow:hidden;border-radius:12px;background:#0b0d16}
+.grid-cell img,.grid-cell video{width:100%;height:100%;object-fit:contain;display:block}
+.grid-cover .grid-cell img,.grid-cover .grid-cell video{object-fit:cover}
+.case-slide:not(.grid-cover) .grid-stage{padding-bottom:clamp(96px,13vh,150px)}
+.grid-label{position:absolute;left:12px;top:12px;z-index:2;padding:5px 12px;border-radius:8px;background:rgba(6,8,16,.8);color:#f0f4ff;font-size:clamp(.72rem,1.05vw,1.05rem);font-weight:600;letter-spacing:.01em}
+.grid-overlay{position:absolute;left:0;right:0;bottom:0;z-index:5;pointer-events:none;
+  padding:clamp(20px,2.8vw,46px) clamp(26px,3.8vw,62px);
+  background:linear-gradient(to top,rgba(6,8,16,.95),rgba(6,8,16,.5) 62%,transparent)}
+.grid-overlay h2{font-size:clamp(1.4rem,2.6vw,2.5rem);font-weight:600;letter-spacing:-.02em}
+.grid-overlay .grid-sub{font-size:clamp(.9rem,1.35vw,1.3rem);color:rgba(240,244,255,.74);margin-top:.3em}
+/* Clickable media: a grid cell with {href} becomes a link. .deck-link-inline is for links in prose. */
+.deck-link{display:block;cursor:pointer;outline:1px solid rgba(0,212,255,.25)}.deck-link:hover{outline:2px solid var(--teal)}
+.deck-link-inline{color:var(--teal);text-decoration:none;pointer-events:auto}
+/* === ALIGNMENT GRID OVERLAY (authoring aid, toggled from the UI) === */
+.align-grid{position:absolute;inset:0;z-index:50;pointer-events:none;display:grid;grid-template:repeat(3,1fr)/repeat(4,1fr)}
+.align-grid-cell{border:1px dashed rgba(0,212,255,.2);display:flex;align-items:center;justify-content:center;font:700 1.2rem 'Space Grotesk',sans-serif;color:rgba(0,212,255,.25);letter-spacing:.1em}
 
 /* === ?notes MODE — phone speaker companion === */
 body.notes-mode #deck,body.notes-mode #counter,body.notes-mode #brand,body.notes-mode #step-indicator,body.notes-mode .nav-arrows,body.notes-mode #mobile-ui-toggle,body.notes-mode #slide-grid-zone,body.notes-mode #slide-grid,body.notes-mode #anno-toggle,body.notes-mode #move-toggle,body.notes-mode #notes-drawer,body.notes-mode #search-overlay,body.notes-mode .bg{display:none!important}
@@ -752,6 +785,29 @@ SECTIONS.forEach((sec,si)=>{
       s.innerHTML=`<div class="big-stack">${c.pill&&c.title?`<div class="big-pill accent-${sec.accent||'teal'}">${c.title}</div>`:c.title?`<h2 class="big-eyebrow">${c.title.replace(/\n/g,'<br>')}</h2>`:''} ${c.subtitle?`<div class="big-sub">${c.subtitle}</div>`:''}${c.bigText?`<h1 class="big-text">${c.bigText.replace(/\n/g,'<br>')}</h1>`:''}${c.bigCaption?`<p class="big-caption">${c.bigCaption.replace(/\n/g,'<br>')}</p>`:''}</div>`;
       deck.appendChild(s);allSlides.push(s);return;
     }
+    // layout: 'full' — full-bleed image, video or iframe with an optional caption overlay
+    if(c.layout==='full'&&c.img){
+      const src=c.img;let media;
+      if(src.indexOf('IFRAME:')===0){const u=src.slice(7);media=`<iframe class="full-media" src="${u}" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen scrolling="no"></iframe>`;}
+      else if(/\.(mp4|webm)$/i.test(src)){media=`<video class="full-media" src="${src}" autoplay loop muted playsinline></video>`;}
+      else {media=`<img class="full-media" src="${src}" loading="lazy">`;}
+      const ov=(c.title||c.subtitle)?`<div class="full-overlay">${c.title?`<h2>${c.title}</h2>`:''}${c.subtitle?`<div class="full-sub">${c.subtitle}</div>`:''}</div>`:'';
+      s.innerHTML=`<div class="full-stage">${media}${ov}</div>`;
+      deck.appendChild(s);allSlides.push(s);return;
+    }
+    // layout: 'grid' — N-up image/video grid; gridCover switches object-fit contain -> cover.
+    // images: ['a.png', {src:'b.mp4', label:'B', href:'https://...'}, ...]
+    if(c.layout==='grid'&&c.images&&c.images.length){
+      const cells=c.images.map(it=>{
+        const src=typeof it==='string'?it:it.src;const lbl=(typeof it==='object'&&it.label)?`<div class="grid-label">${it.label}</div>`:'';
+        const inner=/\.(mp4|webm)$/i.test(src)?`<video src="${src}" autoplay loop muted playsinline></video>`:`<img src="${src}" loading="lazy">`;
+        if(typeof it==='object'&&it.href)return `<a class="grid-cell deck-link" href="${it.href}" target="_blank" rel="noopener">${inner}${lbl}</a>`;
+        return `<div class="grid-cell">${inner}${lbl}</div>`;
+      }).join('');
+      const ov=(c.title||c.subtitle)?`<div class="grid-overlay">${c.title?`<h2>${c.title}</h2>`:''}${c.subtitle?`<div class="grid-sub">${c.subtitle}</div>`:''}</div>`:'';
+      s.innerHTML=`<div class="grid-stage" data-n="${c.images.length}">${cells}${ov}</div>`;
+      deck.appendChild(s);allSlides.push(s);return;
+    }
     // layout: 'placed' — PPTX-coordinate absolute positioning
     // Legacy: placedImages: [[src, left%, top%, width%, height%, optional_object-position], ...]
     // New:    placedItems:  [{type:'img'|'mp4'|'arrow'|'qr-card', src?, x, y, w, h, label?, url?, year?}, ...]
@@ -981,6 +1037,8 @@ function updateHash(){if(current>0)location.hash=current;else if(location.hash)l
 function goToFromHash(){const raw=location.hash.replace('#','');if(raw==='00'||raw==='0'){goTo(0);return;}const h=parseInt(raw);if(h>=0&&h<total)goTo(h);}
 document.getElementById('btn-next').addEventListener('click',()=>{if(window._arrowSubstep!==false&&advanceStep())return;goNext();});
 document.getElementById('btn-prev').addEventListener('click',goPrev);
+// A link inside a slide opens its URL; it must not also advance the deck.
+document.addEventListener('click',e=>{if(e.target.closest('a.deck-link,a.deck-link-inline'))e.stopPropagation();},true);
 // ── Playing indicator + Autoplay ──
 const _navSpinner=document.getElementById('nav-playing');
 let _playingTimer=null;
@@ -1004,7 +1062,7 @@ document.addEventListener('keydown',e=>{
 });
 let touchX=0,touchY=0,touchT=0,lastTapT=0,wasPinch=false;
 document.addEventListener('touchstart',e=>{if(document.body.classList.contains('notes-mode'))return;if(e.touches.length>1){wasPinch=true;return;}touchX=e.touches[0].clientX;touchY=e.touches[0].clientY;touchT=Date.now();},{passive:true});
-document.addEventListener('touchend',e=>{if(document.body.classList.contains('notes-mode'))return;if(wasPinch){if(e.touches.length===0)wasPinch=false;return;}const dx=e.changedTouches[0].clientX-touchX;const dy=e.changedTouches[0].clientY-touchY;const dt=Date.now()-touchT;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){lastTapT=0;dx<0?(window._arrowSubstep!==false&&advanceStep()?0:goNext()):goPrev();}else if(Math.abs(dx)<15&&Math.abs(dy)<15&&dt<300){if(window._arrowSubstep!==false&&advanceStep())return;goNext();}},{passive:true});
+document.addEventListener('touchend',e=>{if(document.body.classList.contains('notes-mode'))return;if(e.target.closest&&e.target.closest('a.deck-link,a.deck-link-inline'))return;if(wasPinch){if(e.touches.length===0)wasPinch=false;return;}const dx=e.changedTouches[0].clientX-touchX;const dy=e.changedTouches[0].clientY-touchY;const dt=Date.now()-touchT;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){lastTapT=0;dx<0?(window._arrowSubstep!==false&&advanceStep()?0:goNext()):goPrev();}else if(Math.abs(dx)<15&&Math.abs(dy)<15&&dt<300){if(window._arrowSubstep!==false&&advanceStep())return;goNext();}},{passive:true});
 // Double-click (desktop): advance substep or next event — same as arrow/tap
 document.addEventListener('dblclick',e=>{
   if(window._moveMode)return;
@@ -1222,7 +1280,7 @@ function aRender(){const list=document.getElementById('anno-list');const items=a
 function annoToggle(on){annoMode=on===undefined?!annoMode:on;document.body.classList.toggle('annotate-mode',annoMode);document.getElementById('anno-toggle').classList.toggle('active',annoMode);document.getElementById('anno-toggle').textContent=annoMode?'Exit Annotate':'Annotate';document.getElementById('anno-panel').classList.toggle('visible',annoMode);if(annoMode)aRender();if(!annoMode)document.getElementById('anno-prompt').classList.remove('visible');}
 document.getElementById('anno-toggle').addEventListener('click',()=>annoToggle());
 document.addEventListener('keydown',e=>{if((e.key==='a'||e.key==='A')&&!['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)&&!document.activeElement?.isContentEditable){e.preventDefault();annoToggle();}});
-document.addEventListener('click',e=>{if(!annoMode)return;if(e.target.closest('#anno-toggle,#anno-panel,#anno-prompt,#anno-toast,.layout-grid'))return;e.preventDefault();e.stopPropagation();pendingTarget=e.target;const sl=e.target.closest('.slide');let posInfo='';if(sl){const r=sl.getBoundingClientRect();const pctL=((e.clientX-r.left)/r.width*100).toFixed(1);const pctT=((e.clientY-r.top)/r.height*100).toFixed(1);const idx=[...document.querySelectorAll('#deck > .slide')].indexOf(sl);const ty=sl.dataset.type||'?',yr=sl.dataset.year||'';const gridVis=sl.querySelector('.layout-grid');let zone='';if(gridVis){const col=Math.min(3,Math.floor((e.clientX-r.left)/r.width*4));const row=Math.min(2,Math.floor((e.clientY-r.top)/r.height*3));zone=' Zone: '+String.fromCharCode(65+row)+(col+1);}posInfo=`POSITION: left:${pctL}%, top:${pctT}% (on slide #${idx+1}, type: ${ty}${yr?', year: '+yr:''})${zone}`;}window._pendingPosInfo=posInfo;const tgt=document.getElementById('anno-target-text');const ctxLine=(aCtx(e.target)||'')+' > '+aSel(e.target);tgt.textContent=posInfo?posInfo+' · '+ctxLine:ctxLine;const pr=document.getElementById('anno-prompt');pr.style.left=Math.min(e.clientX+10,innerWidth-300)+'px';pr.style.top=Math.min(e.clientY+10,innerHeight-200)+'px';pr.classList.add('visible');document.getElementById('anno-text').value='';setTimeout(()=>document.getElementById('anno-text').focus(),50);},true);
+document.addEventListener('click',e=>{if(!annoMode)return;if(e.target.closest('#anno-toggle,#anno-panel,#anno-prompt,#anno-toast,.align-grid'))return;e.preventDefault();e.stopPropagation();pendingTarget=e.target;const sl=e.target.closest('.slide');let posInfo='';if(sl){const r=sl.getBoundingClientRect();const pctL=((e.clientX-r.left)/r.width*100).toFixed(1);const pctT=((e.clientY-r.top)/r.height*100).toFixed(1);const idx=[...document.querySelectorAll('#deck > .slide')].indexOf(sl);const ty=sl.dataset.type||'?',yr=sl.dataset.year||'';const gridVis=sl.querySelector('.align-grid');let zone='';if(gridVis){const col=Math.min(3,Math.floor((e.clientX-r.left)/r.width*4));const row=Math.min(2,Math.floor((e.clientY-r.top)/r.height*3));zone=' Zone: '+String.fromCharCode(65+row)+(col+1);}posInfo=`POSITION: left:${pctL}%, top:${pctT}% (on slide #${idx+1}, type: ${ty}${yr?', year: '+yr:''})${zone}`;}window._pendingPosInfo=posInfo;const tgt=document.getElementById('anno-target-text');const ctxLine=(aCtx(e.target)||'')+' > '+aSel(e.target);tgt.textContent=posInfo?posInfo+' · '+ctxLine:ctxLine;const pr=document.getElementById('anno-prompt');pr.style.left=Math.min(e.clientX+10,innerWidth-300)+'px';pr.style.top=Math.min(e.clientY+10,innerHeight-200)+'px';pr.classList.add('visible');document.getElementById('anno-text').value='';setTimeout(()=>document.getElementById('anno-text').focus(),50);},true);
 document.getElementById('anno-cancel').addEventListener('click',()=>{document.getElementById('anno-prompt').classList.remove('visible');pendingTarget=null;});
 document.getElementById('anno-save').addEventListener('click',()=>{const text=document.getElementById('anno-text').value.trim();if(!text||!pendingTarget)return;const arr=aL();const ctx=aCtx(pendingTarget)||(allSlides[current]?aCtx(allSlides[current]):'');const entry={selector:aSel(pendingTarget),context:ctx,text,timestamp:new Date().toISOString()};if(window._pendingPosInfo)entry.position=window._pendingPosInfo;if(window._lastTransformInfo){entry.transform=window._lastTransformInfo;window._lastTransformInfo='';}arr.push(entry);aS(arr);document.getElementById('anno-prompt').classList.remove('visible');pendingTarget=null;window._pendingPosInfo='';aRender();annoToast('Saved');});
 document.getElementById('anno-text').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();document.getElementById('anno-save').click();}if(e.key==='Escape')document.getElementById('anno-cancel').click();});
@@ -1315,16 +1373,16 @@ let _gridVisible=false;
 function gridToggle(){
   _gridVisible=!_gridVisible;
   const activeSlide=allSlides[current];if(!activeSlide)return;
-  let g=activeSlide.querySelector('.layout-grid');
+  let g=activeSlide.querySelector('.align-grid');
   if(_gridVisible){
-    if(!g){g=document.createElement('div');g.className='layout-grid';
+    if(!g){g=document.createElement('div');g.className='align-grid';
     const labels=['A1','A2','A3','A4','B1','B2','B3','B4','C1','C2','C3','C4'];
-    labels.forEach(l=>{const c=document.createElement('div');c.className='layout-grid-cell';c.textContent=l;g.appendChild(c);});
+    labels.forEach(l=>{const c=document.createElement('div');c.className='align-grid-cell';c.textContent=l;g.appendChild(c);});
     activeSlide.style.position=activeSlide.style.position||'relative';activeSlide.appendChild(g);}
     g.style.display='';annoToast('Grid ON');
   }else{if(g)g.style.display='none';annoToast('Grid OFF');}
 }
-function gridEnsureSlide(){if(!_gridVisible)return;const activeSlide=allSlides[current];if(!activeSlide)return;let g=activeSlide.querySelector('.layout-grid');if(!g){g=document.createElement('div');g.className='layout-grid';const labels=['A1','A2','A3','A4','B1','B2','B3','B4','C1','C2','C3','C4'];labels.forEach(l=>{const c=document.createElement('div');c.className='layout-grid-cell';c.textContent=l;g.appendChild(c);});activeSlide.style.position=activeSlide.style.position||'relative';activeSlide.appendChild(g);}}
+function gridEnsureSlide(){if(!_gridVisible)return;const activeSlide=allSlides[current];if(!activeSlide)return;let g=activeSlide.querySelector('.align-grid');if(!g){g=document.createElement('div');g.className='align-grid';const labels=['A1','A2','A3','A4','B1','B2','B3','B4','C1','C2','C3','C4'];labels.forEach(l=>{const c=document.createElement('div');c.className='align-grid-cell';c.textContent=l;g.appendChild(c);});activeSlide.style.position=activeSlide.style.position||'relative';activeSlide.appendChild(g);}}
 document.addEventListener('keydown',e=>{if(!window._moveMode)return;if(['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)||document.activeElement?.isContentEditable)return;if(e.key==='g'||e.key==='G'){e.preventDefault();gridToggle();}});
 
 // Helper: get grid zone from coordinates relative to a slide
