@@ -92,6 +92,7 @@ Draft dumb, make it amazing, ship it back out — every leg is tooled:
 5. **Press `N` to open the Presenter Popup, then navigate a few slides** — a second window tracks speaker notes, elapsed time, next-slide preview, and a pacing indicator (green / yellow / red).
 6. **Append `?vertical` to the URL (or toggle "Vertical Scroll Mode" in Settings)** — slides flip from step-through presentation to a long-form scrollable page; great for sharing a deck as a readable web doc. Toggle off (or remove `?vertical`) to return to presentation mode.
 7. **Run `python3 tools/export_pdf.py`** — every visible slide captured pixel-faithfully into a 16:9 PDF, rendered by the deck itself (needs Google Chrome installed), ending with a fidelity report of anything that degraded.
+8. **Resize your browser to phone width, or run the sweep at `375 812`** — every slide letterboxes onto a fixed 1920×1080 stage instead of reflowing, so nothing clips. `python3 tools/serve_deck.py --port 8411` then `node tools/sweep_deck.mjs http://localhost:8411/ /tmp/sweep 375 812 phone` proves it: exit 0, `problemSlides: 0`, plus contact sheets you can open.
 
 ---
 
@@ -949,6 +950,42 @@ Current task → model assignments (from nightly evals):
 
 ---
 
+## 🔍 Responsive QA Sweep
+
+`lint_deck.py` reads the `SECTIONS` source. It cannot tell you whether a slide actually
+*fits* — that only shows up at a real viewport, in a real browser. `tools/sweep_deck.mjs`
+walks every slide at a given size and reports text that overflows the stage, images that
+never decoded, videos that won't play, lazy-iframe state, console errors and failed
+requests — and tiles screenshots into 3×3 contact sheets, because the point is that a
+human can open one and look.
+
+```bash
+npm i playwright && npx playwright install chromium   # one-time
+
+python3 tools/serve_deck.py --port 8411               # terminal 1
+node tools/sweep_deck.mjs http://localhost:8411/ /tmp/sweep 375 812 phone   # terminal 2
+node tools/sweep_deck.mjs http://localhost:8411/ /tmp/sweep 800 600 laptop
+node tools/sweep_deck.mjs http://localhost:8411/ /tmp/sweep 1920 1080 desktop
+```
+
+Exit code is 0 for PASS and 1 for FAIL, so it gates in CI. Outputs
+`deck-<tag>-report.json` (the verdict and what drove it), `deck-<tag>-slides.json`
+(per-slide detail) and `deck-<tag>-sheetN.png` (the contact sheets).
+
+**Serve with `tools/serve_deck.py`, not `python3 -m http.server`.** The stdlib one-liner
+is single-threaded with a 5-deep backlog; a sweep requests a slide's images, SVGs and
+videos at once, the server resets the overflow, and Chrome reports `ERR_CONNECTION_RESET`
+on random assets — which renders as *blank image slides that look exactly like deck bugs*.
+That misdiagnosis cost two separate QA passes before the threaded server was written.
+
+**On the verdict.** It keys only on *unexpected* problems. The deck probes for an optional,
+gitignored `notes-config.json` on every load (absent ⇒ local-only presenter mode), and the
+resulting 404 is a browser-level log no `try/catch` can suppress — so a naive
+"zero errors" verdict is permanently FAIL and teaches you to ignore the tool. Known-benign
+noise is declared in `EXPECTED_NOISE`, excluded from the verdict, and still printed in
+full. A rule that *doesn't* fire is reported as `expectedNoiseAbsent`, because an allowlist
+nobody notices has gone stale is the same bug wearing a different hat.
+
 ## 🍴 Fork for Your Talk, Pull Template Updates
 
 The recommended workflow: **fork this repo for each talk**, then pull template updates as they ship.
@@ -996,6 +1033,8 @@ spatial-deck/
 │   ├── merge_decks.py     ← Merge N decks + flag conflicts
 │   ├── peer_review.py     ← Two-reviewer fleet critique w/ merge-vote
 │   ├── capture_slides.py  ← Headless-Chrome per-slide PNG capture (?shot=N)
+│   ├── serve_deck.py      ← Threaded local server for headless passes (NOT python -m http.server)
+│   ├── sweep_deck.mjs     ← Behavioral sweep: clipped text, broken media, console errors, contact sheets
 │   ├── export_pdf.py      ← Pixel-faithful PDF (deck-rendered) + fidelity report
 │   ├── export_md.py       ← SECTIONS → markdown (round-trips via import_md)
 │   ├── export_html.py     ← SECTIONS → static, no-JS HTML outline
