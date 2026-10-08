@@ -229,6 +229,8 @@ Set `layout:` on a case study entry:
 | `yoursite.com/?notes` | Phone speaker companion — notes-only view for your phone |
 | `yoursite.com/?print` | Print mode — all slides as static 16:9 pages (File → Print works; `tools/export_pdf.py` drives it headlessly) |
 | `yoursite.com/?shot=5` | Shot mode — slide 5 alone, full-viewport, chrome hidden (per-slide screenshot capture) |
+| `yoursite.com/?fit=stage` | Force the scaled 16:9 stage on, even at a size that would otherwise render unscaled |
+| `yoursite.com/?fit=off` | Force the scaled 16:9 stage off — the original free-flow layout, even on a small screen |
 
 ### Mobile Support
 
@@ -236,6 +238,7 @@ Set `layout:` on a case study entry:
 - **Tap**: quick tap anywhere advances steps or slides
 - **Swipe left/right**: navigate forward/backward (respects steps + hidden slides)
 - **👁 button**: top-right toggle to show/hide UI chrome
+- **Scaled 16:9 stage**: below 1280×720, slides render on a fixed 1920×1080 canvas scaled to fit the viewport (letterboxed) instead of reflowing — so nothing clips on a phone or a small laptop window. At 1280×720 and above the stage stays off and rendering is pixel-identical to the original unscaled layout. Off entirely in `?vertical` and `?print` modes, which reflow instead. Override with `?fit=stage` / `?fit=off` (see the URL table above).
 
 ### Move Mode (`M` to toggle)
 
