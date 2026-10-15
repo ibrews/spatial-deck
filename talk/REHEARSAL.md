@@ -162,7 +162,7 @@ PMRE audience note ✅: research found this crowd is AI/tech-hype fatigued and p
 
 ⏱ ~2 min.
 
-✅ VERIFIED quote [ESSAY17]: "Fast forward to late 2012… I had never heard of architectural consultancy, and was excited to gain expertise in the design of theater spaces. It was around then that the very first Oculus Rift Development Kit entered Kickstarter…" (The essay also gives the Kickstarter total — fine to say, but it's not on a slide.)
+✅ VERIFIED quote [ESSAY17]: "Fast forward to late 2012… I had never heard of architectural consultancy, and was excited to gain expertise in the design of theater spaces. It was around then that the very first Oculus Rift Development Kit entered Kickstarter…" 
 
 ✅ VERIFIED: "Pioneered the world's first use of VR for theatrical sightline testing" [BIO, ABS].
 
@@ -274,7 +274,7 @@ Media: own work (harvardxr-keynote/media/xmas-carol, ghosted). Ghosted poster ca
 
 ✅ VERIFIED [FSLA, from PREP]: "17 different people were like, 'oh yeah, Alex should be involved with this project somehow.' A lot of forces in the universe were conspiring." ❓ ALEX: don't name the 17 people or the competing studio on stage without permission.
 
-🔒 NO DOLLAR FIGURES ON SLIDES. The KB has conflicting presale/investment numbers ($500M → $2B) and an unsourced "$530M" that traces to an AI-written note. Flagged privately. If you want a number, say only one you personally stand behind.
+🔒 NO DOLLAR FIGURES ON SLIDES. The KB's presale/investment figures conflict with each other; details are flagged privately (KB private/projects/pmre2026). If you want a number on stage, say only one you personally stand behind.
 
 ### 23. motion: scale
 
