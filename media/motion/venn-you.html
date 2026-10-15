@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Your Venn — motion</title>
+<!-- PMRE 2026 motion graphic: the AUDIENCE's version of the speaker's venn (venn.html), as a call to action.
+     Photography / Video + two blanks that slot-machine through example crafts, then settle back to blanks;
+     center = YOUR LANE; caption asks for the audience's own weird intersection.
+     ALL COPY IS PROPOSED (connective, for the audience). The example words are generic illustrations, not claims
+     about anyone. ?static / reduced-motion = final frame; ?t=N = frame at N seconds; window.seek(sec) for rendering. -->
+<style>
+:root{--bg:#060810;--text:#f0f4ff;--dim:rgba(240,244,255,.5);--amber:#f59e0b;--rose:#f43f5e;--violet:#a78bfa}
+html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;font-family:'Space Grotesk','Inter','Avenir Next','Helvetica Neue',system-ui,sans-serif}
+svg{width:100%;height:100%;display:block}
+.c{mix-blend-mode:screen;opacity:0;animation:in 1.6s cubic-bezier(.2,.8,.2,1) var(--t) forwards}
+@keyframes in{from{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.8)}to{opacity:1;transform:none}}
+.fade{opacity:0;animation:fade .9s ease var(--t,0s) forwards}
+@keyframes fade{to{opacity:1}}
+.pop{opacity:0;transform-box:fill-box;transform-origin:center;animation:pop 1s cubic-bezier(.2,1.4,.4,1) var(--t) forwards}
+@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+/* the blank underline draws in once and stays: it is the "fill me in" line */
+.blank{opacity:0;transform-box:fill-box;transform-origin:center;animation:draw .7s cubic-bezier(.2,.8,.2,1) var(--t) forwards}
+@keyframes draw{from{opacity:0;transform:scaleX(0)}to{opacity:1;transform:none}}
+/* slot-machine landing: roll up from below with a small overshoot, hold, roll out the top.
+   fill-mode both = invisible before its cue and after it leaves, so every frame is seekable. */
+.word{opacity:0;animation:roll var(--d,1.8s) linear var(--t) both}
+@keyframes roll{
+  0%{opacity:0;transform:translateY(70px);animation-timing-function:cubic-bezier(.2,1.5,.4,1)}
+  14%{opacity:1;transform:translateY(0)}
+  84%{opacity:1;transform:translateY(0);animation-timing-function:cubic-bezier(.6,0,.8,.4)}
+  100%{opacity:0;transform:translateY(-70px)}}
+/* fast reel spin before the first landing: blurred-looking ghosts streak past */
+.spin{opacity:0;animation:spin .16s linear var(--t) both}
+@keyframes spin{0%{opacity:0;transform:translateY(70px)}30%{opacity:.55}70%{opacity:.55}100%{opacity:0;transform:translateY(-70px)}}
+.lbl{font-size:40px;font-weight:600;letter-spacing:.18em;fill:var(--text)}
+.slot{font-size:44px;font-weight:700;letter-spacing:.06em}
+.ov{font-size:52px;font-weight:600;fill:var(--text)}
+.cap{font-size:58px;font-weight:600;fill:var(--text);letter-spacing:.02em}
+.core{font-size:44px;font-weight:700;fill:#060810;letter-spacing:.08em}
+</style></head><body>
+<svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" aria-label="Three overlapping circles: Photography / Video, and two blanks that cycle through example crafts. Center: Your lane. Caption: What's your weird intersection?">
+<defs>
+  <radialGradient id="gp"><stop offset="0" stop-color="#f59e0b" stop-opacity=".55"/><stop offset="1" stop-color="#f59e0b" stop-opacity=".12"/></radialGradient>
+  <radialGradient id="gr"><stop offset="0" stop-color="#f43f5e" stop-opacity=".55"/><stop offset="1" stop-color="#f43f5e" stop-opacity=".12"/></radialGradient>
+  <radialGradient id="gv"><stop offset="0" stop-color="#a78bfa" stop-opacity=".55"/><stop offset="1" stop-color="#a78bfa" stop-opacity=".12"/></radialGradient>
+  <linearGradient id="core" x1="0" x2="1"><stop offset="0" stop-color="#f59e0b"/><stop offset=".5" stop-color="#f43f5e"/><stop offset="1" stop-color="#a78bfa"/></linearGradient>
+  <!-- slot windows: words roll inside these and are clipped above/below like a reel -->
+  <clipPath id="clipR" clipPathUnits="userSpaceOnUse"><rect x="1290" y="182" width="480" height="68"/></clipPath>
+  <clipPath id="clipV" clipPathUnits="userSpaceOnUse"><rect x="700" y="802" width="520" height="68"/></clipPath>
+</defs>
+<g>
+  <circle class="c" cx="820" cy="410" r="300" fill="url(#gp)" stroke="#f59e0b" stroke-width="3" style="--t:.3s;--dx:-500px;--dy:-120px"/>
+  <circle class="c" cx="1100" cy="410" r="300" fill="url(#gr)" stroke="#f43f5e" stroke-width="3" style="--t:.8s;--dx:500px;--dy:-120px"/>
+  <circle class="c" cx="960" cy="650" r="300" fill="url(#gv)" stroke="#a78bfa" stroke-width="3" style="--t:1.3s;--dx:0px;--dy:420px"/>
+</g>
+
+<!-- top-left: the audience's home craft -->
+<text x="560" y="196" text-anchor="end" class="lbl fade" style="--t:1.2s;fill:#f59e0b">PHOTOGRAPHY</text>
+<text x="560" y="248" text-anchor="end" class="lbl fade" style="--t:1.4s;fill:#f59e0b">/ VIDEO</text>
+
+<!-- top-right blank (rose) -->
+<rect class="blank" x="1380" y="256" width="300" height="8" rx="4" fill="#f43f5e" style="--t:1.7s"/>
+<g clip-path="url(#clipR)" fill="#f43f5e" text-anchor="middle" class="slot">
+  <text x="1530" y="240" class="spin" style="--t:2.30s">MUSIC</text>
+  <text x="1530" y="240" class="spin" style="--t:2.42s">GAMES</text>
+  <text x="1530" y="240" class="spin" style="--t:2.54s">DRONES</text>
+  <text x="1530" y="240" class="word" style="--t:2.66s">THEATER</text>
+  <text x="1530" y="240" class="word" style="--t:4.46s">MUSIC</text>
+  <text x="1530" y="240" class="word" style="--t:6.26s">DRONES</text>
+  <text x="1530" y="240" class="word" style="--t:8.06s">GAMES</text>
+</g>
+
+<!-- bottom blank (violet) -->
+<rect class="blank" x="780" y="876" width="360" height="8" rx="4" fill="#a78bfa" style="--t:2.0s"/>
+<g clip-path="url(#clipV)" fill="#a78bfa" text-anchor="middle" class="slot">
+  <text x="960" y="860" class="spin" style="--t:3.20s">LIGHTING</text>
+  <text x="960" y="860" class="spin" style="--t:3.32s">SCANNING</text>
+  <text x="960" y="860" class="spin" style="--t:3.44s">STORYTELLING</text>
+  <text x="960" y="860" class="word" style="--t:3.56s">REAL-TIME 3D</text>
+  <text x="960" y="860" class="word" style="--t:5.36s">SCANNING</text>
+  <text x="960" y="860" class="word" style="--t:7.16s">LIGHTING</text>
+  <text x="960" y="860" class="word" style="--t:8.96s">STORYTELLING</text>
+</g>
+
+<!-- pairwise overlaps: open questions, for the audience to fill -->
+<text x="960" y="318" text-anchor="middle" class="ov fade" style="--t:10.9s;fill-opacity:.7">?</text>
+<text x="770" y="660" text-anchor="middle" class="ov fade" style="--t:11.1s;fill-opacity:.7">?</text>
+<text x="1150" y="660" text-anchor="middle" class="ov fade" style="--t:11.3s;fill-opacity:.7">?</text>
+
+<g class="pop" style="--t:11.7s">
+  <rect x="780" y="466" width="360" height="80" rx="40" fill="url(#core)"/>
+  <text x="960" y="521" text-anchor="middle" class="core">YOUR LANE</text>
+</g>
+<text x="960" y="1044" text-anchor="middle" class="cap fade" style="--t:13.0s">What’s your weird intersection?</text>
+</svg>
+<script>
+(function(){const P=new URLSearchParams(location.search),END=16;window.MOTION_END=END;
+window.seek=function(s){document.getAnimations().forEach(a=>{a.pause();a.currentTime=s*1000;});};
+if(matchMedia('(prefers-reduced-motion: reduce)').matches||P.has('static'))seek(END);else if(P.has('t'))seek(+P.get('t'));})();
+</script>
+</body></html>
