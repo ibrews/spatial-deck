@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Is XR Right For Your Project? — A Spatial Deck Presentation</title>
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<meta name="description" content="A framework for spatial decisions — before you pick a headset or a studio. Built with Spatial Deck.">
-<meta property="og:title" content="Is XR Right For Your Project?">
-<meta property="og:description" content="3 lessons. 6 case studies. A framework for spatial decisions.">
+<title>Architect to XR-chitect — Alex Coulombe — PMRE 2026</title>
+<link rel="icon" type="image/svg+xml" href="talk/favicon.svg">
+<meta name="description" content="Architect to XR-chitect: The Best Career Advice I Ever Ignored. Alex Coulombe, PMRE 2026, Las Vegas.">
+<meta property="og:title" content="Architect to XR-chitect: The Best Career Advice I Ever Ignored">
+<meta property="og:description" content="Alex Coulombe at PMRE 2026: from architecture school to walkable VR real estate.">
 <meta property="og:image" content="https://ibrews.github.io/spatial-deck/social.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,45 +38,155 @@
               Optional title/subtitle renders as frosted-glass overlay.
    'IFRAME:'  Prefix c.img with 'IFRAME:' to embed a URL (YouTube, etc.)
    ======================================================================= */
+// ── TALK START ──
+/* PMRE 2026 — "Architect to XR-chitect: The Best Career Advice I Ever Ignored" — Alex Coulombe
+   Source of truth for the talk content; tools/bake_talk.py splices this into index.html (between the TALK markers).
+   NOTES LEGEND (presenter-only, never on screen):
+     ✅ VERIFIED  = fact or quote with a KB source (short code in brackets; full ledger: KB projects/pmre2026/deck/opus-motion/story-ledger.md)
+     ✎ PROPOSED  = connective copy written for this talk — Alex's call to keep, rephrase or cut
+     ❓ ALEX      = only Alex can supply this (a memory, a name, a permission). Never improvise it on stage.
+   Source codes: [BIO] context/team/team-alex-full-bio.md · [ABS] PMRE submitted abstract/bio · [ESSAY17] Alex's 2017 essay
+   "Designing Like You're There" · [HXR] HarvardXR 2026 keynote notes · [PREP] HarvardXR prep interview 2026-04-07 ·
+   [VOVR] Voices of VR (Alex interviews) · [FSLA] projects/four-seasons-lake-austin/overview.md · [MOD] KB speaking module ·
+   [FMXDRAFT] FMX 2026 draft script (Alex-approved wording, not a recording) · [FT] projects/floor-tour/overview.md */
+const TALK = {
+  coverEvent: "PMRE 2026 &middot; Las Vegas &middot; Thursday, Nov 19",
+  coverTitle: "Architect to <span class=\"xr\">XR</span>-chitect",
+  coverSub: "The Best Career Advice I Ever Ignored",
+  speaker: "Alex Coulombe",
+  speakerCo: "Founder, Agile Lens &middot; New York City",
+  coverNotes: "⏱ ~60s while the room settles.\n\n✎ PROPOSED open: \"Hi, I'm Alex. I'm an architect. Sort of. You'll see.\"\n\n✅ VERIFIED: \"I'm a former architect turned ex-architect, and I run an XR SWAT team in New York City called Agile Lens.\" [VOVR #1480] — a line Alex has actually used; good to say verbatim.\n\n✎ PROPOSED: Tell the room what this is NOT: not a sales pitch, not an AI talk. It's one winding career, and why the detours turned out to be the route.\n\nTiming: the agenda block is 11:00–12:00. This script runs ~42 min, leaving ~15 for Q&A. ❓ ALEX: confirm talk length vs Q&A with Brandon / the Presenter Guidelines PDF.",
+  mapCenter: ["ARCHITECT", "TO XR-CHITECT"],
+  mapNotes: "⏱ 30s. ✎ PROPOSED: \"Every one of those dots was a detour somebody told me not to take.\" Let it breathe, then go to the thesis.",
+  closeEyebrow: "Thank You",
+  closeTitle: "Let’s Talk.",
+  closeSub: "Tell me your weird intersection — and ask me about my kids’ names.",
+  web: "agilelens.com",
+  qr: "https://agilelens.com",
+  qrLabel: "Agile Lens",
+  closeNotes: "⏱ 60s then Q&A.\n\n✅ VERIFIED callback: the bio line \"two boys whose names each rhyme with only one word in the English language. Ask him about it!\" [ABS]. ❓ ALEX: you deliver the punchline in person; their names are not written anywhere in this deck or the KB on purpose.\n\n✎ PROPOSED last line: \"The advice was to pick a lane. Find the intersection instead. I'll be around all afternoon — come tell me yours.\"\n\nQ&A seeds if the room is quiet: (1) \"What did the first holodeck guests actually say?\" (2) \"Can a two-person studio do any of this?\" → Polycam/Luma + Floor Tour slide. (3) \"Do I need to learn Unreal?\" → No: Agile Lens hires theater people. ❓ ALEX: email/contact pill is left off on purpose until you pick one."
+};
+
 const SECTIONS = [
-  { year: 'CH 1', accent: 'teal',
-    lesson: { title:'Define the Spatial Problem First.\nThe Technology Follows.', short:'SPACE > TECH', tagline:'Every successful XR project starts with a question about space \u2014 not a question about headsets. \u201cWhat does it feel like to stand here?\u201d beats \u201cShould we use Quest or Vision Pro?\u201d every time.', tags:'Architecture \u00b7 Theater \u00b7 Pre-Visualization' },
+  // ── COLD OPEN ──
+  { year: "THE ADVICE", accent: "teal",
+    lesson: { title: "Pick a lane.\nStay in it.", short: "THE ADVICE",
+      tagline: "My architecture professors gave me simple advice: pick a lane, stay in it, and master one craft.<br><br>It was good advice. I ignored it.",
+      tags: "Architecture &middot; Theater &middot; Technology",
+      notes: "⏱ ~2 min. This is the cold open — slow down.\n\n✅ VERIFIED: the advice as worded in your own submitted abstract: \"pick a lane, stay in it, and master one craft.\" [ABS]\n\n❓ ALEX — LOAD-BEARING: tell the real moment. Which professor(s)? Where were you — studio crit, office hours? What exactly did they say? No record of it exists anywhere in the KB, so this deck deliberately does not put words in a professor's mouth. If you can't remember the exact words, say so on stage — \"I don't remember the exact words, but I remember the look\" is honest and lands.\n\n✅ VERIFIED nuance worth one sentence: Syracuse wasn't anti-technology — grad chair Brian Lonsway \"first brought VR headsets into the architecture studio during their 'first wave' in the late 1990's\" [ESSAY17]. The advice was about focus, not fear of tech.\n\n✎ PROPOSED transition: \"Here's what that advice looked like in my head.\" → click." },
     cases: [
-      { title:'The Building That Didn\u2019t Exist Yet', subtitle:'Pre-construction visualization for a 200-room hotel',
-        img:'images/ch1-case1-archviz.png', bullets:['The client\u2019s architect shipped 400 pages of drawings. Nobody could agree on the lobby ceiling height.','Forty-five minutes in VR replaced three months of revision cycles','The breakthrough wasn\u2019t the headset \u2014 it was standing inside an unbuilt room and pointing at a problem'] },
-      { title:'The Rehearsal That Saved the Set', subtitle:'A theater company tests blocking before load-in',
-        img:'images/ch1-case2-theater.png', bullets:['Physical set pieces cost $40K to build. Virtual ones cost an afternoon.','The director found a sightline problem on day one \u2014 not opening night','The actors didn\u2019t need to be gamers. They needed to walk, look, and point.'] },
+      { layout: "full", img: "IFRAME:media/motion/lane.html", motion: "lane",
+        notes: "⏱ 15s of animation, ~45s total. Let it play silently for the first act.\n\nAct 1 \"Pick a lane\" — one straight road. Act 2 — three strands leave it: architecture, theater, technology. Act 3 — they braid back into one wider road: XR-chitect. Title card: \"I didn't.\"\n\n✎ PROPOSED voice-over after it lands: \"I spent fifteen years taking the scenic route on purpose. This talk is the route.\"\n\nReduced-motion/offline: the iframe shows the final frame; the MP4 for the organizer is media/motion/mp4/lane.mp4." },
+      { layout: "big", title: "What I wanted to do", bigText: "“I really don’t think\nthat job exists yet.”", bigCaption: "Me, on combining architecture, theater and emerging technology",
+        notes: "⏱ ~60s.\n\n✅ VERIFIED quote: \"I really don't think that job exists yet.\" [HXR — HarvardXR 2026 closing keynote, pull quote]. The keynote notes frame it as \"Alex in 2010\". ❓ ALEX: confirm the year/context before saying \"2010\" aloud — the full transcript is no longer on disk.\n\n✅ VERIFIED (draft wording you approved for FMX): \"Struggled a lot when I was younger with whether I should be an architect, or do theater, or chase emerging technology — and I'm still in disbelief that I carved out a career doing all three at once.\" [FMXDRAFT]\n\n✎ PROPOSED audience hook: \"Who here has a job title their parents still can't explain? … Keep your hand up if you invented it.\" Real-estate media is full of people who invented their own job." }
     ] },
-  { year: 'CH 2', accent: 'purple',
-    lesson: { title:'Match the Platform\nto the Friction Budget.', short:'FRICTION BUDGET', tagline:'Your users have a finite tolerance for setup, tutorials, and cables. Photorealism doesn\u2019t matter if the headset never leaves the pelican case. Pick the platform that your actual audience will actually put on.', tags:'Quest \u00b7 PCVR \u00b7 OpenXR \u00b7 WebXR' },
+  // ── ORIGIN ──
+  { year: "2005", accent: "rose",
+    lesson: { title: "Two Things That\nDidn’t Belong Together.", short: "ORIGIN",
+      tagline: "A B.Arch at Syracuse with a minor in Drama. A theater company for architecture students. A semester in London.<br><br>Nobody told me to combine them. There was no industry to join yet.",
+      tags: "Syracuse &middot; WhAT &middot; London 2008",
+      notes: "⏱ ~2 min.\n\n✅ VERIFIED [BIO]: Syracuse University School of Architecture, B.Arch cum laude, 2005–2010, Minor in Drama, Study Abroad London 2008. Co-founded Warehouse Architecture Theatre (WhAT) with Danton Spina and Ian Nicholson — a theatrical outlet for architecture/non-drama students. Writer on WhAT shows incl. A Public Affair (2007), Fresh Air of Expectation (2007), Mr. Nice Guy (2008), Le Salty Dream (2009). Played Albert Einstein in Picasso at the Lapin Agile.\n\n✅ VERIFIED (summary-level, 2023 interview youtu.be/pavoG5qa__E): London study abroad \"solidified his commitment to serious dramatic performance\".\n\n❓ ALEX: the London moment — what show, what night, what changed? Only you have this. It's the emotional seed of the whole talk; worth 60 seconds.\n\n✎ PROPOSED line: \"Architecture taught me how people move through space. Theater taught me how to make them feel something while they do it.\"" },
     cases: [
-      { title:'PCVR vs. Standalone', subtitle:'It\u2019s not about specs \u2014 it\u2019s about friction',
-        img:'images/ch2-case1-platforms.png', bullets:['Standalone (Quest): 10-second setup, runs anywhere, good enough for 90% of training and review','Tethered PCVR: photorealistic fidelity, but someone has to manage cables and a gaming PC','Wireless backpack PCVR: best of both \u2014 if your project justifies the hardware investment'] },
-      { title:'The OpenXR Question', subtitle:'Build once, or build for the room you\u2019re in?',
-        img:'images/ch2-case2-flowchart.svg', bullets:['OpenXR promises write-once, deploy-anywhere. Reality: input mapping and performance still diverge.','If your audience is fixed (e.g., a sales center), optimize for one platform ruthlessly','If your audience is unknown (e.g., a downloadable app), OpenXR + graceful fallbacks is the move'] },
+      { title: "Equus, 2008", subtitle: "Set design for the Black Box Players, Syracuse", img: "media/pmre/pre-fda-equus-syracuse-portfolio.png",
+        bullets: ["I was the set designer — an architecture student designing for actors", "The first hint of a thought I’d have for the next decade: <em>I wish I could stand in this before we build it</em>", "Architecture + theater, same sketchbook"],
+        notes: "⏱ ~75s.\n\n✅ VERIFIED: set designer, Equus (2008, SU Black Box Players) [BIO]; HarvardXR notes list Equus as the \"first hint of 'wish we had VR for this'\" [HXR]. The image is your own portfolio page (provenance: harvardxr-keynote/media/interdisciplinary/equus.png).\n\n✎ PROPOSED: bullet 2's italic line is a paraphrase of the HXR note, not a quote. ❓ ALEX: tell what actually went wrong or right with that set — a specific problem you couldn't see on paper is the perfect setup for the sightline story later." },
+      { title: "Connective Corridor, 2008", subtitle: "Student work: making a city walkable", img: "media/pmre/pre-fda-connective-corridor-2008.jpg",
+        bullets: ["A model is a promise about how a place will feel", "Clients, juries, neighbors — all trying to imagine standing in it", "The gap between the drawing and the feeling became my obsession"],
+        notes: "⏱ ~60s.\n\n✅ VERIFIED: image is your 2008 student model, captioned \"(c) 2008 Alex Coulombe\" (harvardxr-keynote/media/interdisciplinary/connectivecorridor_ribbon.jpg). HarvardXR deck lists Connective Corridor (Syracuse) as an outside-in case.\n\n✎ PROPOSED: all three bullets are connective copy — the \"gap between the drawing and the feeling\" frame. ❓ ALEX: one sentence on what the project actually was." },
+      { layout: "big", title: "2009 · Thesis", bigText: "Fake AR on\nGovernors Island.", bigCaption: "“Scopic Operations in Military Theatre” — an immersive theater installation at Fort Jay, built with webcams and markers",
+        notes: "⏱ ~90s — the origin of the XR career.\n\n✅ VERIFIED [BIO]: thesis \"Scopic Operations in Military Theatre\" — immersive theatre installation at Fort Jay, Governors Island; early AR using webcams and markers (2009); the bio calls it the origin of your XR career.\n\n❓ ALEX: this beat has no photos and no anecdote anywhere in the KB. If you have thesis images, drop them in media/pmre/ and turn this into a two-pane slide. Stories that would land: what your thesis jury said; how the webcams/markers actually worked; what broke on the day.\n\n✎ PROPOSED: \"This was 2009. AR wasn't a product category. It was a hack I needed for a theater piece.\"" }
     ] },
-  { year: 'CH 3', accent: 'amber',
-    lesson: { title:'Iteration Speed Is\nthe Only Spec That Matters.', short:'ITERATION SPEED', tagline:'Polygon counts and refresh rates are table stakes. The studio that can show you a change on Tuesday that you asked about on Monday \u2014 that\u2019s the one that finishes the project. Everything else is a demo reel.', tags:'Unreal Engine \u00b7 Real-Time \u00b7 Multiplayer' },
+  // ── QUIET YEARS ──
+  { year: "2010", accent: "teal",
+    lesson: { title: "Years of Quiet\nArchviz Work.", short: "THE QUIET YEARS",
+      tagline: "Rafael Viñoly Architects, then ZGF. A real architect, at real firms, making real renders.<br><br>And quietly pushing real-time tools into places that hadn’t asked for them.",
+      tags: "Rafael Viñoly &middot; ZGF &middot; 2010–2013",
+      notes: "⏱ ~90s.\n\n✅ VERIFIED [BIO]: Rafael Viñoly Architects, then ZGF (Zimmer Gunsul Frasca), 2010–2013; advocated for AR/real-time visualization tools inside traditional architecture firms; \"published in the NY Times (architecture-related)\".\n\n⚠ The FMX draft script says \"Alfonso Frasca\" — wrong. It's Zimmer Gunsul Frasca.\n\n❓ ALEX: the NYT mention has no title/date/topic in the KB — only mention it if you can name it. Any Viñoly/ZGF anecdote (a crit, a client meeting, a render that went wrong) is gold here; there are none on record.\n\n✎ PROPOSED: \"Quiet\" is your own word from the abstract. Lean on it: most of a career is the quiet years." },
     cases: [
-      { title:'Five Questions for Any XR Studio', subtitle:'A checklist before you sign the SOW',
-        img:'images/ch3-case1-checklist.svg', bullets:['Can they show you a working prototype in two weeks, or just a pitch deck in two months?','Do they build in a real-time engine (Unreal, Unity) or pre-render everything? Real-time means you can iterate.','Ask: \u201cWhat happens when we change the floor plan halfway through?\u201d The answer tells you everything.'] },
-      { title:'The Red Flags', subtitle:'How to spot a studio that\u2019ll burn your budget',
-        img:'images/ch3-case2-redflags.png', bullets:['They demo on hardware you\u2019ll never own. If the pitch is on a $10K rig, ask what deployment looks like.','\u201cWe\u2019ll figure out multiplayer later.\u201d Networking is architectural \u2014 it can\u2019t be bolted on in month six.','No one on the team has shipped a project that ran for more than one day. Trade shows \u2260 production.'] },
+      { layout: "big", title: "What my renders kept getting asked", bigText: "“Is that the right scale?”\n“Where’s that light coming from?”\n“What am I looking at right now?”", bigCaption: "From my 2017 essay, “Designing Like You’re There”",
+        notes: "⏱ ~90s. THE BRIDGE TO THIS ROOM — pause after the three questions.\n\n✅ VERIFIED quote [ESSAY17]: \"When I produced architectural renders at my previous firms there were similar questions: 'Is that the right scale?' 'Where's that light coming from?' 'What am I looking at right now?'\"\n\n✎ PROPOSED audience move: \"Hands up if a client has asked you one of these about a listing photo this year.\" (Expect most hands.) \"Same questions. Different medium. That's the whole talk.\"" },
+      { layout: "big", title: "Sound familiar?", bigText: "A still image asks\nthe viewer to imagine.", bigCaption: "Architects, photographers, videographers — we all sell a feeling of standing somewhere",
+        notes: "⏱ ~60s.\n\n✎ PROPOSED (entire slide): connective copy aimed at PMRE's audience of solo/small-studio photographers and videographers [projects/pmre2026/overview.md]. Keep it humble: you are NOT claiming photography expertise — nothing in your record says you shoot real estate. Frame it as: \"You are already doing the hardest part of my job.\"\n\nPMRE audience note ✅: research found this crowd is AI/tech-hype fatigued and prefers relatable personal stories over pitches [overview]. Keep the next chapter human." }
     ] },
-  { year: 'CH 4', accent: 'rose',
-    lesson: { title:'Your Deck Is Data.\nTreat It Like Code.', short:'DECK AS CODE', tagline:'Spatial Deck\u2019s <code>tools/</code> directory turns slides into a pipeline: a local Ollama fleet handles structured-JSON cleanup while frontier models stay reserved for judgment. Every importer has a mirror exporter, every change has a diff, every chapter has a peer review.<br><br>You don\u2019t rewrite a deck anymore \u2014 you <em>refactor</em> it.', tags:'Fleet \u00b7 Ollama \u00b7 Python \u00b7 Zero-Build' },
+  // ── FIRST PROOF ──
+  { year: "2013", accent: "rose",
+    lesson: { title: "Then a Headset Showed Up\non Kickstarter.", short: "THE FIRST PROOF",
+      tagline: "At Fisher Dachs Associates I was finally an architect who specialized — in theaters. Then the first Oculus Rift dev kit arrived.<br><br>We used it for something nobody had done: testing theater sightlines in VR.",
+      tags: "Fisher Dachs Associates &middot; Oculus DK1 &middot; Sightlines",
+      notes: "⏱ ~2 min.\n\n✅ VERIFIED quote [ESSAY17]: \"Fast forward to late 2012… I had never heard of architectural consultancy, and was excited to gain expertise in the design of theater spaces. It was around then that the very first Oculus Rift Development Kit entered Kickstarter…\" (The essay also gives the Kickstarter total — fine to say, but it's not on a slide.)\n\n✅ VERIFIED: \"Pioneered the world's first use of VR for theatrical sightline testing\" [BIO, ABS].\n\n✅ VERIFIED (FMX draft wording): \"I thought I'd found the crossover of my Venn diagram: I'm an architect who gets to specialize in theaters.\" [FMXDRAFT] — this is the twist on the title: you DID specialize… in a niche nobody had named.\n\n✅ VERIFIED: first DK1 experience = the Tuscany demo: \"…the same level of excitement I had after trying the Tuscany demo on my Oculus Rift DK1 back in 2013\" [UploadVR Orion piece, 2024].\n\n⚠ Dates: Kickstarter late 2012, hands-on 2013. Say \"2013\"." },
     cases: [
-      { title:'Bring Any Format In.\nGet Any Format Out.', subtitle:'Markdown \u2194 HTML \u2194 PPTX \u2194 PDF \u2014 round-trip, not one-way',
-        img:'images/ch4-case1-roundtrip.svg', bullets:['Importers: <code>import_md</code> / <code>import_html</code> / <code>import_pptx</code> / <code>import_pdf</code> / <code>import_tokens</code> \u2014 all emit the same SECTIONS-shape JSON','Exporters: <code>export_md</code> / <code>export_html</code> / <code>export_pptx</code> \u2014 round-trip verified (<code>diff_decks</code> reports 0 changes)','Structural extraction in pure Python; the fleet only rewrites prose. Single-pass, never \u201cplease fix your JSON.\u201d'] },
-      { title:'Let a Local Model\nRead Your Deck.', subtitle:'Peer review + lint + alt-text + timing \u2014 all offline, all fleet-powered',
-        img:'images/ch4-case2-peerreview.svg', bullets:['<code>peer_review.py</code>: two model families (llama3.1:8b \u00b7 qwen2.5-coder:14b) critique the same chapter \u2014 agreement is signal, disagreement is the interesting edge','<code>lint_deck</code>, <code>estimate_timing</code>, <code>gen_alt_text</code>, <code>extract_palette</code>: single-purpose QA tools, JSON-patch output only, never mutate <code>index.html</code> in one shot','Claude stays reserved for what local models fail at: architectural decisions, narrative judgment, UX trade-offs'] },
-      { title:'Merge, Diff, Ship.', subtitle:'Multi-deck merge + sentinel splicing + conflict reporting',
-        img:'images/ch4-case3-mergediff.svg', bullets:['<code>merge_decks.py</code>: concat N sources, flag year collisions, duplicate titles, Jaccard near-duplicates \u2014 writes a <code>.conflicts.md</code> for the editorial pass','<code>merge_sections.py</code>: idempotent splice between <code>// \u2500\u2500 IMPORTED START/END \u2500\u2500</code> sentinels \u2014 re-import as many times as you like','<code>diff_decks.py</code>: chapter/case-level diffs with bullet <code>difflib</code>. Your PR reviewer will thank you.'] },
+      { title: "The Next Logical Step", subtitle: "How I pitched VR to my boss", img: "media/pmre/fda-dk1-office-demo.jpg",
+        bullets: ["“We were already taking flat 2D views of seats…”", "“…the capacity for VR to actually make you feel like you were in those seats was the next logical step.”", "“Josh Dachs agreed, and I was out the gate.”"],
+        notes: "⏱ ~90s.\n\n✅ VERIFIED quote [ESSAY17]: \"Rather than pitching VR as a 'new' technology… I talked about VR as an extension of the workflow we had in place. I argued that we were already taking flat 2D views of seats, and the capacity for VR to actually make you feel like you were in those seats was the next logical step. Josh Dachs agreed, and I was out the gate.\"\n\n✎ PROPOSED takeaway for photographers: \"Don't pitch the new thing as new. Pitch it as the next step of what your client already buys from you.\"\n\nImage: FDA-era office demo (harvardxr-keynote/media/lateshow/lateshow01_early-oculus-rift_orig.jpg). ❓ ALEX: confirm who's in the photo and that it's OK to show." },
+      { layout: "full", img: "IFRAME:media/motion/sightline.html", motion: "sightline",
+        notes: "⏱ 13s animation, ~75s total. Explain sightline testing in plain language WHILE it plays.\n\nBeat 1 \"Can every seat see the show?\" — rays from each seat to the top of the set. Beat 2 — the seats under the balcony go red: blocked. Beat 3 — a headset sits in a blocked seat: \"Sit in the seat before it's built.\" Beat 4 — the balcony is raised; every ray clears: \"Find it in VR, fix it in the drawings.\"\n\n⚠ This is an ILLUSTRATIVE generic section, not a specific venue. Say \"a theater\" not a name.\n\n✅ VERIFIED [ESSAY17]: \"When presented with the full-scale version of their design for the very first time, every architect sees decisions they would like to change. If they're seeing it for the first time after construction, it's too late. In VR, it almost never is.\"" },
+      { layout: "big", title: "2013 · Xiqu Centre, Hong Kong", bigText: "“It was entirely something else\nto see the project at exactly the scale\nthe audience would perceive it.”", bigCaption: "Venelin Kokalov, Bing Thom Architects — quoted in my 2017 essay",
+        notes: "⏱ ~90s — a great story, tell it.\n\n✅ VERIFIED [ESSAY17, \"The Xiqu Centre Story\"]: in 2013 FDA worked with Bing Thom Architects on the Xiqu Centre in West Kowloon; the curvy balcony railing design changed daily; \"As soon as we put the design of the theater in VR, we could test these configurations in real time and, most importantly, physically lean our bodies.\" Full Kokalov quote: \"We understood the space in an entirely new way. It was one thing to be rotating around a 3D model. It was entirely something else to see the project at exactly the scale the audience would perceive it after construction.\" (Slide trims \"after construction\" for length — say the full line.)\n\n✅ VERIFIED [ESSAY17]: \"I'll never forget the first time I had a meeting that was scheduled for two hours and ended up taking less than 45 minutes.\"" },
+      { layout: "grid", title: "Sightlines, Everywhere", subtitle: "Theater planning, in VR, 2013–2016", gridCover: true,
+        images: [ {src: "media/pmre/fda-macbeth-armory-unity.png", label: "Macbeth · Park Avenue Armory"}, {src: "media/pmre/fda-geffen-hall-review-01.jpg", label: "David Geffen Hall"}, {src: "media/pmre/fda-shed-unity-axon.png", label: "The Shed"}, {src: "media/pmre/fda-statue-liberty-museum-vr.jpg", label: "Statue of Liberty Museum"} ],
+        notes: "⏱ ~75s. Rapid-fire, don't explain each.\n\n✅ VERIFIED [BIO]: FDA VR sightline projects incl. Brockman Hall for Opera, David Geffen Hall, Statue of Liberty Museum, Yale Schwarzman Center, The Shed, the Ed Sullivan Theater dome, Park Avenue Armory (Branagh's Macbeth). The Armory Macbeth previs was 2014 [FMXDRAFT: \"found actor blocking that really wasn't going to fly\"].\n\nMedia provenance: all from ibrews/harvardxr-keynote media folders (see media/pmre/PROVENANCE.md). ⚠ RIGHTS: these are FDA client renders — ❓ ALEX: confirm FDA is OK with public use at PMRE. The Geffen Hall headset photo is from the actual on-site review.\n\n✎ PROPOSED: \"A specialist in a niche of a niche. And that niche kept opening doors.\"" },
+      { title: "One Talk → One Client", subtitle: "The Late Show dome at the Ed Sullivan Theater", img: "media/pmre/fda-ed-sullivan-unity-lighting.png",
+        bullets: ["2015: I gave a talk about checking theater sightlines in VR", "Someone in the audience was working on the dome projection for The Late Show", "The same code that plotted sightlines could plot projector throw — so we built them an app"],
+        notes: "⏱ ~90s. This is the one to land for a CONFERENCE audience.\n\n✅ VERIFIED (near-verbatim, prep interview [PREP] + module [MOD cross-pollination]): a 2015 NYVR talk on VR sightline checking at Fisher Dachs; Bravo Media was in the audience, working on the Ed Sullivan dome projection for The Late Show with Stephen Colbert; the same code that plotted sightlines plotted projector throw/beam angles; you built an app that \"let you steer projectors around a grid and use different throw distances\".\n\n✅ VERIFIED lesson line [MOD]: \"Never hide your weird, niche R&D. It is the proof-of-concept for someone else's enterprise problem.\"\n\n✎ PROPOSED room callback: \"Somebody in this room is going to hear something today that solves a problem they haven't been hired for yet.\"\n\nImage: Unity lighting-viz render of the dome (FDA/client). Alt media: media/pmre/fda-ed-sullivan-vr-capture.mp4 (32s), fda-ed-sullivan-lsa-magazine.png (3rd-party magazine)." }
     ] },
+  // ── ALL IN ──
+  { year: "2016", accent: "purple",
+    lesson: { title: "Going All In.", short: "GOING ALL IN",
+      tagline: "Companies we worked with kept asking for these tools on projects that weren’t theaters. So we made a company for that.<br><br>Agile Lens: Immersive Design.",
+      tags: "Founded with Josh Dachs &middot; New York City",
+      notes: "⏱ ~2 min.\n\n✅ VERIFIED quote [ESSAY17, \"The Founding of Agile Lens\"]: \"as I found myself creating more VR experiences for FDA, companies we were working with became more interested in these tools and workflows, particularly for non-theater projects… [we] formed a new company called Agile Lens: Immersive Design, specializing in tackling design problems that immersive technology like VR is uniquely suited to solve.\"\n\n✅ VERIFIED [BIO]: founded 2016 with Josh Dachs as co-founder; sister company to Fisher Dachs Associates and Fisher Marantz Stone. ⚠ The LLC was formed in 2014 — always say 2016 publicly.\n\n✅ VERIFIED [HXR 2017 lesson]: \"Chasing architects as clients didn't work — adjacent opportunities did.\" And from the live talk: \"I visited 80 different architecture firms.\" ❓ ALEX: confirm the 80 before saying it.\n\n❓ ALEX: what did it feel like to bet on a job title that didn't exist? No quote on record — this is yours to tell." },
+    cases: [
+      { layout: "big", title: "Who we hired", bigText: "“I don’t want a bunch of\ncomputer science graduates.\nI want actual theater people.”", bigCaption: "On building the Agile Lens team",
+        notes: "⏱ ~75s.\n\n✅ VERIFIED (near-verbatim [PREP]): \"I don't want to go get a bunch of computer science graduates, I want actual theater people.\" (Slide trims \"go get\".) Context: 2019, High Fidelity; recruited David Gochfeld and Kira Benzing; Kira brought Kevin Laibson (improv background).\n\n✅ VERIFIED [HXR]: \"You want to find people who have improv training because the tech breaks and people who have improv training know how to roll with those punches.\" Improv actors \"yes-and\" a broken avatar arm; Shakespeare-trained actors stop and ask for a fix [PREP].\n\n✅ VERIFIED honest nuance [PREP]: not having traditional engineers early made source control/QA harder — \"SOME tech team members are useful — don't have zero.\" Say it; it keeps the talk from sounding anti-specialist." },
+      { layout: "grid", title: "Live VR Theater", subtitle: "A Christmas Carol VR — and the call it led to", gridCover: true,
+        images: [ {src: "media/pmre/xmas-carol-04.jpg", label: "A Christmas Carol VR"}, {src: "media/pmre/xmas-carol-05.png", label: "A virtual stage"}, {src: "media/pmre/ghosted-01.jpg", label: "Ghosted · Magic Leap"}, {src: "media/pmre/xmas-carol-06.png", label: "Marley"} ],
+        notes: "⏱ ~2 min — the Waldorf story is the payoff.\n\n✅ VERIFIED [PREP + MOD cross-pollination]: after a 5-minute SIGGRAPH talk on A Christmas Carol VR, Waldorf Astoria approached Agile Lens — assuming Alex knew nothing about archviz — and asked to \"inject the live motion capture performance system from Christmas Carol into an archviz tour so there could be a host or guide walking you through.\" Waldorf Astoria Miami: a MetaHuman concierge for pre-sales of a 100-story tower [HXR].\n\n✅ VERIFIED [BIO]: Ghosted (Magic Leap AR, 2019) — you were lead dev, Kevin Laibson directed.\n\n✎ PROPOSED: \"The theater work everyone told me was a distraction is what sold the real estate work.\"\n\nMedia: own work (harvardxr-keynote/media/xmas-carol, ghosted). Ghosted poster carries a Cannes XR laurel (3rd-party mark)." },
+      { layout: "big", title: "The pattern", bigText: "Never hide your\nweird, niche R&D.", bigCaption: "It’s the proof-of-concept for someone else’s problem",
+        notes: "⏱ ~45s.\n\n✅ VERIFIED line from your cross-pollination speaking module [MOD]: \"Never hide your weird, niche R&D. It is the proof-of-concept for someone else's enterprise problem.\" Module core message: \"The weird niche thing you did 5 years ago will land you your biggest corporate client today.\"\n\n✎ PROPOSED audience version: \"Post the weird personal project. The drone experiment. The 360 thing nobody paid for. That's your portfolio for the client you don't have yet.\"" }
+    ] },
+  // ── THE BIG PROOF ──
+  { year: "2023", accent: "amber",
+    lesson: { title: "Real Estate,\nBefore It’s Built.", short: "THE BIG PROOF",
+      tagline: "Four Seasons Private Residences, Lake Austin: a wireless VR holodeck of more than 5,000 square feet, where buyers walk homes at true scale years before they exist.",
+      tags: "Four Seasons &middot; Lake Austin &middot; Walkable VR",
+      notes: "⏱ ~2 min.\n\n✅ VERIFIED [FSLA]: wireless VR holodeck, 5,300 sq ft (82×65 ft); Unreal, OptiTrack, Antilatency, wireless multi-user. Marketing materials say \"5,000 sq ft\" — the slide says \"more than 5,000\", which is true of both.\n\n✅ VERIFIED [FSLA]: Agile Lens won a 10-studio bake-off on methodology, not visual fidelity — \"our particular method of problem solving and approaching this from a perspective of novel ideas and novel solutions.\"\n\n✅ VERIFIED [FSLA, from PREP]: \"17 different people were like, 'oh yeah, Alex should be involved with this project somehow.' A lot of forces in the universe were conspiring.\" ❓ ALEX: don't name the 17 people or the competing studio on stage without permission.\n\n🔒 NO DOLLAR FIGURES ON SLIDES. The KB has conflicting presale/investment numbers ($500M → $2B) and an unsourced \"$530M\" that traces to an AI-written note. Flagged privately. If you want a number, say only one you personally stand behind." },
+    cases: [
+      { layout: "full", img: "IFRAME:media/motion/scale.html", motion: "scale",
+        notes: "⏱ 11s animation, ~60s total.\n\nA plan on a page → it grows to true scale around a person → the person walks it. Caption: \"If you see a wall, you can touch a wall.\"\n\n✅ VERIFIED: \"If you see a wall, you can touch a wall\" is the headline of your Holodeck Anywhere speaking module (Slide 3) — tactile alignment between the virtual and the physical [MOD].\n\n⚠ The floor plan is ILLUSTRATIVE — not the Lake Austin plan. The 1:1 tag says so on screen." },
+      { title: "A Theater Experience", subtitle: "…that happens to be driven by VR", img: "media/pmre/re-fourseasons-holodeck-session.jpg",
+        bullets: ["Guests walk untethered through homes that don’t exist yet", "Spike tape on the floor: a 5-cent solution to a $5,000 problem", "“Four Seasons, top to bottom, is a theater experience.”"],
+        notes: "⏱ ~2 min — staging is where photographers will lean in.\n\n✅ VERIFIED [FSLA \"The Spike Tape Story\"]: Kevin Laibson: \"Jonathan, I can't wait for you to meet our thousand-year-old invention — spike tape.\" Henry's framing: \"A 5-cent solution to what would have been a $5,000 problem.\" Kevin: \"Four Seasons, top to bottom, is a theater experience. It happens to be driven by a VR experience.\" ❓ ALEX: attribute the quote to Kevin on stage (it's his line) and don't name the client contact.\n\n✅ VERIFIED [FSLA]: theatrical tricks — e.g. floating an orange in front of guests' faces at a specific moment. Great tiny story.\n\n✎ PROPOSED bridge: \"You stage homes every day. Where the buyer stands first, what they see second, where the light leads them. That's blocking. That's theater.\"\n\nImage: holodeck session with guests in headsets (fsla_01.jpg; client project — confirm OK)." },
+      { layout: "big", title: "What it did", bigText: "“It’s binary. Without this VR experience,\nthis project would not be happening.”", bigCaption: "Me, on Voices of VR — and “very quickly like a 300, 400, 500% increase in the sales”",
+        notes: "⏱ ~60s. Let it land.\n\n✅ VERIFIED quote [VOVR — Voices of VR, 2024; captured in media/youtube/voices-of-vr-episodes.md]: \"It's binary. Without this VR experience, this project would not be happening… there was very quickly like a 300, 400, 500% increase in the sales.\" ⚠ The KB disagrees on episode #1479/#1480/#1481 — use \"on Voices of VR\" and listen once before quoting.\n\n🔒 This is the ONLY impact figure on the slides: your own public words, a percentage, not a dollar amount." },
+      { layout: "grid", title: "The Holodeck", subtitle: "Real people, walking real homes that weren’t built yet",
+        images: [ {src: "media/pmre/re-holodeck-tablet-guests.jpg", label: "Guided by a host"}, {src: "media/pmre/re-holodeck-lakeaustin-room.jpg", label: "An empty room, full of homes"}, {src: "media/pmre/re-unrealfest23-5000sqft-space.jpg", label: "Unreal Fest 2023"} ],
+        notes: "⏱ ~45s. Let the photos breathe.\n\n✅ VERIFIED [FSLA]: press — UploadVR \"Inside The Walkable VR Holodeck That Sells Real Estate\"; you presented the build at Unreal Fest 2023 (\"Building a 5,000 sqft VR Experience Space\").\n\n⚠ RIGHTS: client photos + Epic-branded title card. ❓ ALEX: confirm. The overhead fiducial-floor photo (media/pmre/re-holodeck-fiducial-floor.jpg) is inverted in the source — rotate before use." },
+      { layout: "full", img: "IFRAME:media/motion/timeline.html", motion: "timeline",
+        notes: "⏱ 10s animation, ~60s total. THE LOOK-BACK — this is where the title pays off.\n\nThe career as a winding road, not a lane: 2005 Syracuse → 2008 London → 2009 Governors Island thesis → 2010 Viñoly → ZGF → 2013 Fisher Dachs + DK1 → 2016 Agile Lens → 2019 theater people → 2023 a walkable holodeck → 2026 PMRE.\n\n✅ VERIFIED: every node's year and label is in the ledger [BIO, ESSAY17, PREP, FSLA]. ⚠ 2023 = the year the Lake Austin holodeck was public (Voices of VR 2023 hands-on, Unreal Fest 2023); work began after the Nov 2022 engagement.\n\n✎ PROPOSED: \"If you'd asked me in 2005 to draw this, I'd have drawn a straight line. Every bend is a time somebody said 'that's a distraction.'\"\n\nBuild option: media/motion/timeline.html?step=N shows only nodes 0..N." }
+    ] },
+  // ── YOU ──
+  { year: "YOU", accent: "teal",
+    lesson: { title: "You Already\nThink Spatially.", short: "YOUR INTERSECTION",
+      tagline: "Where the buyer stands. What they see first. What the light is telling them.<br><br>That’s sightlines. That’s staging. That’s theater — and it’s the hardest part of my job.",
+      tags: "Photography &middot; Video &middot; Space",
+      notes: "⏱ ~90s.\n\n✎ PROPOSED (whole chapter): the bridge from your story to theirs. Nothing here claims you shoot real estate — you don't, and the room will know. The claim is the reverse: their eye is the rare part.\n\n✅ VERIFIED spine: \"My background is in architecture and theater, which are both pretty spatial and over the years have led themselves very well to exploring these emerging technologies.\" [VOVR]\n\n✅ VERIFIED [ESSAY17]: \"VR lays out our creative choices naked to the world, but in that vulnerability comes clarity.\"" },
+    cases: [
+      { layout: "full", img: "IFRAME:media/motion/frame-to-room.html", motion: "frame-to-room",
+        notes: "⏱ 13s animation, ~60s total.\n\nThe Frame (a 3:2 photo with a rule-of-thirds grid) → The Room (the frame becomes the far wall; the room extrudes toward us) → The Walk (a path across the floor). End card: \"Same eye. One more dimension.\"\n\n✎ PROPOSED copy throughout. Say: \"Every skill you use to compose a frame is a skill for composing a space. You're not starting over. You're adding a dimension.\"" },
+      { title: "Tools Within Reach", subtitle: "Not a pitch — a starting point", img: "media/pmre/fda-geffen-hall-vr-onsite.jpg",
+        bullets: ["Phone-scan capture: “We’re huge fans of Polycam and Luma AI… both apps have made Gaussian splats incredibly simple”", "Floor Tour: walk a floor plan at 1:1 on a Quest 3 — free on Meta App Lab", "Start with one listing, one room, one client who’s confused by a floor plan"],
+        notes: "⏱ ~90s. Keep it practical, keep it short, no hard sell.\n\n✅ VERIFIED quote [VOVR #1480]: \"We're huge fans of Polycam and Luma AI… both apps have made Gaussian splats incredibly simple.\"\n\n✅ VERIFIED [FT]: Floor Tour is a Quest 3 standalone app to view architectural floor plans at 1:1 scale in co-located VR/MR passthrough; public on Meta App Lab (https://www.meta.com/s/7Z8gal0Jv). ❓ ALEX: confirm it's still free/public and that you're comfortable mentioning it — Brandon said no sales pitches. The prep call reportedly discussed the Floor Tour angle (no recap text in KB).\n\n✎ PROPOSED bullet 3. ❓ ALEX: swap the image for a Floor Tour capture if you have one (candidates: nxtbld-2026-productizing-xr/media/nxtbld/floor-*, not yet reviewed)." },
+      { layout: "full", img: "IFRAME:media/motion/venn.html", motion: "venn",
+        notes: "⏱ 9s animation, ~60s total.\n\nThree circles converge; each overlap is a real chapter: archviz (architecture + technology), theater planning (architecture + theater), live VR theater (theater + technology). Center: XR-chitect. Footer: \"bizarre overlaps\" — your own phrase from the abstract [ABS].\n\n✎ PROPOSED: \"Draw this for yourself tonight. Three circles. What you're trained in, what you love, what's new. The overlap is your lane — and nobody else is in it.\"" },
+      { layout: "big", title: "So, tonight", bigText: "What’s your\nweird intersection?", bigCaption: "Photography + ____ + ____",
+        notes: "⏱ ~60s. Ask it, then actually wait three full seconds.\n\n✎ PROPOSED (phrase \"weird intersection\" comes from the talk outline, not a quote).\n\nOptional: invite two or three people to shout theirs. Real-estate media folks often have odd second skills — drone racing, theater, music video, game design. Riff with them." }
+    ] }
 ];
 
-const BONUS = { year:'BONUS', title:'The Best XR Project\nIs the One You Don\u2019t Need.',
-  tagline:'Sometimes a 3D PDF, a Matterport scan, or a well-placed monitor does the job. The most honest answer a studio can give you is \u201cyou don\u2019t need us for this.\u201d If they never say that \u2014 they\u2019re selling headsets, not solutions.' };
+const BONUS = { year: "THE LESSON", title: "The Advice Wasn’t Wrong.\nIt Just Assumed One Lane.",
+  tagline: "Master your craft — absolutely. I did specialize: in a niche nobody had named yet.<br><br>The lane worth staying in is the one you build where your crafts overlap.",
+  notes: "⏱ ~2 min. THE THESIS — say it slowly.\n\n✎ PROPOSED (the whole slide): this is the talk's argument in your voice, written for you to adapt.\n\n✅ VERIFIED supports: \"I thought I'd found the crossover of my Venn diagram: I'm an architect who gets to specialize in theaters.\" [FMXDRAFT]; HarvardXR 2016 lesson: spatial thinkers — theater, architecture — \"get\" VR faster than film/game people [HXR]; \"Never do things just for tech, for tech's sake.\" [HXR]\n\n✎ PROPOSED close of thesis: \"Being the best in the world at one thing is nearly impossible. Being great at the overlap of two or three things is wide open.\"\n\nNext: the career map (timeline motion) then the close." };
+// ── TALK END ──
 </script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"}}</script>
 
@@ -807,7 +917,7 @@ function playBing(){try{const c=sfxCtx(),t=c.currentTime,o=c.createOscillator(),
 
 // Cover
 const cov=document.createElement('div');cov.className='slide active';cov.dataset.type='cover';
-cov.innerHTML=`<div class="event-tag">Spatial Deck &middot; Open-Source Presentation Framework</div><h1 class="talk-title">Is XR Right<br>For Your Project?</h1><p class="talk-subtitle">A framework for spatial decisions &mdash; before you pick a headset or a studio</p><div class="speaker-card"><div><div class="speaker-name">A Spatial Deck Presentation</div><div class="speaker-co">github.com/spatial-deck</div></div></div>`;
+cov.innerHTML=`<div class="event-tag">${TALK.coverEvent}</div><h1 class="talk-title">${TALK.coverTitle}</h1><p class="talk-subtitle">${TALK.coverSub}</p><div class="speaker-card"><div><div class="speaker-name">${TALK.speaker}</div><div class="speaker-co">${TALK.speakerCo}</div></div></div>`;
 deck.appendChild(cov);allSlides.push(cov);
 
 // Build sections
@@ -950,7 +1060,7 @@ bon.innerHTML=`<div class="year-ghost">${BONUS.year}</div><div class="lesson-ey"
 deck.appendChild(bon);allSlides.push(bon);
 
 // 3D Monocle on Bonus slide
-(function(){
+(function(){if(window.TALK_NO_MONOCLE!==false)return; // TALK_NO_MONOCLE: disabled for PMRE talk
   const container=document.createElement('div');
   container.style.cssText='position:absolute;right:10%;top:50%;transform:translateY(-50%);width:300px;height:300px;pointer-events:auto;z-index:2';
   bon.appendChild(container);
@@ -1055,9 +1165,9 @@ deck.appendChild(mapS);allSlides.push(mapS);
 
 // Close slide with inline Agile Lens SVG logo
 const cls=document.createElement('div');cls.className='slide';cls.dataset.type='close';
-cls.innerHTML=`<div class="close-ey">Thank You</div><h2 class="close-title">Let\u2019s Talk.</h2><p class="close-sub">Thinking spatially?</p>
-<div class="contact-row"><div class="contact-pill"><span class="lbl">Web</span>example.com</div><div class="contact-pill"><span class="lbl">Email</span>hi@example.com</div></div>
-<div class="close-qr-row"><div class="qr-card"><img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=https://github.com/ibrews/spatial-deck" alt="QR"><div class="qr-label">Spatial Deck</div><div class="qr-badge b-teal">Fork it! Ship your own deck!</div></div></div>
+cls.innerHTML=`<div class="close-ey">${TALK.closeEyebrow}</div><h2 class="close-title">${TALK.closeTitle}</h2><p class="close-sub">${TALK.closeSub}</p>
+<div class="contact-row"><div class="contact-pill"><span class="lbl">Web</span>${TALK.web}</div></div>
+<div class="close-qr-row"><div class="qr-card"><img src="talk/qr.png" alt="QR code: ${TALK.qr}" onerror="this.parentNode.style.display='none'"><div class="qr-label">${TALK.qrLabel}</div><div class="qr-badge b-teal">${TALK.web}</div></div></div>
 <div style="position:absolute;bottom:clamp(30px,calc(4*var(--vh)),60px);left:50%;transform:translateX(-50%);opacity:.35;z-index:2"><svg width="200" height="40" viewBox="0 0 869 175" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M266.385 134.295L264.681 136H249.34L247.635 134.295L239.113 112.137L235.704 110.432H193.09L189.681 112.137L181.159 134.295L179.454 136H164.114L162.409 134.295V117.25L201.613 18.3878L203.318 16.6833H225.476L227.181 18.3878L266.385 117.25V134.295ZM230.59 88.2733L215.249 47.3647H213.545L198.204 88.2733L199.909 89.9778H228.886L230.59 88.2733ZM346.604 52.4783V127.477C346.604 158.159 327.854 171.795 303.991 171.795C283.537 171.795 269.901 161.568 268.196 146.227L269.901 144.523H290.355L292.059 146.227C293.764 149.636 297.173 151.341 303.991 151.341C315.923 151.341 322.741 144.523 322.741 129.182H321.036C321.036 129.182 314.218 137.705 298.878 137.705C278.423 137.705 261.378 120.659 261.378 93.3869C261.378 66.1145 278.423 49.0692 298.878 49.0692C314.218 49.0692 321.036 57.5919 321.036 57.5919H322.741L324.445 52.4783L326.15 50.7738H344.9L346.604 52.4783ZM285.241 93.3869C285.241 107.023 290.355 117.25 303.991 117.25C317.627 117.25 322.741 107.023 322.741 93.3869C322.741 79.7507 317.627 69.5235 303.991 69.5235C290.355 69.5235 285.241 79.7507 285.241 93.3869ZM378.964 35.433L377.259 37.1376H356.805L355.1 35.433V18.3878L356.805 16.6833H377.259L378.964 18.3878V35.433ZM378.964 134.295L377.259 136H356.805L355.1 134.295V52.4783L356.805 50.7738H377.259L378.964 52.4783V134.295ZM411.31 134.295L409.605 136H389.151L387.446 134.295V18.3878L389.151 16.6833H409.605L411.31 18.3878V134.295ZM496.496 93.3869V100.205L494.791 101.91H441.951L440.247 103.614C440.247 107.023 443.656 117.25 457.292 117.25C462.405 117.25 467.519 115.546 469.223 112.137L470.928 110.432H491.382L493.087 112.137C491.382 122.364 482.86 137.705 457.292 137.705C428.315 137.705 414.679 117.25 414.679 93.3869C414.679 69.5235 428.315 49.0692 455.587 49.0692C482.86 49.0692 496.496 69.5235 496.496 93.3869ZM469.223 84.8643L470.928 83.1597C470.928 81.4552 469.223 69.5235 455.587 69.5235C441.951 69.5235 440.247 81.4552 440.247 83.1597L441.951 84.8643H469.223ZM615.779 134.295L614.075 136H537.371L535.667 134.295V18.3878L537.371 16.6833H557.825L559.53 18.3878V113.841L561.234 115.546H614.075L615.779 117.25V134.295ZM687.249 93.3869V100.205L685.545 101.91H632.705L631 103.614C631 107.023 634.409 117.25 648.045 117.25C653.159 117.25 658.273 115.546 659.977 112.137L661.682 110.432H682.136L683.84 112.137C682.136 122.364 673.613 137.705 648.045 137.705C619.068 137.705 605.432 117.25 605.432 93.3869C605.432 69.5235 619.068 49.0692 646.341 49.0692C673.613 49.0692 687.249 69.5235 687.249 93.3869ZM659.977 84.8643L661.682 83.1597C661.682 81.4552 659.977 69.5235 646.341 69.5235C632.705 69.5235 631 81.4552 631 83.1597L632.705 84.8643H659.977ZM770.778 134.295L769.073 136H748.619L746.914 134.295V84.8643C746.914 76.3416 743.505 69.5235 733.278 69.5235C721.347 69.5235 714.528 76.3416 714.528 91.6824V134.295L712.824 136H692.37L690.665 134.295V52.4783L692.37 50.7738H711.119L712.824 52.4783L714.528 57.5919H716.233C719.642 54.1828 726.46 49.0692 738.392 49.0692C758.846 49.0692 770.778 62.7054 770.778 83.1597V134.295ZM847.495 110.432C847.495 124.068 837.268 137.705 809.995 137.705C786.132 137.705 772.496 125.773 772.496 108.728L774.2 107.023H794.654L796.359 108.728C796.359 115.546 801.473 117.25 809.995 117.25C818.518 117.25 823.631 115.546 823.631 110.432C823.631 103.614 816.813 103.614 806.586 101.91C796.359 100.205 774.2 95.0914 774.2 74.6371C774.2 61.0009 784.427 49.0692 809.995 49.0692C830.449 49.0692 845.79 57.5919 845.79 74.6371L844.086 76.3416H823.631L821.927 74.6371C821.927 71.2281 818.518 69.5235 809.995 69.5235C801.473 69.5235 798.064 71.2281 798.064 76.3416C798.064 83.1597 808.291 83.1597 818.518 84.8643C828.745 86.5688 847.495 89.9778 847.495 110.432Z" fill="white"/><circle cx="71" cy="73" r="60" stroke="white" stroke-width="8" fill="none"/><line x1="115" y1="117" x2="142" y2="155" stroke="white" stroke-width="8" stroke-linecap="round"/></svg></div>`;
 deck.appendChild(cls);allSlides.push(cls);
 
@@ -1191,7 +1301,7 @@ const cc={x:(CA.x+CB.x)/2+30,y:(CA.y+CB.y)/2+20};const cord=svgE('path',{d:`M${C
 setTimeout(()=>{const t0=performance.now();(function ac(now){const k=Math.min(1,(now-t0)/800);cord.setAttribute('stroke-dashoffset',200*(1-k));if(k<1)requestAnimationFrame(ac);})(t0);},2400);
 for(let i=0;i<SECTIONS.length;i++){const p=mPos(i),dx=p.x-MX,dy=p.y-MY,len=Math.hypot(dx,dy),ld=34,lx=p.x+(dx/len)*ld,ly=p.y+(dy/len)*ld;const anc=p.x>MX+20?'start':p.x<MX-20?'end':'middle';const g=svgE('g',{opacity:'0',style:'cursor:pointer'});g.style.transition='opacity .4s';g.appendChild(svgE('circle',{cx:p.x,cy:p.y,r:'16',fill:'rgba(0,212,255,.02)',stroke:'rgba(0,212,255,.08)','stroke-width':'0.5'}));g.appendChild(svgE('circle',{cx:p.x,cy:p.y,r:'4.5',fill:'rgba(0,212,255,.15)',stroke:'rgba(0,212,255,.65)','stroke-width':'1.5'}));const yr=svgE('text',{x:lx,y:ly,'text-anchor':anc,fill:'rgba(0,212,255,.8)','font-family':'Space Grotesk,sans-serif','font-size':'10.5','font-weight':'600','letter-spacing':'1.2'});yr.textContent=SECTIONS[i].year;g.appendChild(yr);const tl=svgE('text',{x:lx,y:ly+14,'text-anchor':anc,fill:'rgba(255,255,255,.4)','font-family':'Space Grotesk,sans-serif','font-size':'7','font-weight':'500','letter-spacing':'1'});tl.textContent=LSHORT[i];g.appendChild(tl);g.addEventListener('click',()=>{if(window._moveMode)return;let li=lessonIdxs[i];if(li===undefined){const found=allSlides.findIndex(sl=>sl.dataset.type==='case'&&sl.dataset.section===String(i));if(found>=0)li=found;}if(li!==undefined)goTo(li);});svg.appendChild(g);setTimeout(()=>g.setAttribute('opacity','1'),600+i*300);}
 const bg=svgE('g',{opacity:'0',style:'cursor:pointer'});bg.style.transition='opacity .4s';bg.appendChild(svgE('circle',{cx:CB.x,cy:CB.y,r:'6',fill:'rgba(245,158,11,.3)',stroke:'rgba(245,158,11,.7)','stroke-width':'1.5'}));const bl=svgE('text',{x:CB.x+14,y:CB.y+4,fill:'rgba(245,158,11,.8)','font-family':'Space Grotesk,sans-serif','font-size':'10','font-weight':'600','letter-spacing':'1'});bl.textContent=String(BONUS.year).toUpperCase()==='BONUS'?'BONUS':BONUS.year+' BONUS';bg.appendChild(bl);bg.addEventListener('click',()=>{if(window._moveMode)return;const bi=allSlides.findIndex(s=>s.dataset.type==='bonus');if(bi>=0)goTo(bi);});svg.appendChild(bg);setTimeout(()=>bg.setAttribute('opacity','1'),3200);
-const ct=svgE('text',{x:MX,y:MY-10,'text-anchor':'middle',fill:'rgba(255,255,255,.12)','font-family':'Space Grotesk,sans-serif','font-size':'14','font-weight':'600','letter-spacing':'4'});ct.textContent='IS XR RIGHT';svg.appendChild(ct);const ct2=svgE('text',{x:MX,y:MY+12,'text-anchor':'middle',fill:'rgba(255,255,255,.08)','font-family':'Space Grotesk,sans-serif','font-size':'10','font-weight':'500','letter-spacing':'2'});ct2.textContent='FOR YOUR PROJECT?';svg.appendChild(ct2);}
+const ct=svgE('text',{x:MX,y:MY-10,'text-anchor':'middle',fill:'rgba(255,255,255,.12)','font-family':'Space Grotesk,sans-serif','font-size':'14','font-weight':'600','letter-spacing':'4'});ct.textContent=TALK.mapCenter[0];svg.appendChild(ct);const ct2=svgE('text',{x:MX,y:MY+12,'text-anchor':'middle',fill:'rgba(255,255,255,.08)','font-family':'Space Grotesk,sans-serif','font-size':'10','font-weight':'500','letter-spacing':'2'});ct2.textContent=TALK.mapCenter[1];svg.appendChild(ct2);}
 new MutationObserver(()=>{if(mapS.classList.contains('active'))startMap();}).observe(mapS,{attributes:true,attributeFilter:['class']});
 
 // Animation scrubber
@@ -1441,9 +1551,15 @@ function getSlideNotes(idx){
     let caseIdx=0;for(let j=lessonIdxs[si]+1;j<idx;j++){if(allSlides[j]?.dataset.type==='case')caseIdx++;}
     return SECTIONS[si].cases[caseIdx]?.notes||'';
   }
+  if(ty==='bonus'&&BONUS.notes)return BONUS.notes;
+  if(ty==='bonus'&&BONUS.notes)return BONUS.notes;
+  if(ty==='bonus'&&BONUS.notes)return BONUS.notes;
   if(ty==='bonus')return'Bonus lesson: rally the audience. This is the call to action. Build energy and end strong.';
+  if(ty==='cover'&&TALK.coverNotes)return TALK.coverNotes;
   if(ty==='cover')return'Welcome the audience. Wait for stragglers. Introduce yourself and the talk theme.';
+  if(ty==='close'&&TALK.closeNotes)return TALK.closeNotes;
   if(ty==='close')return'Wrap up. Point to the QR codes. Thank the audience. Open for questions.';
+  if(ty==='map'&&TALK.mapNotes)return TALK.mapNotes;
   if(ty==='map')return'The constellation map is a visual summary of the journey. Let it breathe for a moment before moving on.';
   if(ty==='settings')return'Settings slide. Not shown to the audience during presentation mode.';
   return'';
@@ -2757,7 +2873,7 @@ updateHUD();
   }
   // Freeze videos on an early frame; swap iframes for placeholder panels.
   document.querySelectorAll('#deck video').forEach(v=>{try{v.muted=true;v.autoplay=false;v.removeAttribute('autoplay');v.preload='auto';v.addEventListener('loadedmetadata',()=>{try{v.pause();v.currentTime=Math.min(0.1,(v.duration||1)/2);}catch(_){}});v.load();}catch(_){}});
-  document.querySelectorAll('#deck iframe').forEach(f=>{const src=f.src||'';const ph=document.createElement('div');ph.className='sd-iframe-ph';const k=document.createElement('span');k.className='ph-kicker';k.textContent='embedded content';const u=document.createElement('span');u.textContent=src;ph.appendChild(k);ph.appendChild(u);ph.style.minHeight=Math.max(200,f.offsetHeight||0)+'px';f.replaceWith(ph);});
+  document.querySelectorAll('#deck iframe').forEach(f=>{const src=f.src||'';const _mm=src.match(/media\/motion\/([\w-]+)\.html/);if(_mm){const im=document.createElement('img');im.className='full-media sd-motion-poster';im.src='media/motion/mp4/'+_mm[1]+'-poster.png';f.replaceWith(im);return;}const ph=document.createElement('div');ph.className='sd-iframe-ph';const k=document.createElement('span');k.className='ph-kicker';k.textContent='embedded content';const u=document.createElement('span');u.textContent=src;ph.appendChild(k);ph.appendChild(u);ph.style.minHeight=Math.max(200,f.offsetHeight||0)+'px';f.replaceWith(ph);});
   // Fidelity manifest — read by tools/capture_slides.py via --dump-dom.
   const slides=allSlides.map((sl,i)=>{
     const o={i,type:sl.dataset.type||'',title:(sl.querySelector('.case-title,.lesson-title,.cover-title,h1,h2')?.textContent||sl.dataset.type||'').trim().slice(0,120),hidden:sl.dataset.hidden==='1'};
@@ -2779,6 +2895,28 @@ updateHUD();
   },30);},30);
   window.addEventListener('load',()=>{setTimeout(finishAnims,400);});
 })();
+</script>
+<!-- ── PMRE TALK RUNTIME ── -->
+<style>
+.talk-title .xr{background:linear-gradient(90deg,var(--teal),var(--purple),var(--rose));-webkit-background-clip:text;background-clip:text;color:transparent}
+.layout-big .big-text.big-l2{font-size:calc(5.2*var(--vw))}
+.layout-big .big-text.big-l3{font-size:calc(4.1*var(--vw))}
+.layout-big .big-text.big-l4{font-size:calc(3.4*var(--vw));line-height:1.22}
+@media (prefers-reduced-motion: reduce){.slide,.slide *{animation-duration:.001s!important;animation-delay:0s!important;transition:none!important}.bg *{animation:none!important}}
+body.reduced-motion .slide,body.reduced-motion .slide *{animation-duration:.001s!important;animation-delay:0s!important;transition:none!important}
+body.reduced-motion .bg *{animation:none!important}
+</style>
+<script>
+// Long statements step down a size tier by their longest line so quotes never overflow the 16:9 stage.
+document.querySelectorAll('#deck .big-text').forEach(b=>{const n=Math.max(...b.innerHTML.split(/<br\s*\/?>/i).map(l=>l.replace(/<[^>]+>/g,'').length));b.classList.add(n>34?'big-l4':n>27?'big-l3':n>20?'big-l2':'big-l1');});
+// Motion graphics (media/motion/*.html) restart every time their slide becomes active; ?reduced forces final frames.
+(function(){const reduced=new URLSearchParams(location.search).has('reduced');if(reduced)document.body.classList.add('reduced-motion');
+const frames=[...document.querySelectorAll('#deck iframe.anim-frame')].filter(f=>/media\/motion\//.test(f.getAttribute('src')||''));
+frames.forEach(f=>{const base=f.getAttribute('src').split('?')[0];f.dataset.motionBase=base;f.setAttribute('src',base+'?static');});
+function arm(sl){if(!sl)return;sl.querySelectorAll('iframe[data-motion-base]').forEach(f=>{f.setAttribute('src',f.dataset.motionBase+(reduced?'?static':'?play='+Date.now()));});}
+function rest(sl){if(!sl)return;sl.querySelectorAll('iframe[data-motion-base]').forEach(f=>{f.setAttribute('src',f.dataset.motionBase+'?static');});}
+let last=null;new MutationObserver(()=>{const a=document.querySelector('#deck .slide.active');if(a!==last){rest(last);arm(a);last=a;}}).observe(document.getElementById('deck'),{subtree:true,attributes:true,attributeFilter:['class']});
+const a0=document.querySelector('#deck .slide.active');if(a0){arm(a0);last=a0;}})();
 </script>
 </body>
 </html>
