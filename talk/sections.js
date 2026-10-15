@@ -32,7 +32,7 @@ const TALK = {
     thesis:  { label: "Thesis line", default: "a", choices: { a: "Wasn’t wrong, assumed one lane", b: "Specialize in the overlap", c: "Pick a lane, then build a bridge" } },
     close:   { label: "Close", default: "talk", choices: { talk: "Let’s Talk.", kids: "Ask me about my kids’ names", question: "What’s your intersection?" } },
     cover:   { label: "Cover", default: "still", choices: { still: "Still", motion: "Ambient strands" } },
-    cut:     { label: "Length", default: "full", choices: { full: "Full (~47 min)", "30": "~30 min cut", "20": "~20 min cut" } },
+    cut:     { label: "Length", default: "full", choices: { full: "Full (~47 min)", "30": "~35 min cut", "20": "~25 min cut" } },
     theme:   { label: "Look", default: "noir", choices: { noir: "Noir (default)", blueprint: "Blueprint", stage: "Stage light" } }
   },
   thesisAlts: {
