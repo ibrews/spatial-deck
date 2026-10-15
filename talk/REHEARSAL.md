@@ -274,7 +274,7 @@ Media: own work (harvardxr-keynote/media/xmas-carol, ghosted). Ghosted poster ca
 
 ✅ VERIFIED [FSLA, from PREP]: "17 different people were like, 'oh yeah, Alex should be involved with this project somehow.' A lot of forces in the universe were conspiring." ❓ ALEX: don't name the 17 people or the competing studio on stage without permission.
 
-🔒 NO DOLLAR FIGURES ON SLIDES. The KB's presale/investment figures conflict with each other; details are flagged privately (KB private/projects/pmre2026). If you want a number on stage, say only one you personally stand behind.
+🔒 NO DOLLAR FIGURES ON SLIDES. The KB's presale/investment figures conflict with each other; details are flagged privately. If you want a number on stage, say only one you personally stand behind.
 
 ### 23. motion: scale
 
@@ -290,7 +290,7 @@ A plan on a page → it grows to true scale around a person → the person walks
 
 ⏱ ~2 min — staging is where photographers will lean in.
 
-✅ VERIFIED [FSLA "The Spike Tape Story"]: Kevin Laibson: "Jonathan, I can't wait for you to meet our thousand-year-old invention — spike tape." Henry's framing: "A 5-cent solution to what would have been a $5,000 problem." Kevin: "Four Seasons, top to bottom, is a theater experience. It happens to be driven by a VR experience." ❓ ALEX: attribute the quote to Kevin on stage (it's his line) and don't name the client contact.
+✅ VERIFIED [FSLA "The Spike Tape Story"]: Kevin Laibson introduced the client to "our thousand-year-old invention — spike tape." A teammate's framing: "A 5-cent solution to what would have been a $5,000 problem." Kevin: "Four Seasons, top to bottom, is a theater experience. It happens to be driven by a VR experience." ❓ ALEX: attribute the spike-tape line to Kevin on stage and don't name the client contact.
 
 ✅ VERIFIED [FSLA]: theatrical tricks — e.g. floating an orange in front of guests' faces at a specific moment. Great tiny story.
 
