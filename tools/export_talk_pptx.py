@@ -71,8 +71,22 @@ def big_size(t):
     return 66 if n <= 20 else 54 if n <= 27 else 44 if n <= 34 else 36
 
 def main():
-    ap = argparse.ArgumentParser(); ap.add_argument("--out", required=True); a = ap.parse_args()
+    ap = argparse.ArgumentParser(); ap.add_argument("--out", required=True)
+    ap.add_argument("--pick", action="append", default=[], help="group=choice, e.g. --pick open=question --pick cut=30 (defaults from TALK.options)")
+    a = ap.parse_args()
     d = load_talk(); T, S, B = d["TALK"], d["SECTIONS"], d["BONUS"]
+    pick = {g: o["default"] for g, o in T.get("options", {}).items()}
+    for kv in a.pick:
+        g, c = kv.split("=", 1); assert g in pick and c in T["options"][g]["choices"], f"unknown option {kv}"; pick[g] = c
+    cut = None if pick.get("cut", "full") == "full" else int(pick["cut"])
+    def shown(c):
+        if c.get("opt"):
+            g, ch = c["opt"].split(":")
+            if pick.get(g) not in ch.split("|"): return False
+        return cut is None or (c.get("keep") or 99) <= cut
+    th = T.get("thesisAlts", {}).get(pick.get("thesis")); cl = T.get("closeAlts", {}).get(pick.get("close"))
+    if th: B = {**B, "title": th["title"], "tagline": th["tagline"]}
+    if cl: T = {**T, "closeTitle": cl["title"], "closeSub": cl["sub"]}
     prs = Presentation(); prs.slide_width, prs.slide_height = W, H
     videos = []
     s = new(prs, T["coverNotes"])
@@ -88,6 +102,7 @@ def main():
         text(s, Inches(2), Inches(4.4), Inches(9.3), Inches(1.9), L["tagline"], 20, DIM, align=PP_ALIGN.CENTER, spacing=8)
         if L.get("tags"): text(s, Inches(1), Inches(6.5), Inches(11.3), Inches(.4), L["tags"], 12, ac, align=PP_ALIGN.CENTER)
         for c in sec["cases"]:
+            if not shown(c): continue
             s = new(prs, c.get("notes")); lay = c.get("layout")
             if lay == "full" and c.get("motion"):
                 m = c["motion"]; poster = f"media/motion/mp4/{m}-poster.png"
@@ -124,7 +139,7 @@ def main():
     picture(s, "talk/qr.png", Inches(5.67), Inches(4.3), Inches(2), Inches(2))
     text(s, Inches(1), Inches(6.4), Inches(11.3), Inches(.5), T["web"], 16, ACC["teal"], align=PP_ALIGN.CENTER)
     out = Path(a.out).expanduser(); out.parent.mkdir(parents=True, exist_ok=True); prs.save(out)
-    print(f"{out}: {len(prs.slides)} slides, fonts={FONT}; video slides: " + ", ".join(f"#{n} {m}.mp4" for n, m in videos))
+    print(f"{out}: {len(prs.slides)} slides, picks={pick}, fonts={FONT}; video slides: " + ", ".join(f"#{n} {m}.mp4" for n, m in videos))
 
 if __name__ == "__main__":
     main()
