@@ -27,8 +27,8 @@ svg{width:100%;height:100%;display:block}
 </style></head><body>
 <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" aria-label="Two rows. In each, a talk from a podium ripples out to an audience; one audience member lights up and a line connects to the project that followed: The Late Show dome projector-planning app, and a live guide inside a Waldorf Astoria archviz tour.">
 <defs>
-  <clipPath id="clip0"><rect x="250" y="130" width="700" height="290"/></clipPath>
-  <clipPath id="clip1"><rect x="250" y="460" width="700" height="290"/></clipPath>
+  <clipPath id="clip0"><rect x="250" y="158" width="700" height="224"/></clipPath>
+  <clipPath id="clip1"><rect x="250" y="488" width="700" height="224"/></clipPath>
 </defs>
 <g id="rows"></g>
 <text x="960" y="880" text-anchor="middle" class="cap fade" style="--t:10.6s">&#8220;Never hide your weird, niche R&amp;D.&#8221;</text>
@@ -40,10 +40,10 @@ const NS='http://www.w3.org/2000/svg',G=document.getElementById('rows');
 function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);(parent||G).appendChild(e);return e;}
 function fadeIn(e,delay,dur){e.setAttribute('opacity',0);e.animate([{opacity:0},{opacity:1}],{duration:dur||700,delay,fill:'both'});}
 const rows=[
-  {cy:270,t0:0,color:'#f43f5e',pick:[5,2],
+  {cy:270,t0:0,color:'#f43f5e',pick:[6,2],
    label:[['2015',true],[' · a talk about VR theater sightlines',false]],
    node:['The Late Show dome','a projector-planning app']},
-  {cy:600,t0:5200,color:'#f59e0b',pick:[3,1],
+  {cy:600,t0:5200,color:'#f59e0b',pick:[6,1],
    label:[['a 5-minute SIGGRAPH talk on ',false],['A Christmas Carol',true],[' VR',false]],
    node:['Waldorf Astoria','a live guide inside an archviz tour']}
 ];
