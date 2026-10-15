@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Questions Dissolve — motion</title>
+<!-- PMRE 2026 motion graphic: Alex's 2017 essay story. A flat architectural render (abstract one-point-perspective
+     interior, illustrative, not a real project) collects three client questions; a VR headset passes in front of it,
+     the room opens into depth toward the viewer, and the questions dissolve one by one.
+     VERIFIED text (exact wording supplied from Alex's 2017 essay): the three questions
+       "Is that the right scale?" / "Where's that light coming from?" / "What am I looking at right now?"
+     and the caption "When you drop someone in VR, those questions almost entirely disappear."
+     VERIFIED framing (from the deck brief): attribution line "— from my 2017 essay".
+     PROPOSED: all imagery (room, window, light patch, headset glyph) and the timing. No other text.
+     Deterministic CSS animation only; ?static or prefers-reduced-motion = final frame; ?t=SEC or window.seek(SEC). -->
+<style>
+:root{--bg:#060810;--teal:#00d4ff;--purple:#a78bfa;--amber:#f59e0b;--rose:#f43f5e;--text:#f0f4ff;--dim:rgba(240,244,255,.55)}
+html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;font-family:'Space Grotesk','Inter','Avenir Next','Helvetica Neue',system-ui,sans-serif}
+svg{width:100%;height:100%;display:block}
+.draw{stroke-dasharray:1;stroke-dashoffset:1;animation:draw var(--d,1.2s) cubic-bezier(.6,0,.3,1) var(--t,0s) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.fade{opacity:0;animation:fade .9s ease var(--t,0s) forwards}
+@keyframes fade{to{opacity:1}}
+.rise{opacity:0;transform:translateY(20px);animation:rise 1s cubic-bezier(.2,.8,.2,1) var(--t,0s) forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+/* question bubble: pop in at --t1, dissolve at --t2 (one animation list, see gotcha #2) */
+.q{transform-box:fill-box;transform-origin:center;opacity:0;
+   animation:pop .7s cubic-bezier(.2,.9,.25,1.2) var(--t1) forwards, dissolve 1.3s ease-in var(--t2) forwards}
+@keyframes pop{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:none}}
+@keyframes dissolve{from{opacity:1;filter:blur(0);transform:none}to{opacity:0;filter:blur(16px);transform:translateY(-36px) scale(1.08)}}
+.qt{font-size:40px;font-weight:500;fill:var(--text)}
+/* flat frame: the picture-plane boundary fades as the room opens */
+.frame{animation:draw 1.2s cubic-bezier(.6,0,.3,1) .2s forwards, flatten 1.4s ease 7.0s forwards}
+@keyframes flatten{to{opacity:.12}}
+/* headset: slides up in front of the render, then pushes toward the viewer and vanishes ("you're in") */
+.hmd{transform-box:view-box;transform-origin:960px 430px;opacity:0;
+     animation:hmdIn 1.1s cubic-bezier(.2,.8,.2,1) 5.6s forwards, hmdOn 1.2s cubic-bezier(.6,0,.8,.4) 6.9s forwards}
+@keyframes hmdIn{from{opacity:0;transform:translateY(420px)}to{opacity:1;transform:none}}
+@keyframes hmdOn{from{opacity:1;transform:none}to{opacity:0;transform:scale(3.4)}}
+.room{animation:glow 1.6s ease 7.2s forwards}
+@keyframes glow{to{stroke:rgba(0,212,255,.75)}}
+.cap{font-size:52px;font-weight:600;fill:var(--text);paint-order:stroke;stroke:#060810;stroke-width:14px;stroke-linejoin:round}
+.attr{font-size:30px;fill:var(--dim);letter-spacing:.06em;paint-order:stroke;stroke:#060810;stroke-width:10px}
+</style></head><body>
+<svg id="s" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" aria-label="A flat render of a room collects three questions: Is that the right scale? Where's that light coming from? What am I looking at right now? A VR headset passes in front of it, the room opens into depth, and the questions dissolve. Caption: When you drop someone in VR, those questions almost entirely disappear.">
+<defs>
+  <filter id="glow" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <radialGradient id="lightg" gradientUnits="userSpaceOnUse" cx="960" cy="560" r="200"><stop offset="0" stop-color="#f59e0b" stop-opacity=".45"/><stop offset="1" stop-color="#f59e0b" stop-opacity="0"/></radialGradient>
+</defs>
+<g id="depth" fill="none" stroke-linecap="round"></g>
+<g id="roomg" fill="none" stroke-linecap="round" stroke-linejoin="round"></g>
+<g id="qs"></g>
+<g class="hmd" filter="url(#glow)">
+  <path d="M790 380 Q 790 350 822 348 L 1098 348 Q 1130 350 1130 380 L 1130 470 Q 1130 506 1094 506 L 1018 506 Q 990 506 978 482 Q 970 468 960 468 Q 950 468 942 482 Q 930 506 902 506 L 826 506 Q 790 506 790 470 Z" fill="#0b1020" stroke="#f0f4ff" stroke-width="4"/>
+  <rect x="822" y="380" width="120" height="84" rx="26" fill="rgba(0,212,255,.22)" stroke="#00d4ff" stroke-width="3"/>
+  <rect x="978" y="380" width="120" height="84" rx="26" fill="rgba(0,212,255,.22)" stroke="#00d4ff" stroke-width="3"/>
+  <path d="M790 392 Q 752 392 744 432 M1130 392 Q 1168 392 1176 432" fill="none" stroke="#f0f4ff" stroke-width="8" stroke-linecap="round"/>
+</g>
+<text x="960" y="872" text-anchor="middle" class="cap rise" style="--t:9.4s">When you drop someone in VR,</text>
+<text x="960" y="938" text-anchor="middle" class="cap rise" style="--t:9.7s">those questions almost entirely disappear.</text>
+<text x="960" y="1004" text-anchor="middle" class="attr fade" style="--t:10.5s">&#8212; from my 2017 essay</text>
+</svg>
+<script>
+(function(){
+const NS='http://www.w3.org/2000/svg',VX=960,VY=430,HW=280,HH=180,BACK=.36;
+const el=(tag,attrs,parent)=>{const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);parent&&parent.appendChild(e);return e;};
+// point on a box at depth scale s (1 = picture plane), u/v in -1..1 across width/height
+const P=(s,u,v)=>[VX+HW*s*u,VY+HH*s*v];
+const pts=a=>a.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L ');
+const room=document.getElementById('roomg'),depth=document.getElementById('depth');
+const line='rgba(240,244,255,.6)';
+// picture plane (the flat render's frame)
+el('rect',{x:VX-HW,y:VY-HH,width:HW*2,height:HH*2,stroke:'#f0f4ff','stroke-width':4,pathLength:1,class:'frame',style:'stroke-dasharray:1;stroke-dashoffset:1'},room);
+let k=0;const add=(d,extra)=>{const p=el('path',Object.assign({d,stroke:line,'stroke-width':2.5,pathLength:1,class:'draw room'},extra||{}),room);
+  p.style.animation=`draw 1.1s cubic-bezier(.6,0,.3,1) ${(0.9+k++*0.08).toFixed(2)}s forwards, glow 1.6s ease 7.2s forwards`;return p;};
+// back wall + four corner edges
+add('M'+pts([P(BACK,-1,-1),P(BACK,1,-1),P(BACK,1,1),P(BACK,-1,1),P(BACK,-1,-1)]));
+[[-1,-1],[1,-1],[1,1],[-1,1]].forEach(([u,v])=>add('M'+pts([P(BACK,u,v),P(1,u,v)])));
+// floor boards
+[-.6,-.2,.2,.6].forEach(u=>add('M'+pts([P(BACK,u,1),P(1,u,1)]),{'stroke-width':1.5,stroke:'rgba(240,244,255,.35)'}));
+// window on the left wall + door on the back wall
+add('M'+pts([P(.5,-1,-.55),P(.72,-1,-.55),P(.72,-1,.15),P(.5,-1,.15),P(.5,-1,-.55)]),{stroke:'rgba(245,158,11,.85)'});
+add('M'+pts([P(BACK,.25,1),P(BACK,.25,-.2),P(BACK,.6,-.2),P(BACK,.6,1)]));
+// sunlight patch on the floor, thrown from the window
+const patch=el('path',{d:'M'+pts([P(.5,-.55,1),P(.72,-.62,1),P(.8,-.05,1),P(.56,0,1)])+' Z',fill:'rgba(245,158,11,.22)',stroke:'none',class:'fade',style:'--t:2.0s'},room);
+// depth extension: edges + rings run out past the picture plane toward the viewer
+let j=0;const ext=(d,w,c,t)=>{el('path',{d,stroke:c,'stroke-width':w,pathLength:1,class:'draw',style:`--d:1.5s;--t:${t.toFixed(2)}s`,filter:'url(#glow)'},depth);};
+[[-1,-1],[1,-1],[1,1],[-1,1]].forEach(([u,v])=>ext('M'+pts([P(1,u,v),P(4.2,u,v)]),3,'rgba(0,212,255,.7)',7.3+j++*.06));
+[-.6,-.2,.2,.6].forEach(u=>ext('M'+pts([P(1,u,1),P(4.2,u,1)]),1.5,'rgba(0,212,255,.3)',7.5));
+[1.55,2.15].forEach((s,i)=>{const r=el('rect',{x:VX-HW*s,y:VY-HH*s,width:HW*2*s,height:HH*2*s,stroke:'rgba(167,139,250,'+(i?'.28':'.45')+')','stroke-width':2,fill:'none',class:'fade',style:`--t:${(7.8+i*.35).toFixed(2)}s`},depth);});
+// questions: bubble sized to its text, tail pointing at the render
+const Q=[
+  {t:'Is that the right scale?',x:400,y:200,c:'#00d4ff',to:P(.9,-.75,-.6),t1:2.2,t2:7.4},
+  {t:'Where’s that light coming from?',x:1560,y:440,c:'#f59e0b',to:P(1,.92,.1),t1:3.4,t2:8.0},
+  {t:'What am I looking at right now?',x:420,y:700,c:'#a78bfa',to:P(.9,-.7,.75),t1:4.6,t2:8.6}];
+const qs=document.getElementById('qs');
+Q.forEach(q=>{
+  const g=el('g',{class:'q',style:`--t1:${q.t1}s;--t2:${q.t2}s`},qs);
+  const r=el('rect',{rx:22,fill:'rgba(10,14,28,.92)',stroke:q.c,'stroke-width':2.5},g);
+  const tail=el('path',{fill:'rgba(10,14,28,.92)',stroke:'none'},g);
+  const edge=el('path',{fill:'none',stroke:q.c,'stroke-width':2.5,'stroke-linejoin':'round'},g);
+  const tx=el('text',{x:q.x,y:q.y+14,'text-anchor':'middle',class:'qt'},g);tx.textContent='“'+q.t+'”';
+  const w=tx.getComputedTextLength()+64,h=82,hw=w/2,hh=h/2;
+  r.setAttribute('x',q.x-hw);r.setAttribute('y',q.y-hh);r.setAttribute('width',w);r.setAttribute('height',h);
+  // tail: base sits flat on whichever bubble edge faces the target, tip points toward the render
+  const dx=q.to[0]-q.x,dy=q.to[1]-q.y,L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L,cl=(v,a,b)=>Math.max(a,Math.min(b,v));
+  let a,b,m;
+  if(hw/Math.abs(dx||1e-6)<hh/Math.abs(dy||1e-6)){const ex=q.x+Math.sign(dx)*hw,ey=cl(q.y+dy*hw/Math.abs(dx),q.y-hh+24,q.y+hh-24);
+    a=[ex-Math.sign(dx)*2,ey-15];b=[ex-Math.sign(dx)*2,ey+15];m=[ex,ey];}
+  else{const ey=q.y+Math.sign(dy)*hh,ex=cl(q.x+dx*hh/Math.abs(dy),q.x-hw+40,q.x+hw-40);
+    a=[ex-15,ey-Math.sign(dy)*2];b=[ex+15,ey-Math.sign(dy)*2];m=[ex,ey];}
+  const n=Math.abs(a[0]-b[0])<1?[Math.sign(dx),0]:[0,Math.sign(dy)],lat=n[0]?cl(uy*60,-26,26):cl(ux*60,-26,26);
+  const tip=n[0]?[m[0]+n[0]*40,m[1]+lat]:[m[0]+lat,m[1]+n[1]*40];
+  tail.setAttribute('d',`M${a[0]} ${a[1]} L ${tip[0]} ${tip[1]} L ${b[0]} ${b[1]} Z`);
+  edge.setAttribute('d',`M${a[0]} ${a[1]} L ${tip[0]} ${tip[1]} L ${b[0]} ${b[1]}`);
+});
+})();
+(function(){const P=new URLSearchParams(location.search),END=12;window.MOTION_END=END;
+window.seek=function(s){document.getAnimations().forEach(a=>{a.pause();a.currentTime=s*1000;});};
+if(matchMedia('(prefers-reduced-motion: reduce)').matches||P.has('static'))seek(END);else if(P.has('t'))seek(+P.get('t'));})();
+</script>
+</body></html>

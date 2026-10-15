@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spike Tape — motion</title>
+<!-- PMRE 2026 motion graphic. The Four Seasons Lake Austin VR holodeck's theatrical trick, top-down: an empty physical room,
+     a virtual floor plan laid over it exactly, amber spike-tape marks laid at a doorway, counter corners and a wall end,
+     then a guest walks and pauses at each mark (the tape tells guests where a virtual wall/counter is).
+     VERIFIED: the spike-tape story (Lake Austin holodeck) and the end caption, an exact team quote:
+       "A 5-cent solution to what would have been a $5,000 problem."
+     PROPOSED: the opening caption "Spike tape: theater's thousand-year-old invention" is a framing of the verified story,
+       not a quote; it needs a fact check before the talk. The floor plan, room names, tape positions and walk are
+       ILLUSTRATIVE, not the Lake Austin plan. -->
+<style>
+:root{--bg:#060810;--teal:#00d4ff;--purple:#a78bfa;--amber:#f59e0b;--rose:#f43f5e;--text:#f0f4ff;--dim:rgba(240,244,255,.5)}
+html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;font-family:'Space Grotesk','Inter','Avenir Next','Helvetica Neue',system-ui,sans-serif}
+svg{width:100%;height:100%;display:block}
+.draw{stroke-dasharray:1;stroke-dashoffset:1;animation:draw var(--d,1.4s) cubic-bezier(.6,0,.3,1) var(--t,0s) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.fade{opacity:0;animation:fade .8s ease var(--t,0s) forwards}
+@keyframes fade{to{opacity:1}}
+.cap{font-size:50px;font-weight:600;fill:var(--text)}
+.quote{font-size:46px;font-weight:600;fill:var(--text)}
+.step{font-size:26px;letter-spacing:.16em;font-weight:600}
+.tag{font-size:22px;letter-spacing:.3em;fill:var(--dim)}
+.room{font-size:20px;letter-spacing:.2em;fill:rgba(0,212,255,.75)}
+.strip{fill:var(--amber);transform-box:fill-box}
+</style></head><body>
+<svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" aria-label="Top-down view. An empty room, a virtual floor plan overlaid on it, amber spike-tape marks laid at a doorway, counter corners and a wall end, and a guest who walks and pauses at each mark.">
+<!-- 1. the empty physical room (door gap in the bottom wall, x 600-720) -->
+<rect class="fade" style="--t:.6s" x="475" y="205" width="1080" height="690" fill="rgba(240,244,255,.035)"/>
+<path class="draw" pathLength="1" style="--t:.2s;--d:1.3s" fill="none" stroke="rgba(240,244,255,.4)" stroke-width="12" d="M600 900 H 470 V 200 H 1560 V 900 H 720"/>
+<!-- 2. the virtual plan, laid exactly over the room -->
+<g fill="none" stroke="#00d4ff" stroke-width="5">
+  <path class="draw" pathLength="1" style="--t:1.7s;--d:1.2s" d="M600 900 H 470 V 200 H 1560 V 900 H 720"/>
+  <path class="draw" pathLength="1" style="--t:2.3s;--d:.9s" d="M900 200 V 520 M 900 640 V 900"/>
+  <path class="draw" pathLength="1" style="--t:2.5s;--d:.9s" d="M1560 400 H 1250"/>
+  <rect class="fade" style="--t:3.1s" x="1140" y="560" width="260" height="100" fill="rgba(0,212,255,.08)" stroke="none"/>
+  <rect class="draw" pathLength="1" style="--t:2.7s;--d:.9s" x="1140" y="560" width="260" height="100"/>
+</g>
+<g class="fade" style="--t:3.0s">
+  <text x="685" y="380" text-anchor="middle" class="room">FOYER</text>
+  <text x="1270" y="300" text-anchor="middle" class="room">KITCHEN</text>
+  <text x="1270" y="617" text-anchor="middle" class="room">COUNTER</text>
+  <text x="1230" y="820" text-anchor="middle" class="room">DINING</text>
+</g>
+<g id="halos"></g>
+<g id="tapes"></g>
+<!-- the guest -->
+<g id="guest" opacity="0"><circle r="22" fill="#060810" stroke="#a78bfa" stroke-width="6"/><circle r="9" fill="#a78bfa"/></g>
+<!-- step labels, left column -->
+<text x="70" y="330" class="step fade" style="--t:.3s;fill:rgba(240,244,255,.7)">1 &#183; EMPTY ROOM</text>
+<text x="70" y="430" class="step fade" style="--t:1.8s;fill:#00d4ff">2 &#183; VIRTUAL PLAN</text>
+<text x="70" y="530" class="step fade" style="--t:3.6s;fill:#f59e0b">3 &#183; SPIKE TAPE</text>
+<text x="70" y="630" class="step fade" style="--t:6.3s;fill:#a78bfa">4 &#183; GUEST WALKS</text>
+<text id="c1" x="960" y="125" text-anchor="middle" class="cap" opacity="0">Spike tape: theater&#8217;s thousand-year-old invention</text>
+<text id="c2" x="960" y="125" text-anchor="middle" class="quote" opacity="0">&#8220;A 5-cent solution to what would have been a $5,000 problem.&#8221;</text>
+<text x="960" y="1010" text-anchor="middle" class="tag fade" style="--t:3.2s">ILLUSTRATIVE PLAN</text>
+</svg>
+<script>
+(function(){
+const NS='http://www.w3.org/2000/svg';
+// Tape marks in walk order. 'bar' = one strip across a wall end; 'L' = corner mark, arms run outward along both faces.
+// rot = slight hand-laid skew. stop = index of the guest pause that "uses" this mark (the doorway stop serves two).
+const marks=[
+  {x:900,y:520,kind:'bar',rot:-4,stop:0},{x:900,y:640,kind:'bar',rot:3,stop:0},
+  {x:1140,y:560,kind:'L',rot:-3,sx:-1,sy:-1,stop:1},{x:1140,y:660,kind:'L',rot:4,sx:-1,sy:1,stop:2},
+  {x:1400,y:660,kind:'L',rot:-2,sx:1,sy:1,stop:3},{x:1250,y:400,kind:'vbar',rot:5,stop:4}
+];
+const stops=[[840,580],[1080,510],[1080,710],[1460,710],[1235,470]];
+const start=[660,1000],entry=[660,800];
+const T=document.getElementById('tapes'),H=document.getElementById('halos');
+// A strip "unrolls" from one end: scale along its long axis from 0 to 1.
+function strip(g,x,y,w,h,delay,axis,origin){const r=document.createElementNS(NS,'rect');
+  r.setAttribute('x',x);r.setAttribute('y',y);r.setAttribute('width',w);r.setAttribute('height',h);r.setAttribute('rx',2);
+  r.setAttribute('class','strip');r.style.transformOrigin=origin;g.appendChild(r);
+  r.animate([{transform:`scale${axis}(0)`},{transform:`scale${axis}(1)`}],{duration:280,delay,easing:'cubic-bezier(.3,0,.2,1)',fill:'both'});}
+const halos=[];
+marks.forEach((m,i)=>{
+  const g=document.createElementNS(NS,'g');g.setAttribute('transform',`translate(${m.x} ${m.y}) rotate(${m.rot})`);T.appendChild(g);
+  const d=3800+i*420;
+  if(m.kind==='bar')strip(g,-38,-9,76,18,d,'X','0% 50%');
+  else if(m.kind==='vbar')strip(g,-9,-38,18,76,d,'Y','50% 0%');
+  else{strip(g,m.sx<0?-62:0,m.sy<0?-18:0,62,18,d,'X',m.sx<0?'100% 50%':'0% 50%');
+       strip(g,m.sx<0?-18:0,m.sy<0?-62:0,18,62,d+140,'Y',m.sy<0?'50% 100%':'50% 0%');}
+  const c=document.createElementNS(NS,'circle');c.setAttribute('cx',m.x);c.setAttribute('cy',m.y);c.setAttribute('r',54);
+  c.setAttribute('fill','none');c.setAttribute('stroke','#f59e0b');c.setAttribute('stroke-width',5);c.setAttribute('opacity',0);H.appendChild(c);
+  halos.push({c,stop:m.stop});
+});
+// Guest walk: move segments + pauses in ONE WAAPI animation so seek() lands deterministically.
+const W0=6600,MOVE=440,PAUSE=380,FIRST=800;
+// waypoints without a pause steer the guest around the virtual counter instead of through it
+const pts=[[entry,0],[stops[0],1],[stops[1],1],[stops[2],1],[stops[3],1],[[1480,520],0],[stops[4],1]];
+let t=0;const key=[[start,0]],arrive=[];
+pts.forEach(([p,pause],i)=>{t+=(i===0?FIRST:pause?MOVE:MOVE*.6);key.push([p,t]);if(pause){arrive.push(t);t+=PAUSE;key.push([p,t]);}});
+const total=t,guest=document.getElementById('guest');
+guest.animate(key.map(([p,tt])=>({transform:`translate(${p[0]}px,${p[1]}px)`,offset:tt/total})),{duration:total,delay:W0,easing:'linear',fill:'both'});
+guest.animate([{opacity:0},{opacity:1}],{duration:300,delay:W0-250,fill:'both'});
+// each mark flashes as the guest arrives, then settles to a faint ring
+halos.forEach(h=>h.c.animate([{opacity:0},{opacity:.95,offset:.35},{opacity:.25}],{duration:700,delay:W0+arrive[h.stop],fill:'both'}));
+// captions: opener during taping + walk, the quote once the walk ends
+const c1=document.getElementById('c1'),c2=document.getElementById('c2'),end=W0+total;
+c1.animate([{opacity:0,offset:0},{opacity:1,offset:.25},{opacity:1,offset:.9},{opacity:0,offset:1}],{duration:end+400-3700,delay:3700,fill:'both'});
+c2.animate([{opacity:0},{opacity:1}],{duration:800,delay:end+500,fill:'both'});
+})();
+(function(){const P=new URLSearchParams(location.search),END=13.5;window.MOTION_END=END;
+window.seek=function(s){document.getAnimations().forEach(a=>{a.pause();a.currentTime=s*1000;});};
+if(matchMedia('(prefers-reduced-motion: reduce)').matches||P.has('static'))seek(END);else if(P.has('t'))seek(+P.get('t'));})();
+</script>
+</body></html>

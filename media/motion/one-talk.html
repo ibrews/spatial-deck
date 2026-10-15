@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>One Talk — motion</title>
+<!-- PMRE 2026 motion graphic. "One talk → one client", told twice from Alex's history. Each row: a podium, ripples go out
+     to an audience of dots, one dot lights up, and a line draws to the work that came of it.
+     VERIFIED: (a) a 2015 talk about VR theater sightlines; someone in that audience was working on the Ed Sullivan Theater
+       dome projection for The Late Show, and Agile Lens built an app to steer projectors around a grid.
+       (b) a 5-minute SIGGRAPH talk on A Christmas Carol VR led to the Waldorf Astoria work: a live guide inside an
+       archviz tour. End caption is the exact module line "Never hide your weird, niche R&D." with the sub-line
+       "It's the proof-of-concept for someone else's problem."
+     PROPOSED / ILLUSTRATIVE: the audience dots, their count and which dot lights up are abstract; no person is depicted
+       or named. No SIGGRAPH year is shown because none was supplied. -->
+<style>
+:root{--bg:#060810;--teal:#00d4ff;--purple:#a78bfa;--amber:#f59e0b;--rose:#f43f5e;--text:#f0f4ff;--dim:rgba(240,244,255,.55)}
+html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;font-family:'Space Grotesk','Inter','Avenir Next','Helvetica Neue',system-ui,sans-serif}
+svg{width:100%;height:100%;display:block}
+.draw{stroke-dasharray:1;stroke-dashoffset:1;animation:draw var(--d,1s) cubic-bezier(.6,0,.3,1) var(--t,0s) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.fade{opacity:0;animation:fade .8s ease var(--t,0s) forwards}
+@keyframes fade{to{opacity:1}}
+.lab{font-size:34px;font-weight:500;fill:var(--text)}
+.nt{font-size:42px;font-weight:700}
+.ns{font-size:30px;fill:var(--dim)}
+.cap{font-size:56px;font-weight:600;fill:var(--text)}
+.sub{font-size:34px;fill:var(--dim)}
+.rip{fill:none;stroke-width:3;transform-box:fill-box;transform-origin:50% 50%;transform:scale(0);opacity:0}
+</style></head><body>
+<svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" aria-label="Two rows. In each, a talk from a podium ripples out to an audience; one audience member lights up and a line connects to the project that followed: The Late Show dome projector-planning app, and a live guide inside a Waldorf Astoria archviz tour.">
+<defs>
+  <clipPath id="clip0"><rect x="250" y="130" width="700" height="290"/></clipPath>
+  <clipPath id="clip1"><rect x="250" y="460" width="700" height="290"/></clipPath>
+</defs>
+<g id="rows"></g>
+<text x="960" y="880" text-anchor="middle" class="cap fade" style="--t:10.6s">&#8220;Never hide your weird, niche R&amp;D.&#8221;</text>
+<text x="960" y="950" text-anchor="middle" class="sub fade" style="--t:11.4s">&#8220;It&#8217;s the proof-of-concept for someone else&#8217;s problem.&#8221;</text>
+</svg>
+<script>
+(function(){
+const NS='http://www.w3.org/2000/svg',G=document.getElementById('rows');
+function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);(parent||G).appendChild(e);return e;}
+function fadeIn(e,delay,dur){e.setAttribute('opacity',0);e.animate([{opacity:0},{opacity:1}],{duration:dur||700,delay,fill:'both'});}
+const rows=[
+  {cy:270,t0:0,color:'#f43f5e',pick:[5,2],
+   label:[['2015',true],[' · a talk about VR theater sightlines',false]],
+   node:['The Late Show dome','a projector-planning app']},
+  {cy:600,t0:5200,color:'#f59e0b',pick:[3,1],
+   label:[['a 5-minute SIGGRAPH talk on ',false],['A Christmas Carol',true],[' VR',false]],
+   node:['Waldorf Astoria','a live guide inside an archviz tour']}
+];
+const PX=200,RIP=720,RIPDUR=1800,COLS=7,ROWS=4;
+rows.forEach((r,ri)=>{
+  const {cy,t0,color}=r;
+  // label above the row (key phrase in the row's accent color)
+  const lab=el('text',{x:80,y:cy-122,class:'lab'});
+  r.label.forEach(([s,hi])=>{const ts=el('tspan',hi?{fill:color,'font-weight':700}:{},lab);ts.textContent=s;});
+  fadeIn(lab,t0+300);
+  // podium glyph: lectern + mic + speaker head
+  const pod=el('g',{transform:`translate(${PX} ${cy})`});
+  el('circle',{cx:0,cy:-62,r:20,fill:'#f0f4ff'},pod);
+  el('path',{d:'M-46 -30 H 46 L 34 70 H -34 Z',fill:'rgba(240,244,255,.12)',stroke:'#f0f4ff','stroke-width':4,'stroke-linejoin':'round'},pod);
+  el('path',{d:'M-56 -30 H 56',stroke:'#f0f4ff','stroke-width':6,'stroke-linecap':'round'},pod);
+  el('path',{d:'M26 -30 L 40 -54',stroke:'#f0f4ff','stroke-width':4,'stroke-linecap':'round'},pod);
+  fadeIn(pod,t0+300);
+  // ripples, clipped to the audience band
+  const rg=el('g',{'clip-path':`url(#clip${ri})`});
+  for(let k=0;k<3;k++){const c=el('circle',{cx:PX,cy,r:RIP,class:'rip',stroke:'#00d4ff','vector-effect':'non-scaling-stroke'},rg);
+    c.animate([{transform:'scale(0.06)',opacity:.9},{transform:'scale(1)',opacity:0}],{duration:RIPDUR,delay:t0+1200+k*500,easing:'linear',fill:'both'});}
+  // audience; each dot brightens as a ripple front passes it
+  let pick=null;
+  for(let i=0;i<COLS;i++)for(let j=0;j<ROWS;j++){
+    const x=420+i*74,y=cy-90+j*60,d=Math.hypot(x-PX,y-cy);
+    const dot=el('circle',{cx:x,cy:y,r:11,fill:'#f0f4ff'});
+    dot.animate([{opacity:0},{opacity:.35}],{duration:500,delay:t0+600+i*40,fill:'both'});
+    for(let k=0;k<3;k++){const hit=t0+1200+k*500+RIPDUR*(d-RIP*.06)/(RIP*.94);
+      dot.animate([{opacity:.35},{opacity:1,offset:.3},{opacity:.35}],{duration:500,delay:hit,fill:'none',composite:'replace'});}
+    if(i===r.pick[0]&&j===r.pick[1])pick={dot,x,y};
+  }
+  // the one who was listening
+  const tl=t0+3400;
+  pick.dot.animate([{opacity:.35,fill:'#f0f4ff'},{opacity:1,fill:color}],{duration:400,delay:tl,fill:'forwards',composite:'replace'});
+  pick.dot.style.transformBox='fill-box';pick.dot.style.transformOrigin='50% 50%';
+  pick.dot.animate([{transform:'scale(1)'},{transform:'scale(1.7)'}],{duration:400,delay:tl,fill:'forwards'});
+  const halo=el('circle',{cx:pick.x,cy:pick.y,r:30,fill:'none',stroke:color,'stroke-width':4});
+  halo.animate([{opacity:0},{opacity:1,offset:.4},{opacity:.6}],{duration:800,delay:tl,fill:'both'});
+  // line to the work that followed
+  const NX=1180,ln=el('path',{d:`M${pick.x+30} ${pick.y} C ${pick.x+200} ${pick.y}, ${NX-180} ${cy}, ${NX} ${cy}`,fill:'none',stroke:color,'stroke-width':5,'stroke-linecap':'round',pathLength:1,'stroke-dasharray':1,'stroke-dashoffset':1});
+  ln.animate([{strokeDashoffset:1},{strokeDashoffset:0}],{duration:1000,delay:tl+400,easing:'cubic-bezier(.6,0,.3,1)',fill:'both'});
+  const node=el('g',{});
+  el('rect',{x:NX,y:cy-74,width:670,height:148,rx:18,fill:'rgba(240,244,255,.05)',stroke:color,'stroke-width':4},node);
+  const t1=el('text',{x:NX+36,y:cy-6,class:'nt',fill:color},node);t1.textContent=r.node[0];
+  const t2=el('text',{x:NX+36,y:cy+44,class:'ns'},node);t2.textContent=r.node[1];
+  fadeIn(node,tl+1200,600);
+});
+})();
+(function(){const P=new URLSearchParams(location.search),END=14;window.MOTION_END=END;
+window.seek=function(s){document.getAnimations().forEach(a=>{a.pause();a.currentTime=s*1000;});};
+if(matchMedia('(prefers-reduced-motion: reduce)').matches||P.has('static'))seek(END);else if(P.has('t'))seek(+P.get('t'));})();
+</script>
+</body></html>
