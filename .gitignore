@@ -21,6 +21,9 @@ source/media/
 tools/providers.json
 
 # deck import/roundtrip tool outputs — regenerated on demand
-media/
+media/*
+# PMRE 2026 talk branch: curated, provenance-tracked talk media + motion graphics are content
+!media/pmre/
+!media/motion/
 tools/imported-*.json
 tools/palette-*.css
