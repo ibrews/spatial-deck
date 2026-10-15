@@ -29,9 +29,9 @@ Every option below is built into the deck. Press **O** in the deck for the picke
 
 All new copy is ✎ PROPOSED (connective). The quotes inside motion graphics are ✅ VERIFIED against Alex's 2017 essay, the KB speaking modules and the Four Seasons Lake Austin notes. The plans in the motion graphics are illustrative.
 
-**Not done (out of time, 10:45 ET):** an "extended" cut beyond full, a side-by-side comparison page, and alternate cover lines.
+**Not done (out of time, 10:45 ET):** an "extended" cut beyond full, a side-by-side comparison page, and alternate cover lines. The official title is already on the PMRE agenda, so only the kicker line would change.
 
-**MP4s for the alternates** (silent, 1080p30): `media/motion/mp4/{questions-dissolve,one-talk,spike-tape,venn-you}.mp4`. Copies are also in `~/Archives/pmre2026-2026-10/organizer-package-draft/videos/alternates/`. The official title is already on the PMRE agenda, so only the kicker line would change.
+**MP4s for the alternates** (silent, 1080p30): `media/motion/mp4/{questions-dissolve,one-talk,spike-tape,venn-you}.mp4`. Copies are also in `~/Archives/pmre2026-2026-10/organizer-package-draft/videos/alternates/`.
 
 **Exports:**
 - Editable PPTX for any combination: `python3 tools/export_talk_pptx.py --pick thesis=b --pick cut=30 --out x.pptx`
