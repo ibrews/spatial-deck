@@ -134,7 +134,7 @@ Reduced-motion/offline: the iframe shows the final frame; the MP4 for the organi
 
 ⏱ ~90s.
 
-✅ VERIFIED [BIO]: Rafael Viñoly Architects, then ZGF (Zimmer Gunsul Frasca), 2010–2013; advocated for AR/real-time visualization tools inside traditional architecture firms; "published in the NY Times (architecture-related)".
+✅ VERIFIED [BIO]: Rafael Viñoly Architects, then ZGF (Zimmer Gunsul Frasca), 2010–2013; advocated for AR/real-time visualization tools inside traditional architecture firms; published in the New York Times (bio bullet; no article details on record).
 
 ⚠ The FMX draft script says "Alfonso Frasca" — wrong. It's Zimmer Gunsul Frasca.
 
@@ -196,7 +196,7 @@ Beat 1 "Can every seat see the show?" — rays from each seat to the top of the 
 
 ⏱ ~90s — a great story, tell it.
 
-✅ VERIFIED [ESSAY17, "The Xiqu Centre Story"]: in 2013 FDA worked with Bing Thom Architects on the Xiqu Centre in West Kowloon; the curvy balcony railing design changed daily; "As soon as we put the design of the theater in VR, we could test these configurations in real time and, most importantly, physically lean our bodies." Full Kokalov quote: "We understood the space in an entirely new way. It was one thing to be rotating around a 3D model. It was entirely something else to see the project at exactly the scale the audience would perceive it after construction." (Slide trims "after construction" for length — say the full line.)
+✅ VERIFIED [ESSAY17, "The Xiqu Centre Story"]: in 2013 FDA worked with Bing Thom Architects on the Xiqu Centre in West Kowloon; the curvy balcony railing design changed daily; "As soon as we put the design of the theater in VR, we could test these configurations in real time and, most importantly, physically lean our bodies." Full Kokalov quote: "We understood the space in an entirely new way. It was one thing to be rotating around a 3D model. It was entirely something else to see the project at exactly the scale the audience would perceive it after construction." (The slide carries the full line.)
 
 ✅ VERIFIED [ESSAY17]: "I'll never forget the first time I had a meeting that was scheduled for two hours and ended up taking less than 45 minutes."
 
@@ -230,7 +230,7 @@ Image: Unity lighting-viz render of the dome (FDA/client). Alt media: media/pmre
 
 ✅ VERIFIED [BIO]: founded 2016 with Josh Dachs as co-founder; sister company to Fisher Dachs Associates and Fisher Marantz Stone. ⚠ The LLC was formed in 2014 — always say 2016 publicly.
 
-✅ VERIFIED [HXR 2017 lesson]: "Chasing architects as clients didn't work — adjacent opportunities did." And from the live talk: "I visited 80 different architecture firms." ❓ ALEX: confirm the 80 before saying it.
+✅ VERIFIED [HXR 2017 lesson]: "Chasing architects as clients didn't work — adjacent opportunities did." ⚠ UNVERIFIED: "I visited 80 different architecture firms" appears only as a style example in the KB voice guide, with no transcript behind it. ❓ ALEX: confirm the number before saying it.
 
 ❓ ALEX: what did it feel like to bet on a job title that didn't exist? No quote on record — this is yours to tell.
 
@@ -238,11 +238,11 @@ Image: Unity lighting-viz render of the dome (FDA/client). Alt media: media/pmre
 
 ⏱ ~75s.
 
-✅ VERIFIED (near-verbatim [PREP]): "I don't want to go get a bunch of computer science graduates, I want actual theater people." (Slide trims "go get".) Context: 2019, High Fidelity; recruited David Gochfeld and Kira Benzing; Kira brought Kevin Laibson (improv background).
+✅ VERIFIED: the slide wording matches your FMX draft script [FMXDRAFT]; the prep interview has it as "I don't want to go get a bunch of computer science graduates, I want actual theater people." [PREP] Context: 2019, High Fidelity; recruited David Gochfeld and Kira Benzing; Kira brought Kevin Laibson (improv background).
 
 ✅ VERIFIED [HXR]: "You want to find people who have improv training because the tech breaks and people who have improv training know how to roll with those punches." Improv actors "yes-and" a broken avatar arm; Shakespeare-trained actors stop and ask for a fix [PREP].
 
-✅ VERIFIED honest nuance [PREP]: not having traditional engineers early made source control/QA harder — "SOME tech team members are useful — don't have zero." Say it; it keeps the talk from sounding anti-specialist.
+✅ VERIFIED honest nuance [PREP — a lesson heading in the prep notes, not a spoken quote]: some traditional tech team members are useful; don't have zero — their absence early made source control/QA harder. Say it in your own words; it keeps the talk from sounding anti-specialist.
 
 ### 20. Live VR Theater ✂
 
@@ -270,7 +270,7 @@ Media: own work (harvardxr-keynote/media/xmas-carol, ghosted). Ghosted poster ca
 
 ✅ VERIFIED [FSLA]: wireless VR holodeck, 5,300 sq ft (82×65 ft); Unreal, OptiTrack, Antilatency, wireless multi-user. Marketing materials say "5,000 sq ft" — the slide says "more than 5,000", which is true of both.
 
-✅ VERIFIED [FSLA]: Agile Lens won a 10-studio bake-off on methodology, not visual fidelity — "our particular method of problem solving and approaching this from a perspective of novel ideas and novel solutions."
+✅ VERIFIED [FSLA]: in a 10-studio bake-off the client hired two studios — another studio for visual fidelity, Agile Lens for methodology — "our particular method of problem solving and approaching this from a perspective of novel ideas and novel solutions."
 
 ✅ VERIFIED [FSLA, from PREP]: "17 different people were like, 'oh yeah, Alex should be involved with this project somehow.' A lot of forces in the universe were conspiring." ❓ ALEX: don't name the 17 people or the competing studio on stage without permission.
 
@@ -290,7 +290,7 @@ A plan on a page → it grows to true scale around a person → the person walks
 
 ⏱ ~2 min — staging is where photographers will lean in.
 
-✅ VERIFIED [FSLA "The Spike Tape Story"]: Kevin Laibson introduced the client to "our thousand-year-old invention — spike tape." A teammate's framing: "A 5-cent solution to what would have been a $5,000 problem." Kevin: "Four Seasons, top to bottom, is a theater experience. It happens to be driven by a VR experience." ❓ ALEX: attribute the spike-tape line to Kevin on stage and don't name the client contact.
+✅ VERIFIED [FSLA "The Spike Tape Story"]: Kevin Laibson introduced the client to "our thousand-year-old invention — spike tape." A teammate's framing: "A 5-cent solution to what would have been a $5,000 problem." Kevin: "Four Seasons, top to bottom, is a theater experience. It happens to be driven by a VR experience…" (the FSLA notes continue: "It's not a VR experience that is similar to theater…") ❓ ALEX: attribute the spike-tape line to Kevin on stage and don't name the client contact.
 
 ✅ VERIFIED [FSLA]: theatrical tricks — e.g. floating an orange in front of guests' faces at a specific moment. Great tiny story.
 
@@ -310,7 +310,7 @@ Image: holodeck session with guests in headsets (fsla_01.jpg; client project —
 
 ⏱ ~45s. Let the photos breathe.
 
-✅ VERIFIED [FSLA]: press — UploadVR "Inside The Walkable VR Holodeck That Sells Real Estate"; you presented the build at Unreal Fest 2023 ("Building a 5,000 sqft VR Experience Space").
+✅ VERIFIED [FSLA]: press — UploadVR "Inside The Walkable VR Holodeck That Sells Real Estate"; you presented the build at Unreal Fest 2023 — KB title: "A New Virtual Reality: A 5,000 sqft VR Experience for Four Seasons Lake Austin" [media/youtube/by-year/2023.md]. (The title card in the photo reads differently; trust the photo, not this note, if they disagree.)
 
 ⚠ RIGHTS: client photos + Epic-branded title card. ❓ ALEX: confirm. The overhead fiducial-floor photo (media/pmre/re-holodeck-fiducial-floor.jpg) is inverted in the source — rotate before use.
 
