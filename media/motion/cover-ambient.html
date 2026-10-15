@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cover Ambient — motion</title>
+<!-- PMRE 2026 ambient background for the title slide. Text-free by design: the title sits on top.
+     Three thin glowing strands (teal, rose, purple) drift and slowly braid across the lower band and converge into a
+     soft gradient band at right (an ambient echo of lane.html's ending), over a faint drafting grid with a few slow
+     particles. Upper/center 60% of the frame is kept calm; every element stays at opacity <= 0.6.
+     VERIFIED text: none (no text). PROPOSED: all imagery and timing.
+     Deterministic: finite CSS/WAAPI animations only (no rAF). The braid's phase completes whole cycles, so
+     seek(MOTION_END) lands on a composed frame. ?static or prefers-reduced-motion = final frame; ?t=SEC or seek(SEC). -->
+<style>
+:root{--bg:#060810;--teal:#00d4ff;--purple:#a78bfa;--amber:#f59e0b;--rose:#f43f5e;--text:#f0f4ff}
+html,body{margin:0;height:100%;background:var(--bg);overflow:hidden}
+svg{width:100%;height:100%;display:block}
+.fade{opacity:0;animation:fade var(--d,2.5s) ease var(--t,0s) forwards}
+@keyframes fade{to{opacity:var(--o,1)}}
+/* grid drifts exactly one major cell over the run, so start and end frames look alike */
+.grid{transform-box:view-box;animation:fade 3s ease 0s forwards, pan 20s linear 0s forwards;opacity:0;--o:1}
+@keyframes pan{from{transform:translate(0,0)}to{transform:translate(-160px,0)}}
+</style></head><body>
+<svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" aria-label="Decorative background: three thin glowing strands braid across the lower part of the frame over a faint drafting grid.">
+<defs>
+  <filter id="glow" filterUnits="userSpaceOnUse" x="-100" y="0" width="2120" height="1080"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="soft" filterUnits="userSpaceOnUse" x="1200" y="600" width="800" height="400"><feGaussianBlur stdDeviation="14"/></filter>
+  <linearGradient id="band" gradientUnits="userSpaceOnUse" x1="1440" y1="0" x2="1960" y2="0"><stop offset="0" stop-color="#00d4ff" stop-opacity="0"/><stop offset=".3" stop-color="#00d4ff"/><stop offset=".65" stop-color="#a78bfa"/><stop offset="1" stop-color="#f43f5e"/></linearGradient>
+  <!-- grid is faint everywhere and a little stronger toward the bottom -->
+  <linearGradient id="gm" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1080"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".55" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="1"/></linearGradient>
+  <mask id="gmask" maskUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080"><rect width="1920" height="1080" fill="url(#gm)"/></mask>
+</defs>
+<g mask="url(#gmask)"><g id="grid" class="grid" fill="none"></g></g>
+<g id="band" class="fade" style="--t:5.5s;--d:4s;--o:1">
+  <path d="M1440 806 L 1990 806" stroke="url(#band)" stroke-width="46" stroke-linecap="round" opacity=".22" filter="url(#soft)"/>
+  <path d="M1440 806 L 1990 806" stroke="url(#band)" stroke-width="16" stroke-linecap="round" opacity=".4"/>
+</g>
+<g id="strands" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"></g>
+<g id="motes"></g>
+</svg>
+<script>
+(function(){
+const NS='http://www.w3.org/2000/svg',END=20;
+const el=(tag,attrs,parent)=>{const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);parent&&parent.appendChild(e);return e;};
+// --- drafting grid: minor 40px, major 160px; extends one major cell past the right edge for the pan
+const G=document.getElementById('grid');
+for(let x=0;x<=1920+160;x+=40){const M=x%160===0;el('line',{x1:x,y1:0,x2:x,y2:1080,stroke:`rgba(240,244,255,${M?.085:.035})`,'stroke-width':M?1.2:1},G);}
+for(let y=40;y<1080;y+=40){const M=y%160===0;el('line',{x1:0,y1:y,x2:2080,y2:y,stroke:`rgba(240,244,255,${M?.085:.035})`,'stroke-width':M?1.2:1},G);}
+// --- braid: three phase-offset sines whose amplitude decays to zero where they meet the band
+const X0=-60,X1=1460,N=72,Y=x=>880-70*((x-X0)/(X1-X0)),TAU=Math.PI*2;
+const amp=x=>{const u=Math.min(1,Math.max(0,(x-X0)/(X1-X0)));const e=1-u*u*(3-2*u);return 34+56*e;};
+const fall=x=>{const u=Math.min(1,Math.max(0,(x-1050)/(X1-1050)));return 1-u*u*(3-2*u);};
+function d(i,ph){let s='';for(let k=0;k<=N;k++){const x=X0+(X1-X0)*k/N;
+  const y=Y(x)+amp(x)*fall(x)*Math.sin(x/160-ph+i*TAU/3)+(i-1)*8*fall(x)*Math.cos(x/410+ph);
+  s+=(k?' L ':'M')+x.toFixed(1)+' '+y.toFixed(1);}return s+' L 1500 806';}
+const KF=16,COLORS=['#00d4ff','#f43f5e','#a78bfa'],S=document.getElementById('strands');
+COLORS.forEach((c,i)=>{
+  const frames=[];for(let f=0;f<=KF;f++)frames.push({d:`path("${d(i,TAU*f/KF)}")`});
+  // body: draws in from the left, then keeps braiding (two whole phase cycles = END)
+  const body=el('path',{d:d(i,0),stroke:c,'stroke-width':3,'stroke-opacity':.55,pathLength:1,'stroke-dasharray':'1 1','stroke-dashoffset':1},S);
+  body.animate(frames,{duration:END*500,iterations:2,easing:'linear',fill:'forwards'});
+  body.animate([{strokeDashoffset:1},{strokeDashoffset:0}],{duration:5200,delay:400+i*350,easing:'cubic-bezier(.5,0,.25,1)',fill:'forwards'});
+  // a slow bright pulse travelling along each strand
+  const pulse=el('path',{d:d(i,0),stroke:c,'stroke-width':4,'stroke-opacity':.6,pathLength:1,'stroke-dasharray':'.07 1.4','stroke-dashoffset':.07},S);
+  pulse.animate(frames,{duration:END*500,iterations:2,easing:'linear',fill:'forwards'});
+  pulse.animate([{strokeDashoffset:.07},{strokeDashoffset:-1.05}],{duration:6000,delay:5000+i*1100,iterations:2,easing:'ease-in-out',fill:'forwards'});
+});
+// --- motes: seeded, so every render is identical; alternate drift ends where it started at END
+let seed=7;const rnd=()=>((seed=(seed*16807)%2147483647)/2147483647);
+const M=document.getElementById('motes'),MC=['#00d4ff','#a78bfa','#f43f5e','#f0f4ff'];
+for(let i=0;i<16;i++){
+  const x=80+rnd()*1760,y=690+rnd()*350,r=1.4+rnd()*1.8,o=.25+rnd()*.3,delay=1+rnd()*4,dx=20+rnd()*40,dy=-(30+rnd()*50);
+  const c=el('circle',{cx:x.toFixed(1),cy:y.toFixed(1),r:r.toFixed(2),fill:MC[i%4],opacity:0},M);
+  c.animate([{opacity:0},{opacity:o}],{duration:2500,delay:delay*1000,fill:'forwards'});
+  c.animate([{transform:'translate(0,0)'},{transform:`translate(${dx.toFixed(1)}px,${dy.toFixed(1)}px)`}],
+    {duration:(END-delay)*500,delay:delay*1000,iterations:2,direction:'alternate',easing:'ease-in-out',fill:'forwards'});
+}
+})();
+(function(){const P=new URLSearchParams(location.search),END=20;window.MOTION_END=END;
+window.seek=function(s){document.getAnimations().forEach(a=>{a.pause();a.currentTime=s*1000;});};
+if(matchMedia('(prefers-reduced-motion: reduce)').matches||P.has('static'))seek(END);else if(P.has('t'))seek(+P.get('t'));})();
+</script>
+</body></html>
