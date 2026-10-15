@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Frame to Room — motion</title>
+<!-- PMRE 2026 motion graphic 4/6. Bridge to the audience's craft: a 3:2 photo frame with a rule-of-thirds grid becomes the far
+     wall of a room; the room extrudes toward the viewer; a walking path crosses the floor. Frame → Room → Walk. -->
+<style>
+:root{--bg:#060810;--teal:#00d4ff;--purple:#a78bfa;--amber:#f59e0b;--text:#f0f4ff;--dim:rgba(240,244,255,.5)}
+html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;font-family:'Space Grotesk','Inter','Avenir Next','Helvetica Neue',system-ui,sans-serif}
+svg{width:100%;height:100%;display:block}
+.draw{stroke-dasharray:1;stroke-dashoffset:1;animation:draw var(--d,1.2s) cubic-bezier(.6,0,.3,1) var(--t,0s) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.fade{opacity:0;animation:fade .8s ease var(--t,0s) forwards}
+@keyframes fade{to{opacity:1}}
+.shrink{transform-box:view-box;transform-origin:960px 470px;animation:shrink 1.6s cubic-bezier(.6,0,.2,1) var(--t) forwards}
+@keyframes shrink{to{transform:scale(.5)}}
+.walk{offset-path:path('M960 1010 C 900 880, 1080 780, 980 640 S 930 600, 960 560');offset-distance:0%;offset-rotate:0deg;animation:walk 3.4s ease-in-out var(--t) forwards}
+@keyframes walk{to{offset-distance:100%}}
+.word{font-size:30px;letter-spacing:.34em;font-weight:600}
+.cap{font-size:46px;font-weight:600;fill:var(--text)}
+</style></head><body>
+<svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" aria-label="A photo frame with a rule-of-thirds grid becomes the back wall of a room, the room extrudes toward the viewer, and a walking path crosses the floor.">
+<!-- the frame (scales down to become the far wall) -->
+<g class="shrink" style="--t:3.2s">
+  <rect x="510" y="170" width="900" height="600" fill="rgba(0,212,255,.05)" stroke="#00d4ff" stroke-width="5" class="draw" pathLength="1" style="--t:.2s;--d:1.4s"/>
+  <g stroke="rgba(0,212,255,.45)" stroke-width="2.5">
+    <line x1="810" y1="170" x2="810" y2="770" class="draw" pathLength="1" style="--t:1.2s"/>
+    <line x1="1110" y1="170" x2="1110" y2="770" class="draw" pathLength="1" style="--t:1.35s"/>
+    <line x1="510" y1="370" x2="1410" y2="370" class="draw" pathLength="1" style="--t:1.5s"/>
+    <line x1="510" y1="570" x2="1410" y2="570" class="draw" pathLength="1" style="--t:1.65s"/>
+  </g>
+  <g fill="#00d4ff" class="fade" style="--t:2s"><circle cx="810" cy="370" r="9"/><circle cx="1110" cy="370" r="9"/><circle cx="810" cy="570" r="9"/><circle cx="1110" cy="570" r="9"/></g>
+</g>
+<text x="960" y="880" text-anchor="middle" class="word fade" style="--t:1.8s;fill:#00d4ff;animation:fade .8s ease 1.8s forwards,fadeo .5s ease 3.2s forwards">THE FRAME</text>
+<style>@keyframes fadeo{to{opacity:0}}</style>
+<!-- room edges from far-wall corners (735,320)(1185,320)(735,620)(1185,620) to the viewer -->
+<g stroke="#a78bfa" stroke-width="4" fill="none">
+  <line x1="735" y1="320" x2="0" y2="-80" class="draw" pathLength="1" style="--t:4.8s"/>
+  <line x1="1185" y1="320" x2="1920" y2="-80" class="draw" pathLength="1" style="--t:4.95s"/>
+  <line x1="735" y1="620" x2="0" y2="1160" class="draw" pathLength="1" style="--t:5.1s"/>
+  <line x1="1185" y1="620" x2="1920" y2="1160" class="draw" pathLength="1" style="--t:5.25s"/>
+</g>
+<g stroke="rgba(167,139,250,.35)" stroke-width="2">
+  <line x1="530" y1="770" x2="1390" y2="770" class="draw" pathLength="1" style="--t:5.8s"/>
+  <line x1="300" y1="938" x2="1620" y2="938" class="draw" pathLength="1" style="--t:5.95s"/>
+  <line x1="860" y1="620" x2="700" y2="1080" class="draw" pathLength="1" style="--t:6.1s"/>
+  <line x1="960" y1="620" x2="960" y2="1080" class="draw" pathLength="1" style="--t:6.2s"/>
+  <line x1="1060" y1="620" x2="1220" y2="1080" class="draw" pathLength="1" style="--t:6.3s"/>
+</g>
+<text x="960" y="250" text-anchor="middle" class="word fade" style="--t:6.2s;fill:#a78bfa;animation:fade .8s ease 6.2s forwards,fadeo .5s ease 7.6s forwards">THE ROOM</text>
+<!-- the walk -->
+<path d="M960 1010 C 900 880, 1080 780, 980 640 S 930 600, 960 560" fill="none" stroke="#f59e0b" stroke-width="4" stroke-dasharray="2 16" stroke-linecap="round" class="fade" style="--t:7.8s"/>
+<circle r="16" fill="#f59e0b" class="walk" style="--t:8.0s;opacity:0;animation:fade .3s ease 7.9s forwards,walk 3.4s ease-in-out 8s forwards"/>
+<text x="960" y="250" text-anchor="middle" class="word fade" style="--t:8.2s;fill:#f59e0b">THE WALK</text>
+<text x="960" y="130" text-anchor="middle" class="cap fade" style="--t:11.6s">Same eye. One more dimension.</text>
+</svg>
+<script>
+(function(){const P=new URLSearchParams(location.search),END=13;window.MOTION_END=END;
+window.seek=function(s){document.getAnimations().forEach(a=>{a.pause();a.currentTime=s*1000;});};
+if(matchMedia('(prefers-reduced-motion: reduce)').matches||P.has('static'))seek(END);else if(P.has('t'))seek(+P.get('t'));})();
+</script>
+</body></html>

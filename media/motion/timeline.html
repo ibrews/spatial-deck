@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Winding Path — motion</title>
+<!-- PMRE 2026 motion graphic 5/6. Career map as a winding road (not a straight lane). Every node is a VERIFIED fact:
+     sources in projects/pmre2026/deck/opus-motion/story-ledger.md (team-alex-full-bio, 2017 article, HarvardXR prep).
+     ?step=N shows nodes 0..N only (for presenter builds); ?static / reduced-motion = full map. -->
+<style>
+:root{--bg:#060810;--teal:#00d4ff;--purple:#a78bfa;--amber:#f59e0b;--rose:#f43f5e;--text:#f0f4ff;--dim:rgba(240,244,255,.55)}
+html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;font-family:'Space Grotesk','Inter','Avenir Next','Helvetica Neue',system-ui,sans-serif}
+svg{width:100%;height:100%;display:block}
+#road{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 9s linear .3s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.n{opacity:0;animation:pop .7s cubic-bezier(.2,1.4,.4,1) var(--t) forwards;transform-box:fill-box;transform-origin:center}
+@keyframes pop{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:none}}
+.yr{font-size:30px;font-weight:700;letter-spacing:.06em}
+.what{font-size:21px;fill:var(--text);font-weight:500}
+.sub{font-size:17px;fill:var(--dim)}
+.lead{stroke:rgba(240,244,255,.25);stroke-width:2}
+</style></head><body>
+<svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" aria-label="Career timeline from Syracuse in 2005 to PMRE 2026, drawn as a winding road.">
+<defs><linearGradient id="rg" gradientUnits="userSpaceOnUse" x1="100" y1="0" x2="1820" y2="0"><stop offset="0" stop-color="#00d4ff"/><stop offset=".5" stop-color="#a78bfa"/><stop offset="1" stop-color="#f43f5e"/></linearGradient></defs>
+<path id="road" pathLength="1" fill="none" stroke="url(#rg)" stroke-width="6" stroke-linecap="round"
+ d="M120 600 C 220 600, 260 470, 360 470 S 520 610, 600 610 S 740 470, 840 470 S 1000 610, 1080 610 S 1220 470, 1320 470 S 1480 610, 1560 610 S 1700 440, 1800 420"/>
+<g id="nodes"></g>
+</svg>
+<script>
+// [year, headline, subline, color] — placed ON the road by arc length; labels alternate into fixed bands (no collisions).
+const N=[
+ ['2005','Syracuse Architecture','B.Arch + minor in Drama','#00d4ff'],
+ ['2008','London','Study abroad: architecture + theater','#f43f5e'],
+ ['2009','Thesis on Governors Island','Immersive theater + webcam AR','#a78bfa'],
+ ['2010','Rafael Vi\u00f1oly \u2192 ZGF','Architect. Renders. Questions.','#00d4ff'],
+ ['2013','Fisher Dachs + Oculus DK1','First VR theater sightline tests','#f43f5e'],
+ ['2016','Agile Lens','Founded with Josh Dachs','#a78bfa'],
+ ['2019','Theater people, not just coders','Improv actors join the team','#f43f5e'],
+ ['2023','A walkable holodeck','Real estate, before it\u2019s built','#f59e0b'],
+ ['2026','PMRE','Las Vegas','#f0f4ff']];
+const NS='http://www.w3.org/2000/svg',G=document.getElementById('nodes'),P=new URLSearchParams(location.search),road=document.getElementById('road');
+const step=P.has('step')?+P.get('step'):null,L=road.getTotalLength();
+N.forEach((d,i)=>{if(step!==null&&i>step)return;const [y,h,s,c]=d,f=0.02+i*(0.96/(N.length-1)),pt=road.getPointAtLength(f*L),x=pt.x,yy=pt.y;
+ const up=i%2===0,ly=up?250:820,t=(0.3+9*f).toFixed(2)+'s';
+ const g=document.createElementNS(NS,'g');g.setAttribute('class','n');g.style.setProperty('--t',t);
+ const anchor=x<200?'start':x>1720?'end':'middle';
+ g.innerHTML=`<line class="lead" x1="${x}" y1="${up?yy-20:yy+20}" x2="${x}" y2="${up?ly+70:ly-40}"/>`+
+  `<circle cx="${x}" cy="${yy}" r="15" fill="#060810" stroke="${c}" stroke-width="5"/><circle cx="${x}" cy="${yy}" r="5" fill="${c}"/>`+
+  `<text x="${x}" y="${ly}" text-anchor="${anchor}" class="yr" fill="${c}">${y}</text>`+
+  `<text x="${x}" y="${ly+32}" text-anchor="${anchor}" class="what">${h}</text>`+
+  `<text x="${x}" y="${ly+58}" text-anchor="${anchor}" class="sub">${s}</text>`;
+ G.appendChild(g);});
+(function(){const END=10.5;window.MOTION_END=END;
+window.seek=function(s){document.getAnimations().forEach(a=>{a.pause();a.currentTime=s*1000;});};
+if(matchMedia('(prefers-reduced-motion: reduce)').matches||P.has('static'))seek(END);else if(P.has('t'))seek(+P.get('t'));})();
+</script>
+</body></html>
