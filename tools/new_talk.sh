@@ -32,6 +32,9 @@ if [ -n "$FROM" ]; then
   SRC=$(cd "$FROM" && pwd); git -C "$SRC" rev-parse --git-dir >/dev/null || die "--from is not a git checkout"
   [ -z "$(git -C "$SRC" status --porcelain)" ] || die "--from checkout has uncommitted changes; commit first"
   grep -q '^## Things to Try' "$SRC/README.md" 2>/dev/null || die "README.md with a '## Things to Try' section is required before publishing"
+  # The template .gitignore ignores media/ (importer scratch). A talk's media/ IS the talk, so an ignored
+  # media/ publishes a deck with every image 404ing. Hit on ibrews/mia-2026-collective-pitch, 2026-10-18.
+  if git -C "$SRC" check-ignore -q media/probe.jpg; then die "media/ is gitignored (template default) — delete the 'media/' line from .gitignore, add your media, commit, then rerun"; fi
   BR=$(git -C "$SRC" branch --show-current); [ -n "$BR" ] || die "--from checkout is on a detached HEAD"
 else
   SRC=${DIR:-$HOME/GH/$SLUG}; [ ! -e "$SRC" ] || die "$SRC already exists"
@@ -62,7 +65,9 @@ git clone https://github.com/$OWNER/$SLUG && open $SLUG/index.html
 
 **Alex Coulombe Presents** · framework: [Spatial Deck](https://github.com/ibrews/spatial-deck)
 EOF
-    git -C "$SRC" add README.md && git -C "$SRC" commit -q -m "docs: README for $SLUG talk"
+    # a talk's media/ must be tracked; the template ignores it for importer scratch
+    sed -i.bak '/^media\/$/d' "$SRC/.gitignore" && rm -f "$SRC/.gitignore.bak"
+    git -C "$SRC" add README.md .gitignore && git -C "$SRC" commit -q -m "docs: README for $SLUG talk; track media/"
   fi
 fi
 
