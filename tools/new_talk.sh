@@ -79,7 +79,8 @@ git -C "$SRC" remote get-url origin >/dev/null 2>&1 || run git -C "$SRC" remote 
 run git -C "$SRC" -c http.postBuffer=1048576000 push -q -u origin "$BR:main"   # big media packs 408 on the default buffer
 [ "$BR" = main ] || run git -C "$SRC" checkout -q -B main "origin/main"
 grep -qx 'notes-config.json' "$SRC/.gitignore" 2>/dev/null || echo "new_talk: warning — add notes-config.json to .gitignore" >&2
-gh api "/repos/$OWNER/$SLUG/pages" --silent 2>/dev/null || run gh api -X POST "/repos/$OWNER/$SLUG/pages" -f 'source[branch]=main' -f 'source[path]=/' --silent
+# No leading slash on gh api endpoints: Git Bash (MSYS) rewrites "/repos/..." into "C:/Program Files/Git/repos/..."
+gh api "repos/$OWNER/$SLUG/pages" --silent 2>/dev/null || run gh api -X POST "repos/$OWNER/$SLUG/pages" -f 'source[branch]=main' -f 'source[path]=/' --silent
 run gh repo edit "$OWNER/$SLUG" --homepage "https://$OWNER.github.io/$SLUG/"
 echo
 echo "new_talk: done → https://github.com/$OWNER/$SLUG  ·  Pages: https://$OWNER.github.io/$SLUG/ (first build takes ~1 min)"

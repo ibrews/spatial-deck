@@ -34,6 +34,10 @@ CHROME_CANDIDATES = [
     "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
     "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser",
     "google-chrome", "google-chrome-stable", "chromium", "chromium-browser",
+    r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+    r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+    r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+    "chrome", "msedge",
 ]
 
 
