@@ -72,6 +72,9 @@ When the user pastes a `# Annotations` block (exported from the deck's annotatio
 - GIFs animate correctly in the media cycler (`buildMediaCycler` auto-detects `.gif` and uses a cross-fading `<img>` path). However, large GIFs should still be converted to MP4 — they compress far better, load faster, and stay under GitHub's 100MB limit. Rule of thumb: if the GIF is over ~5MB, convert it.
 - Max 5 images per project in media cyclers (keeps file sizes reasonable).
 
+### Custom branding is mandatory
+- **Every presentation gets its own custom social card and favicon; never ship the Spatial Deck defaults** (Alex, 2026-10-22). That covers `social.png`/`social.html` (1200x630), `favicon.svg` + PNG/ICO/apple-touch icons, and the `<title>`, description, og:* and twitter:* tags (og:image must point at the fork's own card). The MIA 2026 fork's `tools/check_branding.py` is a reference check that fails the build when a fork still matches the template.
+
 ### Favicon — every fork gets its own
 - **As soon as a fork has a real title (i.e. its `BONUS.title` / cover / `<title>` is set to something other than the template default), generate a favicon for it.** A talk-specific favicon shows up in browser tabs, GitHub Pages link previews, bookmarks, presenter notes windows, AirPlay receivers — anywhere the page is referenced.
 - Generate `favicon.ico` (multi-resolution: 16, 32, 48), plus `favicon-16.png`, `favicon-32.png`, `favicon.svg` (if you have a vector source), and `apple-touch-icon.png` (180×180). Reference them with `<link rel="icon">` in `<head>`.
