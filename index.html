@@ -100,6 +100,8 @@ window.SD=window.SD||{};
 })(window.SD);
 </script>
 <!-- ── SD SLIDE MODULES START ── -->
+<script src="slides/core/intro-avatar/slide.js"></script>
+<script src="slides/core/intro-lens/slide.js"></script>
 <script src="slides/core/lane/slide.js"></script>
 <script src="slides/core/timeline/slide.js"></script>
 <script src="slides/core/venn/slide.js"></script>
@@ -1721,6 +1723,7 @@ function playBing(){try{const c=sfxCtx(),t=c.currentTime,o=c.createOscillator(),
   function frameInstance(r){
     const s=r.ctx.slide,def=r.def;
     const src=def.base+def.frame+(EXPORT?'?static':'')+'#sdp='+encodeURIComponent(JSON.stringify(r.props));
+    s.classList.add('layout-full');  // same box as an IFRAME: full slide, so looks style both identically
     s.innerHTML=`<div class="full-stage sd-frame-stage"><iframe class="full-media anim-frame" data-sd-frame="${r.id}" src="${src}" frameborder="0" scrolling="no" allow="autoplay"></iframe></div>`;
     const f=r.frameEl=s.querySelector('iframe');let ready=false;
     const post=m=>{if(!ready||!f.contentWindow)return;f.contentWindow.postMessage(Object.assign({sd:MSG,v:1,instant:r.ctx.instant},m),'*');};
@@ -1731,7 +1734,7 @@ function playBing(){try{const c=sfxCtx(),t=c.currentTime,o=c.createOscillator(),
     return{enter(){post({type:'enter'});},step(n){post({type:'step',n});},leave(){post({type:'leave'});},staticFrame(){post({type:'static'});},seek(t){post({type:'seek',t});}};
   }
   // ── Tool hooks (sweep, lint, slide.py list, render_motion) ──
-  SD.list=function(){const out=[];allSlides.forEach((s,i)=>{const r=recs.get(s);if(r)out.push({index:i,id:r.id,steps:r.steps,duration:r.def.duration||null,frame:r.def.frame||null,frameSteps:s.dataset.sdFrameSteps!=null?+s.dataset.sdFrameSteps:null,hidden:s.dataset.hidden==='1',seekable:typeof r.inst.seek==='function'});});return out;};
+  SD.list=function(){const out=[];allSlides.forEach((s,i)=>{const r=recs.get(s);if(r)out.push({index:i,id:r.id,name:r.c.motion||null,src:r.frameEl?r.frameEl.getAttribute('src'):null,steps:r.steps,duration:r.def.duration||null,frame:r.def.frame||null,frameSteps:s.dataset.sdFrameSteps!=null?+s.dataset.sdFrameSteps:null,hidden:s.dataset.hidden==='1',seekable:typeof r.inst.seek==='function'});});return out;};
   SD.seekSlide=function(i,t){const r=recs.get(allSlides[i]);if(!r||typeof r.inst.seek!=='function')return false;r.ctx.clock.stop();call(r,'seek',t);return true;};
 })(window.SD);
 
