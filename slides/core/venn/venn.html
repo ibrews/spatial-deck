@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Venn — Spatial Deck module core/venn</title>
+<!-- core/venn: three overlapping circles with the HarvardXR pixel icons (temple, proscenium, platformer monitor); a pixel
+     avatar hops icon to icon, each icon reacts when it lands, overlap labels appear as it crosses them, and it ends on the
+     center pill. Every word is a prop. WAAPI keyframes sampled from pure functions of time (../../kit/sprite.js), so
+     ?static = final frame, ?t=SEC, window.seek(sec) reproduce any frame; slides/sd-frame.js answers the deck.
+     From ibrews/pmre-2026-xr-chitect media/motion/venn-sprite.html @310afba, itself a seekable port of
+     harvardxr-keynote@7c6fbf5 buildVennSlide. -->
+<style>
+:root{--bg:#060810;--text:#f0f4ff;--dim:rgba(240,244,255,.5)}
+html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;font-family:'Space Grotesk','Inter','Avenir Next','Helvetica Neue',system-ui,sans-serif}
+svg{width:100%;height:100%;display:block}
+.c{mix-blend-mode:screen;opacity:0;animation:in 1.6s cubic-bezier(.2,.8,.2,1) var(--t) forwards}
+@keyframes in{from{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.8)}to{opacity:1;transform:none}}
+.fade{opacity:0;animation:fade .9s ease var(--t,0s) forwards}
+@keyframes fade{to{opacity:1}}
+.pop{opacity:0;transform-box:fill-box;transform-origin:center;animation:pop 1s cubic-bezier(.2,1.4,.4,1) var(--t) forwards}
+@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+.lbl{font-size:40px;font-weight:600;letter-spacing:.18em;fill:var(--text)}
+.ov{font-size:27px;font-weight:500;fill:var(--text);letter-spacing:.04em}
+.halo{stroke:#060810;stroke-width:10px;stroke-linejoin:round;paint-order:stroke fill;stroke-opacity:.85}
+.cap{font-size:30px;fill:var(--dim);letter-spacing:.3em}
+.core{font-size:44px;font-weight:700;fill:#060810;letter-spacing:.06em}
+</style></head><body>
+<svg id="s" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" aria-label="">
+<defs>
+  <radialGradient id="ga"><stop offset="0" stop-color="#00d4ff" stop-opacity=".42"/><stop offset="1" stop-color="#00d4ff" stop-opacity=".1"/></radialGradient>
+  <radialGradient id="gt"><stop offset="0" stop-color="#f43f5e" stop-opacity=".42"/><stop offset="1" stop-color="#f43f5e" stop-opacity=".1"/></radialGradient>
+  <radialGradient id="gx"><stop offset="0" stop-color="#a78bfa" stop-opacity=".42"/><stop offset="1" stop-color="#a78bfa" stop-opacity=".1"/></radialGradient>
+  <linearGradient id="core" x1="0" x2="1"><stop offset="0" stop-color="#00d4ff"/><stop offset=".5" stop-color="#a78bfa"/><stop offset="1" stop-color="#f43f5e"/></linearGradient>
+</defs>
+<g>
+  <circle class="c" cx="820" cy="450" r="300" fill="url(#ga)" stroke="#00d4ff" stroke-width="3" style="--t:.3s;--dx:-500px;--dy:-120px"/>
+  <circle class="c" cx="1100" cy="450" r="300" fill="url(#gt)" stroke="#f43f5e" stroke-width="3" style="--t:.8s;--dx:500px;--dy:-120px"/>
+  <circle class="c" cx="960" cy="690" r="300" fill="url(#gx)" stroke="#a78bfa" stroke-width="3" style="--t:1.3s;--dx:0px;--dy:420px"/>
+</g>
+<text x="560" y="118" text-anchor="middle" class="lbl fade" style="--t:1.2s;fill:#00d4ff" data-p="labels.0"></text>
+<text x="1320" y="118" text-anchor="middle" class="lbl fade" style="--t:1.6s;fill:#f43f5e" data-p="labels.1"></text>
+<text x="960" y="1040" text-anchor="middle" class="lbl fade" style="--t:2.0s;fill:#a78bfa" data-p="labels.2"></text>
+<g id="icons"></g>
+<!-- overlap labels, revealed as the avatar crosses each overlap -->
+<text x="960" y="355" text-anchor="middle" class="ov halo fade" style="--t:4.5s" data-p="overlaps.0"></text>
+<text x="1160" y="700" text-anchor="middle" class="ov halo fade" style="--t:6.6s" data-p="overlaps.1"></text>
+<text x="755" y="700" text-anchor="middle" class="ov halo fade" style="--t:8.6s" data-p="overlaps.2"></text>
+<g class="pop" style="--t:10.2s" data-p-group="center">
+  <rect x="790" y="508" width="340" height="76" rx="38" fill="url(#core)"/>
+  <text x="960" y="560" text-anchor="middle" class="core" data-p="center"></text>
+</g>
+<g id="hero"></g>
+<g id="fx"></g>
+<text x="960" y="56" text-anchor="middle" class="cap fade" style="--t:11.4s" data-p="caption"></text>
+</svg>
+<script src="../../kit/sprite.js"></script>
+<script src="../../sd-frame.js"></script>
+<script>
+// Words come from the deck (props) or these neutral defaults. An empty string drops that element (and its animation).
+const VP = SDFrame.props({ labels: ['CRAFT ONE', 'CRAFT TWO', 'CRAFT THREE'], overlaps: ['', '', ''], center: 'YOU', caption: '', beard: false });
+document.querySelectorAll('[data-p]').forEach((el) => { const [k, i] = el.dataset.p.split('.'); const v = i == null ? VP[k] : (VP[k] || [])[+i]; if (v) el.textContent = v; else el.remove(); });
+if (!VP.center) document.querySelector('[data-p-group="center"]').remove();
+document.getElementById('s').setAttribute('aria-label', `Three overlapping circles, ${VP.labels.join(', ')}, each with a pixel icon; a pixel avatar hops between them${VP.center ? ' and ends on ' + VP.center : ''}.`);
+</script>
+
+<script>
+(function(){
+const END=13.5, {track,clamp}=PX, icons=document.getElementById('icons'), S=3.4, SC=1.6;
+// Icons in each circle's exclusive region (HXR layout, PMRE colors: architecture teal, theater rose, technology purple).
+const A=[640,470], T=[1280,470], X=[960,880], C=[960,508];  // sprite foot positions
+const tmp=PX.temple(icons,A[0],A[1]-17*S,S), th=PX.theater(icons,T[0],T[1]-12*S,S), mo=PX.monitor(icons,X[0],X[1]-14*S,S);
+[[tmp,2.0],[th,2.2],[mo,2.4]].forEach(([I,t0])=>track(I.pos,END,t=>{const k=clamp((t-t0)/.5,0,1);return{opacity:+k.toFixed(3)};}));
+const hero=PX.sprite(document.getElementById('hero'),{withBeard:!!VP.beard});
+// Two bounces per leg, like the HXR pinball: the first lands on the overlap, the second on the next icon.
+const at=PX.route([
+  {type:'idle',t0:0,t1:3.4,a:A,face:1},
+  {type:'hop',t0:3.4,t1:4.3,a:A,b:[960,440],h:120},           // into Architecture ∩ Theater
+  {type:'hop',t0:4.3,t1:5.1,a:[960,440],b:T,h:80},
+  {type:'idle',t0:5.1,t1:5.6,a:T},
+  {type:'hop',t0:5.6,t1:6.4,a:T,b:[1170,640],h:90},            // Theater ∩ Technology
+  {type:'hop',t0:6.4,t1:7.2,a:[1170,640],b:X,h:70},
+  {type:'idle',t0:7.2,t1:7.6,a:X},
+  {type:'hop',t0:7.6,t1:8.4,a:X,b:[760,640],h:90},             // Architecture ∩ Technology
+  {type:'idle',t0:8.4,t1:8.9,a:[760,640]},
+  {type:'hop',t0:8.9,t1:9.9,a:[760,640],b:C,h:150},            // up onto the center
+  {type:'idle',t0:9.9,t1:END,a:C,cheer:false,face:1}
+]);
+PX.drive(hero,END,at,SC,[2.6,3.1]);
+PX.reactArch(tmp,END,3.1); PX.reactTheater(th,END,5.1); PX.reactTech(mo,END,7.2);
+const fx=document.getElementById('fx');
+PX.sparkles(fx,END,A[0],A[1]-60,2.7,21,.8); PX.sparkles(fx,END,T[0],T[1]-60,5.1,22,.6); PX.sparkles(fx,END,X[0],X[1]-50,7.2,23,.6); PX.sparkles(fx,END,960,546,10.0,24,1.3);
+SDFrame.init({ duration: END, steps: 0 });
+})();
+</script>
+</body></html>

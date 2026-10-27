@@ -94,6 +94,8 @@ Draft dumb, make it amazing, ship it back out — every leg is tooled:
 7. **Run `python3 tools/export_pdf.py`** — every visible slide captured pixel-faithfully into a 16:9 PDF, rendered by the deck itself (needs Google Chrome installed), ending with a fidelity report of anything that degraded.
 8. **Open any talk from the [Talks built with Spatial Deck](#-talks-built-with-spatial-deck) table** and press `→` — each is a live, single-file deck you can read the source of and fork.
 9. **Resize your browser to phone width, or run the sweep at `375 812`** — every slide letterboxes onto a fixed 1920×1080 stage instead of reflowing, so nothing clips. `python3 tools/serve_deck.py --port 8411` then `node tools/sweep_deck.mjs http://localhost:8411/ /tmp/sweep 375 812 phone` proves it: exit 0, `problemSlides: 0`, plus contact sheets you can open.
+10. **Run `bash tools/tests/test_steps.sh`**: it builds a fixture deck from the template and runs `node tools/sweep_deck.mjs --steps` twice. The good deck passes; the broken deck fails on exactly its three planted defects (a dead click, an iframe that reports the wrong step count, a module that sneaks in its own substeps). Open the contact sheets it prints: every substep is a captioned tile.
+11. **Run `python3 tools/slide.py list .`** to see the slide-module library (`core/lane`, `core/timeline`, `core/venn`, …) with step counts and durations, then open `slides/core/venn/venn.html` directly: it plays on its own, `?static` shows the final frame and `?t=5` the frame at 5 s. See [Slide modules](#-slide-modules).
 
 ---
 
@@ -304,6 +306,23 @@ Two or more keyframes on the same element build a WAAPI animation automatically.
 9. **Add `?look=sheet` (or `swiss`, `memo`, `atlas` and nine others) to the URL**, or open [`styles/index.html`](styles/index.html) to browse all twelve looks. The same slides become a construction-document sheet, a Swiss poster, a typewritten memo or a survey map; then run `node tools/lint_look.mjs --look sheet` and compare it with the original look (`--look noir`), which trips 7 generic-AI-design tells.
 
 ---
+
+## 🧩 Slide modules
+
+A slide with its own behavior (an animated diagram, an intro, a motion graphic) is a **module**: a folder
+`slides/<namespace>/<id>/` with `slide.js` and its assets. A talk uses it as a case and passes its own words as props:
+
+```js
+{ use: 'core/venn', props: { labels: ['Architecture', 'Theater', 'Realtime Tech'], center: 'XR' }, notes: '…' }
+```
+
+The module declares how many clicks it has (`steps`), how long its entry motion runs (`duration`) and, if it can,
+`seek(t)` for deterministic MP4 rendering. iframe motion graphics get the same enter / step / leave calls over
+`postMessage` (`slides/sd-frame.js`), so they replay on slide entry without a reload. `slides/core/` is the shared
+library and holds no talk text. `python3 tools/slide.py pull <deck> <ns/id> --into <talk>` copies a module with its
+files and provenance; `node tools/sweep_deck.mjs <url> <out> 1920 1080 steps --steps` screenshots every substep and
+fails when declared clicks and reachable clicks disagree. Contract, protocol and design notes:
+[slides/README.md](slides/README.md).
 
 ## 🖋️ Looks (style library)
 

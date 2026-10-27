@@ -78,6 +78,32 @@ const SECTIONS = [
 const BONUS = { year:'BONUS', title:'The Best XR Project\nIs the One You Don\u2019t Need.',
   tagline:'Sometimes a 3D PDF, a Matterport scan, or a well-placed monitor does the job. The most honest answer a studio can give you is \u201cyou don\u2019t need us for this.\u201d If they never say that \u2014 they\u2019re selling headsets, not solutions.' };
 </script>
+<script>
+/* ── SD SLIDE MODULE REGISTRY ──────────────────────────────────────────────
+   A slide module is a folder slides/<namespace>/<id>/ holding slide.js plus its assets. slide.js is a CLASSIC
+   script (not an ES module, so the deck still opens from file://) that calls SD.defineSlide({...}). The deck
+   loads every module listed between the SD SLIDE MODULES sentinels below (tools/slide.py sync rewrites that
+   list from disk), then a SECTIONS case { use:'<namespace>/<id>', props:{...}, notes:'...' } builds a slide
+   from it. Contract, lifecycle and the iframe step protocol: slides/README.md. */
+window.SD=window.SD||{};
+(function(SD){
+  SD.protocol=1;
+  const reg=SD.modules=SD.modules||{};
+  SD.defineSlide=function(def){
+    if(!def||typeof def.id!=='string'||!/^[\w-]+\/[\w-]+$/.test(def.id))throw new Error('SD.defineSlide: id must look like "<namespace>/<id>", got '+JSON.stringify(def&&def.id));
+    if(!def.render&&!def.frame)throw new Error('SD.defineSlide('+def.id+'): needs render(el, props, ctx) or frame:"<file>.html"');
+    // Assets resolve against the folder slide.js was loaded from, so a pulled module keeps working wherever it lands.
+    const cs=document.currentScript;def.base=def.base||(cs&&cs.src?cs.src.replace(/[^/]*$/,''):'slides/'+def.id+'/');
+    if(reg[def.id])console.warn('SD: module '+def.id+' is defined twice; the later definition wins');
+    reg[def.id]=def;return def;
+  };
+})(window.SD);
+</script>
+<!-- ── SD SLIDE MODULES START ── -->
+<script src="slides/core/lane/slide.js"></script>
+<script src="slides/core/timeline/slide.js"></script>
+<script src="slides/core/venn/slide.js"></script>
+<!-- ── SD SLIDE MODULES END ── -->
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"}}</script>
 
 <style>
@@ -1637,6 +1663,78 @@ function playBing(){try{const c=sfxCtx(),t=c.currentTime,o=c.createOscillator(),
   loadNotesConfig().then(cfg=>{if(!cfg){_syncStatus.textContent='no notes-config.json';return;}_syncStatus.textContent='configured · '+cfg.deckId;syncCall('getNotes',{}).then(d=>{_applyNotesData(d);_refreshNotesUi();_syncStatus.textContent='synced · '+(d.slides||[]).length+' slides';}).catch(e=>{_syncStatus.textContent='sync error: '+e.message;});});
 })();
 
+// ── SD SLIDE MODULE RUNTIME (build + lifecycle; contract in slides/README.md) ──
+// A case with `use` is built by its module. The deck owns navigation and chrome; the module owns what is inside the
+// slide. Clicks inside a slide go through slideSteps exactly like hand-written steps, so the step indicator, timing
+// estimate and ?print step-completion keep working. iframe modules get the same calls over postMessage.
+(function(SD){
+  const Q=new URLSearchParams(location.search);let rm=false;try{rm=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
+  const EXPORT=Q.has('print')||Q.has('shot');
+  // instant: every beat jumps to its final frame (no timers, no sound). Print/shot, ?static, ?reduced, reduced motion.
+  const INSTANT=EXPORT||Q.has('static')||Q.has('reduced')||rm;
+  SD.exportMode=EXPORT;SD.instant=INSTANT;
+  const recs=SD._recs=new Map();
+  const MSG='spatial-deck';
+  // One clock per slide: leave() stops every timeout, interval and frame loop started through it.
+  function clock(){const ts=new Set(),iv=new Set();let gen=0;return{
+    after(ms,fn){const g=gen;const id=setTimeout(()=>{ts.delete(id);if(g===gen)fn();},ms);ts.add(id);return id;},
+    every(ms,fn){const g=gen;const id=setInterval(()=>{if(g===gen)fn();},ms);iv.add(id);return id;},
+    raf(fn){const g=gen;requestAnimationFrame(t=>{if(g===gen)fn(t);});},
+    // fn(secondsSinceStart) every frame until it returns false or the clock stops; the basis for seekable live playback
+    loop(fn){const g=gen;let t0=null;const tick=t=>{if(g!==gen)return;if(t0===null)t0=t;if(fn((t-t0)/1000)!==false)requestAnimationFrame(tick);};requestAnimationFrame(tick);},
+    stop(){ts.forEach(clearTimeout);ts.clear();iv.forEach(clearInterval);iv.clear();gen++;}};}
+  let _audio=null;
+  // The deck's _killAllSfx() closes every AudioContext on slide change; hand out a fresh one after that.
+  function audio(){if(INSTANT)return null;try{if(!_audio||_audio.state==='closed')_audio=new(window.AudioContext||window.webkitAudioContext)();if(_audio.state==='suspended')_audio.resume();return _audio;}catch(e){return null;}}
+  function call(r,fn,...a){const f=r.inst&&r.inst[fn];if(typeof f!=='function')return;try{return f.apply(r.inst,a);}catch(e){console.error('SD: '+r.id+'.'+fn+'() threw',e);}}
+  function resolveSteps(def,c,props){const n=c.steps!=null?c.steps:(typeof def.steps==='function'?def.steps(props):def.steps);return Math.max(0,Math.floor(+n||0));}
+  function fail(s,msg){s.classList.add('sd-mod-error');s.innerHTML=`<div class="sd-iframe-ph"><span class="ph-kicker">slide module</span><span>${msg}</span></div>`;console.error('SD: '+msg.replace(/<[^>]+>/g,''));}
+  SD._build=function(s,c,sec){
+    const id=c.use,def=SD.modules[id];
+    s.dataset.sdMod=id;s.classList.add('sd-mod','sd-mod-'+id.replace(/[^\w-]/g,'-'));
+    if(!def){s.dataset.sdMissing='1';fail(s,`Module <code>${id}</code> is not loaded. Put it in slides/${id}/ and run tools/slide.py sync.`);return;}
+    if(def.css&&!document.querySelector(`style[data-sd-mod="${id}"]`)){const st=document.createElement('style');st.dataset.sdMod=id;st.textContent=def.css;document.head.appendChild(st);}
+    const props=Object.assign({},def.props||{},c.props||{});  // shallow: a talk replaces a whole prop, arrays included
+    const steps=resolveSteps(def,c,props);s.dataset.sdSteps=steps;
+    if(def.duration)s.dataset.sdDuration=def.duration;
+    const ctx={id,slide:s,props,steps,base:def.base,asset:p=>def.base+p,instant:INSTANT,exportMode:EXPORT,params:Q,
+      clock:clock(),audio,svg:svgE,section:sec,look:()=>window.SD_ACTIVE_LOOK||document.body.dataset.look||'noir'};
+    const r={id,def,c,props,ctx,steps,inst:{},on:false,cur:0,frozen:false};recs.set(s,r);
+    try{r.inst=def.frame?frameInstance(r):(def.render(s,props,ctx)||{});}catch(e){fail(s,`Module <code>${id}</code> failed to render: ${String(e&&e.message||e)}`);r.inst={};}
+    if(steps>0)slideSteps.set(s,{current:0,sdModule:id,reset(){},
+      steps:Array.from({length:steps},(_,i)=>()=>{if(r.frozen)return;r.cur=i+1;call(r,'step',i+1);})});
+  };
+  function enter(r){if(r.on||r.frozen)return;r.on=true;r.cur=0;r.ctx.clock.stop();call(r,'enter');}
+  function leave(r){if(!r.on)return;r.on=false;r.ctx.clock.stop();call(r,'leave');}
+  // Final frame with every step applied: staticFrame() if the module has one, else an instant replay of every beat.
+  function freeze(r){r.frozen=true;r.ctx.clock.stop();if(typeof r.inst.staticFrame==='function')call(r,'staticFrame');else{const i0=r.ctx.instant;r.ctx.instant=true;call(r,'enter');for(let i=1;i<=r.steps;i++)call(r,'step',i);r.ctx.instant=i0;}r.ctx.clock.stop();}
+  SD._wire=function(){
+    if(EXPORT){recs.forEach((r,s)=>{freeze(r);const ss=slideSteps.get(s);if(ss)ss.current=ss.steps.length;});return;}
+    recs.forEach((r,s)=>{new MutationObserver(()=>{s.classList.contains('active')?enter(r):leave(r);}).observe(s,{attributes:true,attributeFilter:['class']});if(s.classList.contains('active'))enter(r);});
+  };
+  // ── iframe modules: slides/<ns>/<id>/<frame>.html + slides/sd-frame.js speak this protocol ──
+  // parent → frame {sd:'spatial-deck',v:1,type:'enter'|'step'|'leave'|'seek'|'static', n?, t?, instant?}
+  // frame → parent {sd:'spatial-deck',v:1,type:'ready', steps, duration}
+  // Props travel in the URL fragment (#sdp=<json>) so the frame can build synchronously, and render_motion can open it.
+  // Match the sender by contentWindow at receive time: ready can arrive before the iframe's load event fires.
+  addEventListener('message',e=>{const d=e.data;if(!d||d.sd!==MSG||d.type!=='ready')return;for(const r of recs.values())if(r.frameEl&&r.frameEl.contentWindow===e.source){r.frameReady(d);break;}});
+  function frameInstance(r){
+    const s=r.ctx.slide,def=r.def;
+    const src=def.base+def.frame+(EXPORT?'?static':'')+'#sdp='+encodeURIComponent(JSON.stringify(r.props));
+    s.innerHTML=`<div class="full-stage sd-frame-stage"><iframe class="full-media anim-frame" data-sd-frame="${r.id}" src="${src}" frameborder="0" scrolling="no" allow="autoplay"></iframe></div>`;
+    const f=r.frameEl=s.querySelector('iframe');let ready=false;
+    const post=m=>{if(!ready||!f.contentWindow)return;f.contentWindow.postMessage(Object.assign({sd:MSG,v:1,instant:r.ctx.instant},m),'*');};
+    const sync=()=>{if(r.frozen){post({type:'static'});return;}if(r.on){post({type:'enter'});for(let i=1;i<=r.cur;i++)post({type:'step',n:i,instant:true});}else post({type:'leave'});};
+    r.frameReady=d=>{ready=true;s.dataset.sdFrameSteps=d.steps|0;if(d.duration)s.dataset.sdDuration=d.duration;
+      if((d.steps|0)!==r.steps)console.warn(`SD: ${r.id} frame reports ${d.steps|0} step(s) but the deck asks for ${r.steps}`);sync();};
+    // A frame that reloads (look change, src reassigned) sends ready again and is resynced to the current step.
+    return{enter(){post({type:'enter'});},step(n){post({type:'step',n});},leave(){post({type:'leave'});},staticFrame(){post({type:'static'});},seek(t){post({type:'seek',t});}};
+  }
+  // ── Tool hooks (sweep, lint, slide.py list, render_motion) ──
+  SD.list=function(){const out=[];allSlides.forEach((s,i)=>{const r=recs.get(s);if(r)out.push({index:i,id:r.id,steps:r.steps,duration:r.def.duration||null,frame:r.def.frame||null,frameSteps:s.dataset.sdFrameSteps!=null?+s.dataset.sdFrameSteps:null,hidden:s.dataset.hidden==='1',seekable:typeof r.inst.seek==='function'});});return out;};
+  SD.seekSlide=function(i,t){const r=recs.get(allSlides[i]);if(!r||typeof r.inst.seek!=='function')return false;r.ctx.clock.stop();call(r,'seek',t);return true;};
+})(window.SD);
+
 // Cover
 const cov=document.createElement('div');cov.className='slide active';cov.dataset.type='cover';
 cov.innerHTML=`<div class="event-tag">Spatial Deck &middot; Open-Source Presentation Framework</div><h1 class="talk-title">Is XR Right<br>For Your Project?</h1><p class="talk-subtitle">A framework for spatial decisions &mdash; before you pick a headset or a studio</p><div class="speaker-card"><div><div class="speaker-name">A Spatial Deck Presentation</div><div class="speaker-co">github.com/spatial-deck</div></div></div>`;
@@ -1650,6 +1748,8 @@ SECTIONS.forEach((sec,si)=>{
   deck.appendChild(ls);allSlides.push(ls);lessonIdxs.push(allSlides.length-1);
   sec.cases.forEach(c=>{
     const s=document.createElement('div');s.className=`slide case-slide${ac}${c.layout?' layout-'+c.layout:''}${c.gridCover?' grid-cover':''}`;s.dataset.type='case';s.dataset.year=sec.year;s.dataset.section=si;
+    // use: '<namespace>/<id>' — the slide is built by a slide module (slides/README.md)
+    if(c.use){SD._build(s,c,sec);deck.appendChild(s);allSlides.push(s);return;}
     // layout: 'big' — full-slide statement text (bigText, optional title/subtitle/bigCaption)
     if(c.layout==='big'){
       s.innerHTML=`<div class="big-stack">${c.pill&&c.title?`<div class="big-pill accent-${sec.accent||'teal'}">${c.title}</div>`:c.title?`<h2 class="big-eyebrow">${c.title.replace(/\n/g,'<br>')}</h2>`:''} ${c.subtitle?`<div class="big-sub">${c.subtitle}</div>`:''}${c.bigText?`<h1 class="big-text">${c.bigText.replace(/\n/g,'<br>')}</h1>`:''}${c.bigCaption?`<p class="big-caption">${c.bigCaption.replace(/\n/g,'<br>')}</p>`:''}</div>`;
@@ -1893,6 +1993,7 @@ cls.innerHTML=`<div class="close-ey">Thank You</div><h2 class="close-title">Let\
 <div style="position:absolute;bottom:clamp(30px,calc(4*var(--vh)),60px);left:50%;transform:translateX(-50%);opacity:.35;z-index:2"><svg width="200" height="40" viewBox="0 0 869 175" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M266.385 134.295L264.681 136H249.34L247.635 134.295L239.113 112.137L235.704 110.432H193.09L189.681 112.137L181.159 134.295L179.454 136H164.114L162.409 134.295V117.25L201.613 18.3878L203.318 16.6833H225.476L227.181 18.3878L266.385 117.25V134.295ZM230.59 88.2733L215.249 47.3647H213.545L198.204 88.2733L199.909 89.9778H228.886L230.59 88.2733ZM346.604 52.4783V127.477C346.604 158.159 327.854 171.795 303.991 171.795C283.537 171.795 269.901 161.568 268.196 146.227L269.901 144.523H290.355L292.059 146.227C293.764 149.636 297.173 151.341 303.991 151.341C315.923 151.341 322.741 144.523 322.741 129.182H321.036C321.036 129.182 314.218 137.705 298.878 137.705C278.423 137.705 261.378 120.659 261.378 93.3869C261.378 66.1145 278.423 49.0692 298.878 49.0692C314.218 49.0692 321.036 57.5919 321.036 57.5919H322.741L324.445 52.4783L326.15 50.7738H344.9L346.604 52.4783ZM285.241 93.3869C285.241 107.023 290.355 117.25 303.991 117.25C317.627 117.25 322.741 107.023 322.741 93.3869C322.741 79.7507 317.627 69.5235 303.991 69.5235C290.355 69.5235 285.241 79.7507 285.241 93.3869ZM378.964 35.433L377.259 37.1376H356.805L355.1 35.433V18.3878L356.805 16.6833H377.259L378.964 18.3878V35.433ZM378.964 134.295L377.259 136H356.805L355.1 134.295V52.4783L356.805 50.7738H377.259L378.964 52.4783V134.295ZM411.31 134.295L409.605 136H389.151L387.446 134.295V18.3878L389.151 16.6833H409.605L411.31 18.3878V134.295ZM496.496 93.3869V100.205L494.791 101.91H441.951L440.247 103.614C440.247 107.023 443.656 117.25 457.292 117.25C462.405 117.25 467.519 115.546 469.223 112.137L470.928 110.432H491.382L493.087 112.137C491.382 122.364 482.86 137.705 457.292 137.705C428.315 137.705 414.679 117.25 414.679 93.3869C414.679 69.5235 428.315 49.0692 455.587 49.0692C482.86 49.0692 496.496 69.5235 496.496 93.3869ZM469.223 84.8643L470.928 83.1597C470.928 81.4552 469.223 69.5235 455.587 69.5235C441.951 69.5235 440.247 81.4552 440.247 83.1597L441.951 84.8643H469.223ZM615.779 134.295L614.075 136H537.371L535.667 134.295V18.3878L537.371 16.6833H557.825L559.53 18.3878V113.841L561.234 115.546H614.075L615.779 117.25V134.295ZM687.249 93.3869V100.205L685.545 101.91H632.705L631 103.614C631 107.023 634.409 117.25 648.045 117.25C653.159 117.25 658.273 115.546 659.977 112.137L661.682 110.432H682.136L683.84 112.137C682.136 122.364 673.613 137.705 648.045 137.705C619.068 137.705 605.432 117.25 605.432 93.3869C605.432 69.5235 619.068 49.0692 646.341 49.0692C673.613 49.0692 687.249 69.5235 687.249 93.3869ZM659.977 84.8643L661.682 83.1597C661.682 81.4552 659.977 69.5235 646.341 69.5235C632.705 69.5235 631 81.4552 631 83.1597L632.705 84.8643H659.977ZM770.778 134.295L769.073 136H748.619L746.914 134.295V84.8643C746.914 76.3416 743.505 69.5235 733.278 69.5235C721.347 69.5235 714.528 76.3416 714.528 91.6824V134.295L712.824 136H692.37L690.665 134.295V52.4783L692.37 50.7738H711.119L712.824 52.4783L714.528 57.5919H716.233C719.642 54.1828 726.46 49.0692 738.392 49.0692C758.846 49.0692 770.778 62.7054 770.778 83.1597V134.295ZM847.495 110.432C847.495 124.068 837.268 137.705 809.995 137.705C786.132 137.705 772.496 125.773 772.496 108.728L774.2 107.023H794.654L796.359 108.728C796.359 115.546 801.473 117.25 809.995 117.25C818.518 117.25 823.631 115.546 823.631 110.432C823.631 103.614 816.813 103.614 806.586 101.91C796.359 100.205 774.2 95.0914 774.2 74.6371C774.2 61.0009 784.427 49.0692 809.995 49.0692C830.449 49.0692 845.79 57.5919 845.79 74.6371L844.086 76.3416H823.631L821.927 74.6371C821.927 71.2281 818.518 69.5235 809.995 69.5235C801.473 69.5235 798.064 71.2281 798.064 76.3416C798.064 83.1597 808.291 83.1597 818.518 84.8643C828.745 86.5688 847.495 89.9778 847.495 110.432Z" fill="white"/><circle cx="71" cy="73" r="60" stroke="white" stroke-width="8" fill="none"/><line x1="115" y1="117" x2="142" y2="155" stroke="white" stroke-width="8" stroke-linecap="round"/></svg></div>`;
 deck.appendChild(cls);allSlides.push(cls);
 
+SD._wire();
 // Navigation
 let current=1,total=allSlides.length,direction=1;
 function nextVisible(f,d){let i=f;for(let n=0;n<total;n++){i=(i+d+total)%total;if(allSlides[i].dataset.hidden!=='1')return i;}return f;}
@@ -3589,7 +3690,7 @@ updateHUD();
   }
   // Freeze videos on an early frame; swap iframes for placeholder panels.
   document.querySelectorAll('#deck video').forEach(v=>{try{v.muted=true;v.autoplay=false;v.removeAttribute('autoplay');v.preload='auto';v.addEventListener('loadedmetadata',()=>{try{v.pause();v.currentTime=Math.min(0.1,(v.duration||1)/2);}catch(_){}});v.load();}catch(_){}});
-  document.querySelectorAll('#deck iframe').forEach(f=>{const src=f.src||'';const ph=document.createElement('div');ph.className='sd-iframe-ph';const k=document.createElement('span');k.className='ph-kicker';k.textContent='embedded content';const u=document.createElement('span');u.textContent=src;ph.appendChild(k);ph.appendChild(u);ph.style.minHeight=Math.max(200,f.offsetHeight||0)+'px';f.replaceWith(ph);});
+  document.querySelectorAll('#deck iframe').forEach(f=>{const src=f.src||'';if(f.dataset.sdFrame)return;const ph=document.createElement('div');ph.className='sd-iframe-ph';const k=document.createElement('span');k.className='ph-kicker';k.textContent='embedded content';const u=document.createElement('span');u.textContent=src;ph.appendChild(k);ph.appendChild(u);ph.style.minHeight=Math.max(200,f.offsetHeight||0)+'px';f.replaceWith(ph);});
   // Fidelity manifest — read by tools/capture_slides.py via --dump-dom.
   const slides=allSlides.map((sl,i)=>{
     const o={i,type:sl.dataset.type||'',title:(sl.querySelector('.case-title,.lesson-title,.cover-title,h1,h2')?.textContent||sl.dataset.type||'').trim().slice(0,120),hidden:sl.dataset.hidden==='1'};
@@ -3625,7 +3726,7 @@ updateHUD();
   document.body.dataset.chrome=chrome;window.SD_ACTIVE_CHROME=chrome;
   const deck0=document.getElementById('deck');const slideType=()=>{const a=deck0.querySelector('.slide.active');document.body.dataset.slide=a?(a.dataset.type||''):'';};
   if(deck0){new MutationObserver(slideType).observe(deck0,{subtree:true,attributes:true,attributeFilter:['class']});slideType();}
-  const tag=f=>{if(/media\/motion\//.test(f.getAttribute('src')||''))f.name='sd-look:'+look;};
+  const tag=f=>{if(/media\/motion\/|(^|\/)slides\//.test(f.getAttribute('src')||''))f.name='sd-look:'+look;};
   document.querySelectorAll('iframe').forEach(tag);
   new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.tagName==='IFRAME')tag(n);else if(n.querySelectorAll)n.querySelectorAll('iframe').forEach(tag);}))).observe(document.body,{childList:true,subtree:true});
   if(look==='noir'){if(chrome!=='full')document.querySelectorAll('.ey-badge').forEach(b=>{const m=/^\s*(\d+)\s*\/\s*(\d+)\s*$/.exec(b.textContent);if(m)b.textContent=m[1];});return;}

@@ -1,0 +1,11 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>beats</title>
+<style>html,body{margin:0;height:100%;background:#060810;color:#f0f4ff;font:600 120px system-ui;display:flex;align-items:center;justify-content:center}
+span{opacity:.15;margin:0 .3em}span.w0{opacity:0;animation:in 1s ease .3s forwards}@keyframes in{to{opacity:1}}
+html[data-step="1"] .w1,html[data-step="2"] .w1,html[data-step="2"] .w2{opacity:1}</style></head><body>
+<div id="w"></div>
+<script src="../../sd-frame.js"></script>
+<script>
+const P = SDFrame.props({ words: ['a', 'b', 'c'] });
+document.getElementById('w').innerHTML = P.words.map((w, i) => `<span class="w${i}">${w}</span>`).join('');
+SDFrame.init({ duration: 1.5, steps: 2 });
+</script></body></html>

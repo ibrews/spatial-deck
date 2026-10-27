@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lane — Spatial Deck module core/lane</title>
+<!-- core/lane: one straight lane splits into three strands that braid back into one wider path. Every word is a prop
+     (slide.js). Seekable: ?static = final frame, ?t=SEC = frame at SEC, window.seek(sec); in a deck, slides/sd-frame.js
+     answers enter/leave over postMessage. Geometry from ibrews/pmre-2026-xr-chitect media/motion/lane.html @310afba. -->
+<style>
+:root{--bg:#060810;--teal:#00d4ff;--purple:#a78bfa;--amber:#f59e0b;--rose:#f43f5e;--text:#f0f4ff;--dim:rgba(240,244,255,.45)}
+html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;font-family:'Space Grotesk','Inter','Avenir Next','Helvetica Neue',system-ui,sans-serif}
+svg{width:100%;height:100%;display:block}
+.draw{stroke-dasharray:1;stroke-dashoffset:1;animation:draw var(--d,2s) cubic-bezier(.6,0,.3,1) var(--t,0s) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.fade{opacity:0;animation:fade .9s ease var(--t,0s) forwards}
+@keyframes fade{to{opacity:1}}
+.fadeout{animation:fadeout .8s ease var(--t,0s) forwards}
+@keyframes fadeout{to{opacity:0}}
+.rise{opacity:0;transform:translateY(24px);animation:rise 1s cubic-bezier(.2,.8,.2,1) var(--t,0s) forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+.lane-dash{stroke-dasharray:28 22;animation:march 1.2s linear 0s 6 forwards}
+@keyframes march{to{stroke-dashoffset:-50}}
+.label{fill:var(--dim);font-size:26px;letter-spacing:.32em;font-weight:500}
+.halo{stroke:#060810;stroke-width:14px;stroke-linejoin:round;paint-order:stroke fill}  /* labels sit clear of the strands; the halo keeps a crossing glow off the letters */
+.big{fill:var(--text);font-size:96px;font-weight:600;letter-spacing:-.01em}
+.dot{offset-rotate:0deg}
+</style></head><body>
+<svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" id="lane" aria-label="">
+<defs>
+  <linearGradient id="g" gradientUnits="userSpaceOnUse" x1="1480" y1="0" x2="1820" y2="0"><stop offset="0" stop-color="#00d4ff"/><stop offset=".5" stop-color="#a78bfa"/><stop offset="1" stop-color="#f43f5e"/></linearGradient>
+  <filter id="glow" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<!-- Act 1: the single lane -->
+<g class="fadeout" style="--t:4.8s">
+  <line x1="120" y1="500" x2="1800" y2="500" stroke="rgba(240,244,255,.35)" stroke-width="3" class="draw" pathLength="1" style="--d:1.6s;--t:.2s"/>
+  <line x1="120" y1="620" x2="1800" y2="620" stroke="rgba(240,244,255,.35)" stroke-width="3" class="draw" pathLength="1" style="--d:1.6s;--t:.35s"/>
+  <line x1="120" y1="560" x2="1800" y2="560" stroke="rgba(240,244,255,.5)" stroke-width="4" class="lane-dash"/>
+  <text x="960" y="400" text-anchor="middle" class="big rise" style="--t:1.6s" data-p="title"></text>
+  <text x="960" y="720" text-anchor="middle" class="label rise" style="--t:2.6s" data-p="caption"></text>
+</g>
+<!-- Act 2: three strands leave the lane and braid -->
+<g filter="url(#glow)" fill="none" stroke-linecap="round">
+  <path d="M120 560 C 420 560, 520 560, 640 560 S 820 300, 980 360 S 1180 760, 1340 620 S 1520 560, 1800 560" stroke="#00d4ff" stroke-width="7" class="draw" pathLength="1" style="--d:3.6s;--t:5.6s"/>
+  <path d="M120 560 C 420 560, 520 560, 640 560 S 820 800, 980 740 S 1180 340, 1340 480 S 1520 560, 1800 560" stroke="#f43f5e" stroke-width="7" class="draw" pathLength="1" style="--d:3.6s;--t:5.8s"/>
+  <path d="M120 560 C 420 560, 520 560, 640 560 S 820 560, 980 560 S 1180 560, 1340 560 S 1520 560, 1800 560" stroke="#a78bfa" stroke-width="7" class="draw" pathLength="1" style="--d:3.6s;--t:6.0s"/>
+</g>
+<text x="930" y="300" text-anchor="middle" class="label fade" style="--t:6.8s;fill:#00d4ff" data-p="strands.0"></text>
+<text x="930" y="840" text-anchor="middle" class="label fade" style="--t:7.0s;fill:#f43f5e" data-p="strands.1"></text>
+<text x="940" y="616" text-anchor="middle" class="label halo fade" style="--t:7.2s;fill:#a78bfa" data-p="strands.2"></text>
+<!-- Act 3: one wider path -->
+<path d="M1500 560 L 1800 560" stroke="url(#g)" stroke-width="64" stroke-linecap="round" class="draw" pathLength="1" style="--d:1.2s;--t:9.4s" filter="url(#glow)"/>
+<text x="1650" y="680" text-anchor="middle" class="label fade" style="--t:10.2s;fill:#f0f4ff;letter-spacing:.24em" data-p="result"></text>
+<text x="960" y="200" text-anchor="middle" class="big rise" style="--t:10.8s;font-size:84px" data-p="punch"></text>
+</svg>
+<script src="../../sd-frame.js"></script>
+<script>
+// Words come from the deck (props) or these neutral defaults; the library holds no talk text.
+const P = SDFrame.props({ title: 'Pick a lane.', caption: 'STAY IN IT', strands: ['CRAFT ONE', 'CRAFT TWO', 'CRAFT THREE'], result: 'YOUR LANE', punch: '' });
+document.querySelectorAll('[data-p]').forEach((el) => {
+  const [k, i] = el.dataset.p.split('.'); const v = i == null ? P[k] : (P[k] || [])[+i];
+  if (v) el.textContent = v; else el.remove();
+});
+document.getElementById('lane').setAttribute('aria-label', `${P.title} ${P.caption}. One lane splits into ${(P.strands || []).join(', ')}, which braid back into one wider path: ${P.result}. ${P.punch || ''}`.trim());
+SDFrame.init({ duration: 13, steps: 0 });
+</script>
+</body></html>

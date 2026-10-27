@@ -9,6 +9,7 @@ single file. This writes, between sentinels, into the deck's index.html:
     else window.SD_LOOK, else the --default; sets the chrome density (?chrome=full|quiet|none, else body[data-chrome],
     else window.SD_CHROME, else --chrome); builds the look frame (#sd-frame: title block / running head /
     masthead); tags motion iframes with window.name "sd-look:<id>" so they can recolor themselves offline.
+When the deck has slides/sd-frame.js (slide modules) it writes slides/look.js for iframe modules too.
 With --motion-dir it also writes <dir>/look.js (the motion recolorer, palettes from each look.json) and adds
 <script src="look.js"></script> to every seekable motion graphic there. Idempotent; re-run after editing styles/.
     python3 tools/apply_look.py                                   # the template itself
@@ -37,7 +38,7 @@ RUNTIME = r"""<script>
   document.body.dataset.chrome=chrome;window.SD_ACTIVE_CHROME=chrome;
   const deck0=document.getElementById('deck');const slideType=()=>{const a=deck0.querySelector('.slide.active');document.body.dataset.slide=a?(a.dataset.type||''):'';};
   if(deck0){new MutationObserver(slideType).observe(deck0,{subtree:true,attributes:true,attributeFilter:['class']});slideType();}
-  const tag=f=>{if(/media\/motion\//.test(f.getAttribute('src')||''))f.name='sd-look:'+look;};
+  const tag=f=>{if(/media\/motion\/|(^|\/)slides\//.test(f.getAttribute('src')||''))f.name='sd-look:'+look;};
   document.querySelectorAll('iframe').forEach(tag);
   new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.tagName==='IFRAME')tag(n);else if(n.querySelectorAll)n.querySelectorAll('iframe').forEach(tag);}))).observe(document.body,{childList:true,subtree:true});
   if(look==='noir'){if(chrome!=='full')document.querySelectorAll('.ey-badge').forEach(b=>{const m=/^\s*(\d+)\s*\/\s*(\d+)\s*$/.exec(b.textContent);if(m)b.textContent=m[1];});return;}
@@ -128,11 +129,16 @@ def main():
             s = s[:i] + block + "\n" + s[i:]
     html.write_text(s, encoding="utf-8")
     print(f"apply_look: {html} — looks noir (original), {', '.join(looks)}; default {a.default}, chrome {a.chrome}")
+    src = next(iter(meta.values()))["motionSource"] if meta else {}
+    pal = {k: v["motion"] for k, v in meta.items()}
+    js = MOTION_JS.replace("@@SRC@@", json.dumps(src)).replace("@@LOOKS@@", json.dumps(pal)).replace("@@FONTS@@", json.dumps(FONTS))
+    # Slide modules (slides/<ns>/<id>/*.html) load slides/look.js themselves through slides/sd-frame.js.
+    sd = html.parent / "slides"
+    if (sd / "sd-frame.js").exists():
+        (sd / "look.js").write_text(js, encoding="utf-8")
+        print(f"apply_look: wrote {sd / 'look.js'} for iframe slide modules")
     if a.motion_dir:
         md = Path(a.motion_dir)
-        src = next(iter(meta.values()))["motionSource"] if meta else {}
-        pal = {k: v["motion"] for k, v in meta.items()}
-        js = MOTION_JS.replace("@@SRC@@", json.dumps(src)).replace("@@LOOKS@@", json.dumps(pal)).replace("@@FONTS@@", json.dumps(FONTS))
         (md / "look.js").write_text(js, encoding="utf-8")
         n = 0
         for f in sorted(md.glob("*.html")):

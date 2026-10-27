@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Timeline — Spatial Deck module core/timeline</title>
+<!-- core/timeline: a winding road with N milestones placed on it by arc length; labels alternate above and below in
+     fixed bands. Milestones are props (slide.js). ?static = full map, ?t=SEC, window.seek(sec); in a deck,
+     slides/sd-frame.js answers enter/leave over postMessage. From ibrews/pmre-2026-xr-chitect media/motion/timeline.html @310afba. -->
+<style>
+:root{--bg:#060810;--teal:#00d4ff;--purple:#a78bfa;--amber:#f59e0b;--rose:#f43f5e;--text:#f0f4ff;--dim:rgba(240,244,255,.55)}
+html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;font-family:'Space Grotesk','Inter','Avenir Next','Helvetica Neue',system-ui,sans-serif}
+svg{width:100%;height:100%;display:block}
+#road{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 9s linear .3s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.n{opacity:0;animation:pop .7s cubic-bezier(.2,1.4,.4,1) var(--t) forwards;transform-box:fill-box;transform-origin:center}
+@keyframes pop{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:none}}
+.yr{font-size:30px;font-weight:700;letter-spacing:.06em}
+.what{font-size:21px;fill:var(--text);font-weight:500}
+.sub{font-size:17px;fill:var(--dim)}
+.lead{stroke:rgba(240,244,255,.25);stroke-width:2}
+</style></head><body>
+<svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" id="tl" aria-label="">
+<defs><linearGradient id="rg" gradientUnits="userSpaceOnUse" x1="100" y1="0" x2="1820" y2="0"><stop offset="0" stop-color="#00d4ff"/><stop offset=".5" stop-color="#a78bfa"/><stop offset="1" stop-color="#f43f5e"/></linearGradient></defs>
+<path id="road" pathLength="1" fill="none" stroke="url(#rg)" stroke-width="6" stroke-linecap="round"
+ d="M120 600 C 220 600, 260 470, 360 470 S 520 610, 600 610 S 740 470, 840 470 S 1000 610, 1080 610 S 1220 470, 1320 470 S 1480 610, 1560 610 S 1700 440, 1800 420"/>
+<g id="nodes"></g>
+</svg>
+<script src="../../sd-frame.js"></script>
+<script>
+// [year, headline, subline, color] placed ON the road by arc length; labels alternate into fixed bands (no collisions).
+// Colors are the noir source palette so look.js can restyle them. Defaults are neutral; a talk passes its own milestones.
+const P = SDFrame.props({ nodes: [
+  ['2016', 'First milestone', 'What happened', '#00d4ff'], ['2018', 'Second milestone', 'What happened', '#f43f5e'],
+  ['2020', 'Third milestone', 'What happened', '#a78bfa'], ['2022', 'Fourth milestone', 'What happened', '#f59e0b'],
+  ['2026', 'Today', 'Where this talk is', '#f0f4ff']], label: 'Timeline' });
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const N = P.nodes, NS = 'http://www.w3.org/2000/svg', G = document.getElementById('nodes'), Q = new URLSearchParams(location.search), road = document.getElementById('road');
+const step = Q.has('step') ? +Q.get('step') : null, L = road.getTotalLength();
+N.forEach((d, i) => { if (step !== null && i > step) return; const [y, h, s, c] = d, f = N.length > 1 ? 0.02 + i * (0.96 / (N.length - 1)) : 0.5, pt = road.getPointAtLength(f * L), x = pt.x, yy = pt.y;
+  const up = i % 2 === 0, ly = up ? 250 : 820, t = (0.3 + 9 * f).toFixed(2) + 's';
+  const g = document.createElementNS(NS, 'g'); g.setAttribute('class', 'n'); g.style.setProperty('--t', t);
+  const anchor = x < 200 ? 'start' : x > 1720 ? 'end' : 'middle';
+  g.innerHTML = `<line class="lead" x1="${x}" y1="${up ? yy - 20 : yy + 20}" x2="${x}" y2="${up ? ly + 70 : ly - 40}"/>` +
+    `<circle cx="${x}" cy="${yy}" r="15" fill="#060810" stroke="${esc(c)}" stroke-width="5"/><circle cx="${x}" cy="${yy}" r="5" fill="${esc(c)}"/>` +
+    `<text x="${x}" y="${ly}" text-anchor="${anchor}" class="yr" fill="${esc(c)}">${esc(y)}</text>` +
+    `<text x="${x}" y="${ly + 32}" text-anchor="${anchor}" class="what">${esc(h)}</text>` +
+    `<text x="${x}" y="${ly + 58}" text-anchor="${anchor}" class="sub">${esc(s)}</text>`;
+  G.appendChild(g); });
+document.getElementById('tl').setAttribute('aria-label', P.label + ': ' + N.map((d) => d[0] + ' ' + d[1]).join(', '));
+SDFrame.init({ duration: 10.5, steps: 0 });
+</script>
+</body></html>
