@@ -16,18 +16,31 @@ A look only restyles the markup they already produce.
 
 ## Looks
 
+Twelve looks plus the original. Browse them with example slides in [`index.html`](index.html) (regenerate with `python3 tools/build_look_gallery.py`).
+
 | id | Name | Reads as | Example |
 |---|---|---|---|
 | `noir` | Noir (original) | The template's original look. It trips every tell below. Kept so existing talks don't change. | [examples](looks/noir/examples/) |
-| [`sheet`](looks/sheet/look.md) | Drawing Set | A construction-document sheet: paper, ink, 1px hairlines, a title block and a redline accent | [cover](looks/sheet/examples/cover.jpg) |
-| [`folio`](looks/folio/look.md) | Folio | Editorial print on a black page: optical-size serif, one vermilion spot color, running head | [cover](looks/folio/examples/cover.jpg) |
-| [`house`](looks/house/look.md) | House | A theater program: marquee-gold masthead, wood-type caps, serif program copy, a hard-edged followspot | [cover](looks/house/examples/cover.jpg) |
+| [`sheet`](looks/sheet/look.md) | Drawing Set | Paper, ink and 1px hairlines in a drawing border with a title block; redline red is the one accent, blue pencil the second. | [cover](looks/sheet/examples/cover.jpg) |
+| [`folio`](looks/folio/look.md) | Folio | Editorial print on a black page: warm white optical-size serif, one vermilion spot color, running head with folio number, lowercase italic kickers. | [cover](looks/folio/examples/cover.jpg) |
+| [`house`](looks/house/look.md) | House | Theater program: warm black house, cream type, marquee-gold masthead band, condensed wood-type caps, serif program copy, a hard-edged followspot on chapter cards. | [cover](looks/house/examples/cover.jpg) |
+| [`swiss`](looks/swiss/look.md) | Swiss | International Typographic Style: white paper, black grotesk, one signal red, flush-left on a six-column grid, hierarchy from size and position only. | [cover](looks/swiss/examples/cover.jpg) |
+| [`transit`](looks/transit/look.md) | Transit | Wayfinding signage: white grotesk on black sign panels, a white rule under the band, chapters as colored route bullets. | [cover](looks/transit/examples/cover.jpg) |
+| [`memo`](looks/memo/look.md) | Memo | A typewritten technical memorandum: one monospace, a SUBJECT / FROM / PAGE header, numbered paragraphs, a rubber-stamp red. | [cover](looks/memo/examples/cover.jpg) |
+| [`riso`](looks/riso/look.md) | Riso | A risograph zine: two spot inks (federal blue and orange) on cream stock, overprint where they cross, a hard misregistered second pass on titles, halftone dots. | [cover](looks/riso/examples/cover.jpg) |
+| [`bauhaus`](looks/bauhaus/look.md) | Bauhaus | Dessau-era printed matter: cream stock, black, the three primaries, a geometric sans set lowercase, circle / square / triangle as structure. | [cover](looks/bauhaus/examples/cover.jpg) |
+| [`gallery`](looks/gallery/look.md) | Gallery | An exhibition: a deep green painted wall, works hung in white mats with a thin brass line, chapters as room introductions, tombstone labels. | [cover](looks/gallery/examples/cover.jpg) |
+| [`cyanotype`](looks/cyanotype/look.md) | Cyanotype | Photogram plates: a Prussian blue ground, white where light was held back, plates numbered and captioned in italic. | [cover](looks/cyanotype/examples/cover.jpg) |
+| [`broadside`](looks/broadside/look.md) | Broadside | A letterpress broadside: newsprint stock, everything centered, a slab display face with a book serif, thick-thin rules and fleurons, one red second color. | [cover](looks/broadside/examples/cover.jpg) |
+| [`atlas`](looks/atlas/look.md) | Atlas | A survey map: buff paper, a neatline with a map collar, brown contours, blue water, letterspaced caps for names and italic for water features. | [cover](looks/atlas/examples/cover.jpg) |
 
 ## Use it
 
 ```bash
 python3 tools/apply_look.py --html index.html --default sheet --motion-dir media/motion   # inline the library
 ```
+
+Starting a new talk? `tools/new_talk.sh <slug> --title "…" --look <id>` bakes that look in as the default.
 
 Then pick a look with `?look=sheet` in the URL, or set `body[data-look]` from a talk's options picker before the
 runtime runs (the PMRE talk does this with its `theme` option). `apply_look.py` keeps the deck a single file. It
@@ -48,7 +61,7 @@ python3 tools/check_branding.py                       # a fork must not ship the
 | Group | Tokens | Notes |
 |---|---|---|
 | Color | `--paper` `--paper-2` `--ink` `--ink-2` `--ink-3` `--rule` `--rule-2` `--acc-1..4` | Builders' `--teal/--purple/--amber/--rose` map to `--acc-1..4`, so section accents keep working. One real accent per look; the others repeat or step toward ink. |
-| Type | `--font-display` `--font-body` `--font-mono` | One pairing per look. Fonts load from one Google Fonts link: Archivo (with width axis), IBM Plex Mono, Newsreader (optical size), Big Shoulders Display. |
+| Type | `--font-display` `--font-body` `--font-mono` | One pairing per look. Fonts load from one Google Fonts link: Archivo (with width axis), IBM Plex Mono, Newsreader (optical size), Big Shoulders Display, Libre Franklin, EB Garamond, Jost, Bricolage Grotesque, Alfa Slab One. |
 | Scale | `--t-display` `--t-h1` `--t-h2` `--t-lead` `--t-body` `--t-label` | Shared, declared in `base.css` on `#deck` so they follow the 1920x1080 stage. The lead is larger than the template's tagline, so it stays legible on LED walls. |
 | Space | `--s1`..`--s6` | 0.5, 1, 1.5, 2.5, 4 and 6.5 rem. |
 | Motion | `--m-enter` `--m-enter-2` `--m-dur` `--m-ease` `--m-stagger` | One entrance per look, on the active slide only. Reduced motion lands on the final frame. |
@@ -78,7 +91,7 @@ come from a real tradition (see each `look.md`) and keep one idea per slide.
 2. Copy a `look.json`, then set the tokens and a motion palette for every key in `motionSource`.
 3. Write `look.css` with `:look` rules. Restyle builder classes. Don't add per-slide variants. If a layout needs
    structure CSS can't give it, add it to the look runtime in `apply_look.py`, the way the chapter badge split works.
-4. Run `apply_look.py`, capture `examples/` (`tools/capture_slides.py --query look=<id>`), and run
+4. Run `apply_look.py` and `build_look_gallery.py`, capture `examples/` (`tools/capture_slides.py --query look=<id>`), and run
    `lint_look.mjs --look <id>` (0 tells expected). Check it at 390px wide and with reduced motion.
 
 Research and references behind these looks: KB `projects/spatial-deck/style-references.md`.

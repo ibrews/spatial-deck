@@ -1,0 +1,54 @@
+{
+  "id": "bauhaus",
+  "kind": "look",
+  "name": "Bauhaus",
+  "summary": "Dessau-era printed matter: cream stock, black, the three primaries, a geometric sans set lowercase, circle / square / triangle as structure.",
+  "lineage": "Bauhaus Dessau print shop (Herbert Bayer, László Moholy-Nagy, Joost Schmidt), 1925-32; Bayer's universal lowercase alphabet.",
+  "tokens": {
+    "paper": "#efe8d8",
+    "paper-2": "#e2d9c4",
+    "ink": "#1b1a18",
+    "ink-2": "#45423c",
+    "ink-3": "#7f7a70",
+    "acc-1": "#d2302c",
+    "acc-2": "#1f4e9c",
+    "acc-3": "#f0b323",
+    "acc-4": "#d2302c"
+  },
+  "type": {
+    "display": "Jost 600 lowercase",
+    "body": "Jost 400",
+    "label": "Jost 500 lowercase"
+  },
+  "motion": {
+    "grammar": "build: shapes and type slide in from the left as if set on the press, .5 s, 180 ms stagger",
+    "palette": {
+      "bg": "#efe8d8",
+      "bg2": "#e2d9c4",
+      "text": "#1b1a18",
+      "white": "#1b1a18",
+      "teal": "#1f4e9c",
+      "purple": "#7f7a70",
+      "violet": "#7f7a70",
+      "amber": "#f0b323",
+      "rose": "#d2302c"
+    },
+    "font": "Jost",
+    "stripGlow": true,
+    "blend": "multiply"
+  },
+  "frame": "a key of the three shapes with the page number, bottom left",
+  "css": "styles/looks/bauhaus/look.css",
+  "scope": "body[data-look=\"bauhaus\"]",
+  "motionSource": {
+    "bg": "#060810",
+    "bg2": "#0a0e1c",
+    "text": "#f0f4ff",
+    "white": "#ffffff",
+    "teal": "#00d4ff",
+    "purple": "#a78bfa",
+    "violet": "#7c3aed",
+    "amber": "#f59e0b",
+    "rose": "#f43f5e"
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "id": "gallery",
+  "kind": "look",
+  "name": "Gallery",
+  "summary": "An exhibition: a deep green painted wall, works hung in white mats with a thin brass line, chapters as room introductions, tombstone labels.",
+  "lineage": "Museum exhibition design: painted gallery walls, wall text and tombstone label conventions (artist, title, date, medium).",
+  "tokens": {
+    "paper": "#22302a",
+    "paper-2": "#2c3c35",
+    "ink": "#f1ece0",
+    "ink-2": "#c3bcaa",
+    "ink-3": "#8f8a7b",
+    "acc-1": "#c9a45c",
+    "acc-2": "#c9a45c",
+    "acc-3": "#c9a45c",
+    "acc-4": "#c9a45c"
+  },
+  "type": {
+    "display": "EB Garamond 500",
+    "body": "EB Garamond 400 / italic",
+    "label": "Libre Franklin 500 caps"
+  },
+  "motion": {
+    "grammar": "light: everything comes up slowly like gallery lighting, 1.1 s fade, 350 ms stagger",
+    "palette": {
+      "bg": "#22302a",
+      "bg2": "#2c3c35",
+      "text": "#f1ece0",
+      "white": "#f1ece0",
+      "teal": "#f1ece0",
+      "purple": "#8f8a7b",
+      "violet": "#8f8a7b",
+      "amber": "#c9a45c",
+      "rose": "#c9a45c"
+    },
+    "font": "EB Garamond",
+    "stripGlow": true
+  },
+  "frame": "a small room label bottom left: project and page",
+  "css": "styles/looks/gallery/look.css",
+  "scope": "body[data-look=\"gallery\"]",
+  "motionSource": {
+    "bg": "#060810",
+    "bg2": "#0a0e1c",
+    "text": "#f0f4ff",
+    "white": "#ffffff",
+    "teal": "#00d4ff",
+    "purple": "#a78bfa",
+    "violet": "#7c3aed",
+    "amber": "#f59e0b",
+    "rose": "#f43f5e"
+  }
+}

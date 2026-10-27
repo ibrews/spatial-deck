@@ -1,0 +1,53 @@
+{
+  "id": "cyanotype",
+  "kind": "look",
+  "name": "Cyanotype",
+  "summary": "Photogram plates: a Prussian blue ground, white where light was held back, plates numbered and captioned in italic.",
+  "lineage": "Anna Atkins, Photographs of British Algae: Cyanotype Impressions (1843); the blueprint copies of engineering drawings that used the same process.",
+  "tokens": {
+    "paper": "#1c3f6e",
+    "paper-2": "#24497b",
+    "ink": "#f3f1ea",
+    "ink-2": "#c3cfdf",
+    "ink-3": "#8ea3c0",
+    "acc-1": "#f3f1ea",
+    "acc-2": "#c3cfdf",
+    "acc-3": "#e9dcb8",
+    "acc-4": "#f3f1ea"
+  },
+  "type": {
+    "display": "EB Garamond 400 italic",
+    "body": "EB Garamond 400",
+    "label": "IBM Plex Mono 400 caps"
+  },
+  "motion": {
+    "grammar": "expose: type develops in slowly, 1.2 s, 300 ms stagger",
+    "palette": {
+      "bg": "#1c3f6e",
+      "bg2": "#24497b",
+      "text": "#f3f1ea",
+      "white": "#f3f1ea",
+      "teal": "#f3f1ea",
+      "purple": "#8ea3c0",
+      "violet": "#8ea3c0",
+      "amber": "#e9dcb8",
+      "rose": "#e9dcb8"
+    },
+    "font": "EB Garamond",
+    "stripGlow": true
+  },
+  "frame": "\"Plate N / M\" in italic, top right, inside a hairline border",
+  "css": "styles/looks/cyanotype/look.css",
+  "scope": "body[data-look=\"cyanotype\"]",
+  "motionSource": {
+    "bg": "#060810",
+    "bg2": "#0a0e1c",
+    "text": "#f0f4ff",
+    "white": "#ffffff",
+    "teal": "#00d4ff",
+    "purple": "#a78bfa",
+    "violet": "#7c3aed",
+    "amber": "#f59e0b",
+    "rose": "#f43f5e"
+  }
+}

@@ -78,7 +78,7 @@ index.html
 - Steps registered via `setTimeout(()=>{slideSteps.set(...)}, 0)` to defer past declaration
 
 ### Looks (style library, 2026-10-27)
-- `styles/` holds art directions: `base.css` neutralizes the template's stock effects, and `looks/<id>/look.{css,json,md}` plus `examples/` defines each look. Scope placeholders are `:look` / `:looked`.
+- `styles/` holds twelve art directions (gallery: `styles/index.html`, built by `tools/build_look_gallery.py`; `tools/new_talk.sh --look <id>` sets a new talk's default): `base.css` neutralizes the template's stock effects, and `looks/<id>/look.{css,json,md}` plus `examples/` defines each look. Scope placeholders are `:look` / `:looked`.
 - `tools/apply_look.py` inlines them into index.html between `SD LOOKS` sentinels (head) and `SD LOOK RUNTIME` (body). It's idempotent. Picked via `?look=`, `body[data-look]`, `window.SD_LOOK` or `--default`. The runtime builds `#sd-frame` (title block / running head / masthead) inside `#deck` and splits `.ey-badge` "n / N" into `.n`/`.of`.
 - Size tokens are declared on `#deck`, because in stage mode `#deck` is a scaled 1920x1080 box with its own `--vw`.
 - `--motion-dir` writes `look.js` (motion recolorer) and tags motion iframes with `window.name="sd-look:<id>"`, which works from file://.

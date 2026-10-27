@@ -1,0 +1,54 @@
+{
+  "id": "broadside",
+  "kind": "look",
+  "name": "Broadside",
+  "summary": "A letterpress broadside: newsprint stock, everything centered, a slab display face with a book serif, thick-thin rules and fleurons, one red second color.",
+  "lineage": "19th-century American letterpress broadsides, handbills and auction notices set in wood and metal type.",
+  "tokens": {
+    "paper": "#efe6d2",
+    "paper-2": "#e3d8bf",
+    "ink": "#1a1714",
+    "ink-2": "#463f36",
+    "ink-3": "#837a6b",
+    "acc-1": "#a3271f",
+    "acc-2": "#1a1714",
+    "acc-3": "#a3271f",
+    "acc-4": "#1a1714"
+  },
+  "type": {
+    "display": "Alfa Slab One caps",
+    "body": "EB Garamond 400 / italic",
+    "label": "EB Garamond 500 spaced caps"
+  },
+  "motion": {
+    "grammar": "press: a short, firm impression; elements settle from 104% scale in .3 s",
+    "palette": {
+      "bg": "#efe6d2",
+      "bg2": "#e3d8bf",
+      "text": "#1a1714",
+      "white": "#1a1714",
+      "teal": "#1a1714",
+      "purple": "#837a6b",
+      "violet": "#837a6b",
+      "amber": "#a3271f",
+      "rose": "#a3271f"
+    },
+    "font": "Alfa Slab One",
+    "stripGlow": true,
+    "blend": "multiply"
+  },
+  "frame": "thick-thin double rules across the top and bottom; project and page centered under them",
+  "css": "styles/looks/broadside/look.css",
+  "scope": "body[data-look=\"broadside\"]",
+  "motionSource": {
+    "bg": "#060810",
+    "bg2": "#0a0e1c",
+    "text": "#f0f4ff",
+    "white": "#ffffff",
+    "teal": "#00d4ff",
+    "purple": "#a78bfa",
+    "violet": "#7c3aed",
+    "amber": "#f59e0b",
+    "rose": "#f43f5e"
+  }
+}

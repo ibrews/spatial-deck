@@ -1,0 +1,54 @@
+{
+  "id": "atlas",
+  "kind": "look",
+  "name": "Atlas",
+  "summary": "A survey map: buff paper, a neatline with a map collar, brown contours, blue water, letterspaced caps for names and italic for water features.",
+  "lineage": "USGS 7.5-minute topographic quadrangle conventions (neatline, collar, scale bar, benchmarks); Swiss and British survey cartography.",
+  "tokens": {
+    "paper": "#f3eedb",
+    "paper-2": "#e7e0c6",
+    "ink": "#2b2a26",
+    "ink-2": "#55524a",
+    "ink-3": "#8a8577",
+    "acc-1": "#a6643a",
+    "acc-2": "#3f7cac",
+    "acc-3": "#6e8b3d",
+    "acc-4": "#c2412d"
+  },
+  "type": {
+    "display": "Libre Franklin 600 spaced caps",
+    "body": "Libre Franklin 400",
+    "label": "Libre Franklin 500 caps, wide tracking"
+  },
+  "motion": {
+    "grammar": "survey: titles are revealed top to bottom like a sheet coming off the plotter, .7 s; copy fades in after",
+    "palette": {
+      "bg": "#f3eedb",
+      "bg2": "#e7e0c6",
+      "text": "#2b2a26",
+      "white": "#2b2a26",
+      "teal": "#3f7cac",
+      "purple": "#6e8b3d",
+      "violet": "#6e8b3d",
+      "amber": "#a6643a",
+      "rose": "#c2412d"
+    },
+    "font": "Libre Franklin",
+    "stripGlow": true,
+    "blend": "multiply"
+  },
+  "frame": "a map collar under the neatline: project left, presenter and event, scale bar and page right",
+  "css": "styles/looks/atlas/look.css",
+  "scope": "body[data-look=\"atlas\"]",
+  "motionSource": {
+    "bg": "#060810",
+    "bg2": "#0a0e1c",
+    "text": "#f0f4ff",
+    "white": "#ffffff",
+    "teal": "#00d4ff",
+    "purple": "#a78bfa",
+    "violet": "#7c3aed",
+    "amber": "#f59e0b",
+    "rose": "#f43f5e"
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "id": "swiss",
+  "kind": "look",
+  "name": "Swiss",
+  "summary": "International Typographic Style: white paper, black grotesk, one signal red, flush-left on a six-column grid, hierarchy from size and position only.",
+  "lineage": "Josef Müller-Brockmann, Grid Systems in Graphic Design (1981); Armin Hofmann and the Basel school posters; Neue Grafik (1958-65).",
+  "tokens": {
+    "paper": "#f7f6f2",
+    "paper-2": "#e9e7e1",
+    "ink": "#111111",
+    "ink-2": "#3d3d3b",
+    "ink-3": "#7a7976",
+    "acc-1": "#e1251b",
+    "acc-2": "#111111",
+    "acc-3": "#e1251b",
+    "acc-4": "#111111"
+  },
+  "type": {
+    "display": "Archivo 700, tight tracking",
+    "body": "Archivo 400",
+    "label": "Archivo 700, sentence case"
+  },
+  "motion": {
+    "grammar": "cut: elements appear in two steps, .32 s, reading order with a 160 ms stagger",
+    "palette": {
+      "bg": "#f7f6f2",
+      "bg2": "#e9e7e1",
+      "text": "#111111",
+      "white": "#111111",
+      "teal": "#111111",
+      "purple": "#7a7976",
+      "violet": "#7a7976",
+      "amber": "#e1251b",
+      "rose": "#e1251b"
+    },
+    "font": "Archivo",
+    "stripGlow": true,
+    "blend": "multiply"
+  },
+  "frame": "a 3px rule across the top with the project left and page right",
+  "css": "styles/looks/swiss/look.css",
+  "scope": "body[data-look=\"swiss\"]",
+  "motionSource": {
+    "bg": "#060810",
+    "bg2": "#0a0e1c",
+    "text": "#f0f4ff",
+    "white": "#ffffff",
+    "teal": "#00d4ff",
+    "purple": "#a78bfa",
+    "violet": "#7c3aed",
+    "amber": "#f59e0b",
+    "rose": "#f43f5e"
+  }
+}

@@ -1,0 +1,71 @@
+/* Look: Bauhaus. Dessau-era printed matter (Bayer, Moholy-Nagy, Schmidt): cream stock, black, the three primaries,
+   geometric sans set lowercase, circle / square / triangle as structure. `:look` -> body[data-look="bauhaus"]. */
+:look{--logo-filter:invert(1);--paper:#efe8d8;--paper-2:#e2d9c4;--ink:#1b1a18;--ink-2:#45423c;--ink-3:#7f7a70;--rule:rgba(27,26,24,.85);--rule-2:rgba(27,26,24,.08);
+  --red:#d2302c;--yellow:#f0b323;--blue:#1f4e9c;--acc-1:#d2302c;--acc-2:#1f4e9c;--acc-3:#f0b323;--acc-4:#d2302c;
+  --font-display:'Jost',system-ui,sans-serif;--font-body:'Jost',system-ui,sans-serif;--font-mono:'Jost',system-ui,sans-serif;
+  --ambient-blend:multiply;--ambient-opacity:.5;
+  --m-enter:sd-bauhaus-build;--m-enter-2:sd-bauhaus-fade;--m-dur:.5s;--m-ease:cubic-bezier(.5,0,.2,1);--m-stagger:.18s}
+@keyframes sd-bauhaus-build{from{opacity:0;transform:translateX(-.5em)}to{opacity:1;transform:none}}
+@keyframes sd-bauhaus-fade{from{opacity:0}to{opacity:1}}
+/* frame: the three shapes as a key, bottom left, with the page number */
+:look #sd-frame{left:clamp(40px,calc(5*var(--vw)),96px);bottom:30px;align-items:center;gap:14px;font-family:var(--font-body);font-weight:500;font-size:var(--t-body);color:var(--ink)}
+:look #sd-frame::before{content:'';width:84px;height:24px;background:radial-gradient(circle at 12px 12px,var(--red) 0 11px,transparent 11.5px),linear-gradient(var(--yellow),var(--yellow)) 30px 1px/22px 22px no-repeat,conic-gradient(from 150deg at 72px 2px,var(--blue) 0 60deg,transparent 60deg) 0 0/100% 100% no-repeat}
+:look #sd-frame b,:look #sd-frame .f-project,:look #sd-frame .f-meta{display:none}
+:look #sd-frame i{font-style:normal}
+:look #counter{display:none}
+:look #brand{font-weight:500;letter-spacing:0;text-transform:lowercase}
+:look .lesson-title,:look .talk-title,:look .close-title,:look .case-title,:look .big-text,:look .full-overlay h2,:look .speaker-name{font-family:var(--font-display);font-weight:600;letter-spacing:-.02em;line-height:.95;text-transform:lowercase}
+:look .event-tag,:look .lesson-ey,:look .case-ytag,:look .lesson-tags,:look .close-ey,:look .map-label,:look .qr-badge,:look .grid-label,:look .contact-pill .lbl,:look .big-pill{font-family:var(--font-body);font-weight:500;letter-spacing:.02em;text-transform:lowercase}
+:look .slide[data-type="cover"],:look .slide[data-type="close"],:look .slide-lesson,:look .case-slide.layout-big{align-items:flex-start;text-align:left;padding-left:clamp(48px,calc(8*var(--vw)),170px);padding-right:clamp(48px,calc(30*var(--vw)),600px)}
+:look .slide[data-type="cover"]{padding-right:clamp(48px,calc(40*var(--vw)),780px)}
+/* cover: a red disc and a blue bar carry the composition, type sits on the bar's edge */
+:look .slide[data-type="cover"]{background:radial-gradient(circle at 81% 42%,var(--red) 0 min(13vw,23vh),transparent calc(min(13vw,23vh) + 1px)),linear-gradient(var(--blue),var(--blue)) 69% 0/min(2.4vw,4.2vh) 100% no-repeat}
+:look .event-tag{color:var(--ink);opacity:1;font-size:var(--t-lead);margin-bottom:var(--s4);padding-left:.8em;border-left:.4em solid var(--yellow)}
+:look .talk-title{font-size:calc(var(--t-display)*1.05);margin-bottom:var(--s3)}
+:look .talk-title .xr{color:var(--red)!important}
+:look .talk-subtitle{font-size:var(--t-h2);font-weight:400;color:var(--ink-2);margin-bottom:var(--s5);text-transform:lowercase}
+:look .speaker-card{background:var(--ink);color:var(--paper);border:0;padding:12px 22px}
+:look .speaker-name{font-size:var(--t-lead);color:var(--paper)}
+:look .speaker-co{font-size:var(--t-body);color:var(--paper-2)}
+/* chapter: number in a red circle; the old accent bar becomes square + triangle */
+:look .lesson-ey{justify-content:flex-start;align-items:center;gap:.7em;margin-bottom:var(--s3);font-size:var(--t-lead)}
+:look .ey-badge:has(.n){display:inline-flex;align-items:center;justify-content:center;width:2.7em;height:2.7em;border-radius:50%;background:var(--red);color:var(--paper)!important;font-weight:600;font-size:1.4em}
+:look .slide-lesson:nth-of-type(3n+2) .ey-badge:has(.n){background:var(--blue);border-radius:0}
+:look .slide-lesson:nth-of-type(3n) .ey-badge:has(.n){background:var(--yellow);color:var(--ink)!important;border-radius:0;clip-path:polygon(50% 0,100% 100%,0 100%);padding-top:.7em}
+:look .ey-badge i{font-style:normal}
+:look .ey-badge .of{display:none}
+:look .ey-yr{color:var(--ink)}
+:look .ey-sep{display:none}
+:look .lesson-title{font-size:var(--t-h1);max-width:12em;margin-bottom:var(--s3)}
+:look .lesson-tagline{font-size:var(--t-lead);line-height:1.4;max-width:28em;color:var(--ink-2)}
+:look .lesson-tags{margin-top:var(--s3);color:var(--ink-3);font-size:var(--t-body)}
+:look .lesson-rule{width:120px;height:40px;background:linear-gradient(var(--ink),var(--ink)) 0 0/40px 40px no-repeat,conic-gradient(from 150deg at 100px 0,var(--blue) 0 60deg,transparent 60deg)!important;margin-top:var(--s4)}
+:look .case-image{background:var(--paper-2)}
+:look .case-ytag{color:var(--red)!important;opacity:1;font-size:var(--t-body)}
+:look .case-title{font-size:var(--t-h2)}
+:look .case-sub{font-size:var(--t-body);color:var(--ink-2)}
+:look .case-bl{gap:var(--s2)}
+:look .case-bl li{font-size:var(--t-body);color:var(--ink);padding-left:1.5em}
+:look .case-bl li::before{width:.55em;height:.55em;border-radius:0;background:var(--ink)!important;opacity:1;top:.5em}
+:look .case-bl li:nth-child(3n+1)::before{background:var(--red)!important;border-radius:50%}
+:look .case-bl li:nth-child(3n+2)::before{background:var(--blue)!important}
+:look .case-bl li:nth-child(3n)::before{background:var(--yellow)!important;clip-path:polygon(50% 0,100% 100%,0 100%)}
+:look .layout-big .big-stack{align-items:flex-start;gap:var(--s3);padding-left:var(--s4);border-left:min(1.4vw,2.4vh) solid var(--blue)}
+:look .layout-big .big-eyebrow{font-size:var(--t-lead);color:var(--red);text-transform:lowercase;letter-spacing:0}
+:look .layout-big .big-text{font-size:var(--t-h1);color:var(--ink)}
+:look .layout-big .big-caption{font-size:var(--t-lead);color:var(--ink-2)}
+:look .big-pill{background:var(--yellow)!important;color:var(--ink)!important;border:0}
+:look .full-overlay{background:var(--paper)!important;color:var(--ink);border-top:8px solid var(--red)}
+:look .full-overlay h2{color:var(--ink)}
+:look .grid-stage{gap:8px}
+:look .grid-label{background:var(--ink);color:var(--paper);left:0;top:0;padding:5px 12px;font-size:var(--t-label)}
+:look .slide[data-type="close"]{background:radial-gradient(circle at 82% 70%,var(--yellow) 0 min(12vw,21vh),transparent calc(min(12vw,21vh) + 1px))}
+:look .close-ey{color:var(--red);opacity:1;font-size:var(--t-lead)}
+:look .close-title{font-size:var(--t-display)}
+:look .close-sub{font-size:var(--t-lead);color:var(--ink-2)}
+:look .contact-row,:look .close-qr-row{justify-content:flex-start}
+:look .contact-pill{background:transparent;border:2px solid var(--ink);color:var(--ink)}
+:look .qr-card img{background:#fff;padding:6px}
+:look #map-svg text{fill:var(--ink)!important}
+:look .lesson-rule{margin-left:0;margin-right:auto}
+:look #deck .slide.active[data-type="close"]~#sd-frame{visibility:hidden}

@@ -1,0 +1,62 @@
+/* Look: Cyanotype. Anna Atkins's photogram plates (1843) and the blueprint copies that followed: Prussian blue
+   ground, the image as white where light was held back, plates numbered and captioned. `:look` -> body[data-look="cyanotype"]. */
+:look{--paper:#1c3f6e;--paper-2:#24497b;--ink:#f3f1ea;--ink-2:#c3cfdf;--ink-3:#8ea3c0;--rule:rgba(243,241,234,.45);--rule-2:rgba(243,241,234,.09);
+  --acc-1:#f3f1ea;--acc-2:#c3cfdf;--acc-3:#e9dcb8;--acc-4:#f3f1ea;
+  --font-display:'EB Garamond',Georgia,serif;--font-body:'EB Garamond',Georgia,serif;--font-mono:'IBM Plex Mono',ui-monospace,monospace;
+  --ambient-blend:screen;--ambient-opacity:.35;
+  --m-enter:sd-cyan-expose;--m-enter-2:sd-cyan-expose;--m-dur:1.2s;--m-ease:cubic-bezier(.6,0,.4,1);--m-stagger:.3s}
+@keyframes sd-cyan-expose{from{opacity:0;letter-spacing:.04em}to{opacity:1}}
+/* uneven brushed edge of the coated sheet, drawn as an inset double line */
+:look #deck::after{content:'';position:absolute;z-index:14;inset:18px;border:1px solid var(--rule);pointer-events:none}
+:look.vertical-mode #deck::after,:look.print-mode #deck::after{display:none}
+:look #sd-frame{right:clamp(40px,calc(4*var(--vw)),80px);top:34px;font-family:var(--font-body);font-style:italic;font-size:var(--t-lead);color:var(--ink)}
+:look #sd-frame b,:look #sd-frame .f-project,:look #sd-frame .f-meta{display:none}
+:look #sd-frame i{font-style:italic}
+:look #sd-frame .f-sheet::before{content:'Plate\00a0'}
+:look #counter{display:none}
+:look #brand{font-family:var(--font-mono);font-weight:400;letter-spacing:.1em}
+:look .lesson-title,:look .talk-title,:look .close-title,:look .case-title,:look .big-text,:look .full-overlay h2,:look .speaker-name{font-family:var(--font-display);font-weight:400;letter-spacing:0;line-height:1.02;text-transform:none}
+:look .event-tag,:look .lesson-ey,:look .case-ytag,:look .lesson-tags,:look .close-ey,:look .map-label,:look .qr-badge,:look .grid-label,:look .contact-pill .lbl,:look .big-pill{font-family:var(--font-mono);font-weight:400;letter-spacing:.12em;text-transform:uppercase}
+:look .event-tag{color:var(--ink-2);opacity:1;font-size:var(--t-label);margin-bottom:var(--s4)}
+:look .talk-title{font-size:var(--t-display);font-style:italic;margin-bottom:var(--s3)}
+:look .talk-title .xr{font-style:normal;color:var(--acc-3)!important}
+:look .talk-subtitle{font-size:var(--t-h2);color:var(--ink-2);margin-bottom:var(--s5)}
+:look .speaker-card{background:transparent;border:0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:10px 26px}
+:look .speaker-name{font-size:var(--t-lead)}
+:look .speaker-co{font-style:italic;font-size:var(--t-body);color:var(--ink-2)}
+:look .lesson-ey{gap:.7em;margin-bottom:var(--s3);font-size:var(--t-label)}
+:look .ey-badge{color:var(--ink)!important}
+:look .ey-badge i{font-style:normal}
+:look .ey-badge .n::before{content:'Plate\00a0'}
+:look .ey-badge .of::before{content:'\00a0of\00a0'}
+:look .ey-yr{color:var(--ink-2)}
+:look .ey-sep{color:var(--ink-3)}
+:look .lesson-title{font-size:var(--t-h1);font-style:italic;margin-bottom:var(--s3)}
+:look .lesson-tagline{font-size:var(--t-lead);line-height:1.5;max-width:30em;color:var(--ink-2)}
+:look .lesson-tags{margin-top:var(--s3);color:var(--ink-3);font-size:var(--t-label)}
+:look .lesson-rule{width:clamp(80px,calc(8*var(--vw)),160px);height:1px;background:var(--ink)!important}
+/* images print as if exposed: a pale border, blue tint over the photo */
+:look .case-image{background:var(--paper-2);border:1px solid var(--ink)}
+:look .case-image img,:look .grid-cell img{filter:grayscale(1) contrast(1.05)}
+:look .case-image::after,:look .grid-cell::after{content:'';position:absolute;inset:0;background:var(--paper);mix-blend-mode:screen;opacity:.85;pointer-events:none}
+:look .case-ytag{color:var(--acc-3)!important;opacity:1;font-size:var(--t-label)}
+:look .case-title{font-size:var(--t-h2);font-style:italic}
+:look .case-sub{font-family:var(--font-mono);font-size:var(--t-label);color:var(--ink-2)}
+:look .case-bl{counter-reset:fig;gap:var(--s2)}
+:look .case-bl li{counter-increment:fig;font-size:var(--t-body);color:var(--ink);padding-left:2.2em;line-height:1.45}
+:look .case-bl li::before{content:counter(fig,lower-roman) '.';background:none!important;width:auto;height:auto;top:0;border-radius:0;opacity:1;color:var(--ink-2);font-style:italic}
+:look .layout-big .big-stack{gap:var(--s3)}
+:look .layout-big .big-eyebrow{font-family:var(--font-mono);font-size:var(--t-label);color:var(--ink-2);letter-spacing:.12em;text-transform:uppercase}
+:look .layout-big .big-text{font-size:var(--t-h1);font-style:italic;color:var(--ink)}
+:look .layout-big .big-caption{font-size:var(--t-lead);color:var(--ink-2)}
+:look .big-pill{background:transparent!important;color:var(--ink)!important;border:1px solid var(--ink)}
+:look .full-overlay{background:linear-gradient(transparent,rgba(28,63,110,.95) 40%)!important}
+:look .grid-stage{gap:8px}
+:look .grid-cell{border:1px solid var(--ink)}
+:look .grid-label{background:var(--paper);color:var(--ink);left:0;bottom:0;top:auto;padding:4px 10px;font-family:var(--font-body);font-style:italic;text-transform:none;letter-spacing:0;font-size:var(--t-body)}
+:look .close-ey{color:var(--ink-2);opacity:1;font-size:var(--t-label)}
+:look .close-title{font-size:var(--t-display);font-style:italic}
+:look .close-sub{font-size:var(--t-lead);color:var(--ink-2)}
+:look .contact-pill{background:transparent;border:1px solid var(--rule);color:var(--ink)}
+:look .qr-card img{background:#fff;padding:6px}
+:look #map-svg text{fill:var(--ink)!important}

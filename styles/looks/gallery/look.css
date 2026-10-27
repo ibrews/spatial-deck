@@ -1,0 +1,64 @@
+/* Look: Gallery (exhibition). A painted gallery wall in deep green, works hung in white mats with a tombstone label,
+   chapters as room introductions (wall text), brass for the one accent. `:look` -> body[data-look="gallery"]. */
+:look{--paper:#22302a;--paper-2:#2c3c35;--ink:#f1ece0;--ink-2:#c3bcaa;--ink-3:#8f8a7b;--rule:rgba(241,236,224,.35);--rule-2:rgba(241,236,224,.08);
+  --mat:#f6f3ec;--acc-1:#c9a45c;--acc-2:#c9a45c;--acc-3:#c9a45c;--acc-4:#c9a45c;
+  --font-display:'EB Garamond',Georgia,serif;--font-body:'EB Garamond',Georgia,serif;--font-mono:'Libre Franklin',system-ui,sans-serif;
+  --ambient-blend:screen;--ambient-opacity:.3;
+  --m-enter:sd-gallery-light;--m-enter-2:sd-gallery-light;--m-dur:1.1s;--m-ease:ease-out;--m-stagger:.35s}
+@keyframes sd-gallery-light{from{opacity:0}to{opacity:1}}
+/* frame: a room label, bottom left, small sans */
+:look #sd-frame{left:clamp(40px,calc(5*var(--vw)),96px);bottom:30px;flex-direction:column;gap:2px;font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.06em;color:var(--ink-2)}
+:look #sd-frame b{display:none}
+:look #sd-frame .f-meta{display:none}
+:look #sd-frame .f-project{color:var(--ink);font-weight:600}
+:look #sd-frame i{font-style:normal}
+:look #counter{display:none}
+:look #brand{font-family:var(--font-mono);font-weight:500;letter-spacing:.08em}
+:look .lesson-title,:look .talk-title,:look .close-title,:look .case-title,:look .big-text,:look .full-overlay h2,:look .speaker-name{font-family:var(--font-display);font-weight:500;letter-spacing:-.005em;line-height:1.02;text-transform:none}
+:look .event-tag,:look .lesson-ey,:look .case-ytag,:look .lesson-tags,:look .close-ey,:look .map-label,:look .qr-badge,:look .grid-label,:look .contact-pill .lbl,:look .big-pill{font-family:var(--font-mono);font-weight:500;letter-spacing:.12em;text-transform:uppercase}
+:look .event-tag{color:var(--acc-1);opacity:1;font-size:var(--t-label);margin-bottom:var(--s4)}
+:look .talk-title{font-size:var(--t-display);margin-bottom:var(--s3)}
+:look .talk-title .xr{font-style:italic;color:var(--acc-1)!important}
+:look .talk-subtitle{font-style:italic;font-size:var(--t-h2);color:var(--ink-2);margin-bottom:var(--s5)}
+:look .speaker-card{background:transparent;border:0;padding:0}
+:look .speaker-name{font-size:var(--t-lead)}
+:look .speaker-co{font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.06em;color:var(--ink-2)}
+/* chapter: room introduction, wall text set in a narrow measure */
+:look .slide-lesson{align-items:flex-start;text-align:left;padding-left:clamp(48px,calc(16*var(--vw)),330px);padding-right:clamp(48px,calc(24*var(--vw)),480px)}
+:look .lesson-ey{justify-content:flex-start;gap:.8em;margin-bottom:var(--s3);font-size:var(--t-label)}
+:look .ey-badge{color:var(--acc-1)!important}
+:look .ey-badge i{font-style:normal}
+:look .ey-badge .n::before{content:'Room\00a0'}
+:look .ey-badge .of{display:none}
+:look .ey-yr{color:var(--ink-2)}
+:look .ey-sep{color:var(--ink-3)}
+:look .lesson-title{font-size:var(--t-h1);margin-bottom:var(--s3)}
+:look .lesson-tagline{font-size:var(--t-lead);line-height:1.5;color:var(--ink)}
+:look .lesson-tags{margin-top:var(--s3);color:var(--ink-3);font-size:var(--t-label)}
+:look .lesson-rule{width:48px;height:1px;background:var(--acc-1)!important}
+/* the work: white mat, thin brass frame line; the text column is the tombstone label */
+:look .case-image{background:var(--mat);padding:clamp(12px,calc(1.6*var(--vw)),30px);outline:1px solid var(--acc-1);outline-offset:0}
+:look .case-ytag{color:var(--acc-1)!important;opacity:1;font-size:var(--t-label)}
+:look .case-title{font-size:var(--t-h2);font-style:italic}
+:look .case-sub{font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.04em;color:var(--ink-2)}
+:look .case-bl{gap:var(--s2)}
+:look .case-bl li{font-size:var(--t-body);color:var(--ink);padding-left:0;line-height:1.5}
+:look .case-bl li::before{display:none}
+:look .layout-big .big-stack{gap:var(--s3)}
+:look .layout-big .big-eyebrow{font-family:var(--font-mono);font-size:var(--t-label);color:var(--acc-1);letter-spacing:.12em;text-transform:uppercase}
+:look .layout-big .big-text{font-size:var(--t-h1);font-style:italic;color:var(--ink)}
+:look .layout-big .big-caption{font-size:var(--t-lead);color:var(--ink-2)}
+:look .big-pill{background:transparent!important;color:var(--acc-1)!important;border:1px solid var(--acc-1)}
+:look .full-overlay{background:linear-gradient(transparent,rgba(34,48,42,.94) 40%)!important}
+:look .full-overlay h2{font-style:italic}
+:look .grid-stage{gap:clamp(16px,calc(2*var(--vw)),36px);padding:clamp(28px,calc(4*var(--vw)),72px)}
+:look .grid-cell{background:var(--mat);padding:10px}
+:look .grid-label{background:var(--paper);color:var(--ink);left:auto;right:0;top:auto;bottom:-1px;padding:4px 10px;font-size:var(--t-label);letter-spacing:.06em}
+:look .close-ey{color:var(--acc-1);opacity:1;font-size:var(--t-label)}
+:look .close-title{font-size:var(--t-display)}
+:look .close-sub{font-style:italic;font-size:var(--t-lead);color:var(--ink-2)}
+:look .contact-pill{background:transparent;border:0;border-bottom:1px solid var(--acc-1);padding:6px 0;color:var(--ink)}
+:look .qr-card img{background:var(--mat);padding:10px}
+:look #map-svg text{fill:var(--ink)!important}
+:look .lesson-rule{margin-left:0;margin-right:auto}
+:look #deck .slide.active[data-type="close"]~#sd-frame{visibility:hidden}

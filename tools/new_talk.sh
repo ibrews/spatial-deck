@@ -4,25 +4,28 @@
 # upstream = ibrews/spatial-deck. Talk content NEVER goes on a branch of ibrews/spatial-deck.
 # Pre-authorized by Alex 2026-10-16 (KB intelligence/decisions/2026-10-16-preauthorize-spatial-deck-talk-repos.md).
 #
-#   tools/new_talk.sh <slug> --title "Talk title" [--description "..."] [--from <checkout>] [--dir <path>] [--dry-run]
+#   tools/new_talk.sh <slug> --title "Talk title" [--description "..."] [--look <id>] [--from <checkout>] [--dir <path>] [--dry-run]
 #
 #   --from <checkout>  publish an existing local checkout's current branch as the new repo's main
 #                      (it must already contain README.md with a "## Things to Try" section)
 #   (no --from)        seed a fresh talk: clone ibrews/spatial-deck main into --dir (default ~/GH/<slug>)
 #                      and write a starter README; you then edit SECTIONS and push
+#   --look <id>        fresh talks only: the default look from the style library (styles/looks/<id>; browse them in
+#                      styles/index.html). Every look stays selectable with ?look=<id>. Omitted: the template default.
 # Steps: refuse if ibrews/<slug> exists → create public repo → push main → origin/upstream remotes →
 #        enable GitHub Pages (main, /) → set homepage → print the Pages URL + KB follow-ups.
 set -euo pipefail
 OWNER=ibrews; UPSTREAM=https://github.com/ibrews/spatial-deck
 die(){ echo "new_talk: $*" >&2; exit 1; }
 [ $# -ge 1 ] || die "usage: new_talk.sh <slug> --title \"...\" [--description ...] [--from <checkout>] [--dir <path>] [--dry-run]"
-SLUG=$1; shift; TITLE=""; DESC=""; FROM=""; DIR=""; DRY=0; RESUME=0
+SLUG=$1; shift; TITLE=""; DESC=""; FROM=""; DIR=""; DRY=0; RESUME=0; LOOK=""
 while [ $# -gt 0 ]; do case "$1" in
   --title) TITLE=$2; shift 2;; --description) DESC=$2; shift 2;; --from) FROM=$2; shift 2;;
-  --dir) DIR=$2; shift 2;; --dry-run) DRY=1; shift;; --resume) RESUME=1; shift;; *) die "unknown arg $1";; esac; done
+  --dir) DIR=$2; shift 2;; --look) LOOK=$2; shift 2;; --dry-run) DRY=1; shift;; --resume) RESUME=1; shift;; *) die "unknown arg $1";; esac; done
 [[ "$SLUG" =~ ^[a-z0-9][a-z0-9-]{2,60}$ ]] || die "slug must be lowercase kebab-case: $SLUG"
 [ "$SLUG" != "spatial-deck" ] || die "refusing: talks never go in ibrews/spatial-deck itself"
 [ -n "$TITLE" ] || die "--title is required"
+[ -z "$LOOK" ] || [ -z "$FROM" ] || die "--look applies to fresh talks; in an existing checkout run tools/apply_look.py --default <id>"
 [ -n "$DESC" ] || DESC="$TITLE — Alex Coulombe"
 command -v gh >/dev/null || die "gh CLI required"
 if gh repo view "$OWNER/$SLUG" >/dev/null 2>&1; then [ "$RESUME" = 1 ] || die "$OWNER/$SLUG already exists — not overwriting (use --resume to finish a half-done run)"; else RESUME=0; fi
@@ -60,6 +63,7 @@ git clone https://github.com/$OWNER/$SLUG && open $SLUG/index.html
 1. Open \`index.html\` and press → to step through the talk.
 2. Press **N** for presenter notes, or open \`index.html?notes\` on a phone.
 3. Open \`index.html?edit\` and press **M** for move mode to reposition anything.
+4. Try another look: \`index.html?look=swiss\` (or folio, memo, atlas…). See them all in \`styles/index.html\`.
 
 ## Credits
 
@@ -67,7 +71,13 @@ git clone https://github.com/$OWNER/$SLUG && open $SLUG/index.html
 EOF
     # a talk's media/ must be tracked; the template ignores it for importer scratch
     sed -i.bak '/^media\/$/d' "$SRC/.gitignore" && rm -f "$SRC/.gitignore.bak"
-    git -C "$SRC" add README.md .gitignore && git -C "$SRC" commit -q -m "docs: README for $SLUG talk; track media/"
+    if [ -n "$LOOK" ]; then
+      [ "$LOOK" = noir ] || [ -f "$SRC/styles/looks/$LOOK/look.css" ] || die "unknown --look $LOOK; looks: noir $(ls "$SRC/styles/looks" | tr '\n' ' ')"
+      python3 "$SRC/tools/apply_look.py" --html "$SRC/index.html" --styles "$SRC/styles" --default "$LOOK"
+    else
+      echo "new_talk: no --look given; the talk opens in the template default. Browse styles/index.html, then: tools/apply_look.py --default <id>"
+    fi
+    git -C "$SRC" add README.md .gitignore index.html && git -C "$SRC" commit -q -m "docs: README for $SLUG talk; track media/${LOOK:+; default look $LOOK}"
   fi
 fi
 

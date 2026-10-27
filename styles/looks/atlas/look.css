@@ -1,0 +1,72 @@
+/* Look: Atlas (survey map). The USGS 7.5-minute topographic quadrangle: buff paper, a neatline with a map collar,
+   brown contours, blue water, letterspaced caps for names and italic for water. `:look` -> body[data-look="atlas"]. */
+:look{--logo-filter:invert(1);--paper:#f3eedb;--paper-2:#e7e0c6;--ink:#2b2a26;--ink-2:#55524a;--ink-3:#8a8577;--rule:rgba(43,42,38,.7);--rule-2:rgba(166,100,58,.16);
+  --contour:#a6643a;--water:#3f7cac;--wood:#6e8b3d;--acc-1:#a6643a;--acc-2:#3f7cac;--acc-3:#6e8b3d;--acc-4:#c2412d;
+  --font-display:'Libre Franklin',system-ui,sans-serif;--font-body:'Libre Franklin',system-ui,sans-serif;--font-mono:'IBM Plex Mono',ui-monospace,monospace;
+  --ambient-blend:multiply;--ambient-opacity:.55;
+  --m-enter:sd-atlas-survey;--m-enter-2:sd-atlas-fade;--m-dur:.7s;--m-ease:cubic-bezier(.3,0,.2,1);--m-stagger:.2s}
+@keyframes sd-atlas-survey{from{opacity:0;clip-path:inset(0 0 100% 0)}to{opacity:1;clip-path:inset(0)}}
+@keyframes sd-atlas-fade{from{opacity:0}to{opacity:1}}
+/* contour lines on the stage, very light; the neatline inset from the edge */
+:look #deck{background:repeating-radial-gradient(ellipse 140% 90% at 78% 30%,transparent 0 46px,var(--rule-2) 46px 47.5px)}
+:look #deck::after{content:'';position:absolute;z-index:14;inset:28px 28px 64px;border:1.5px solid var(--ink);pointer-events:none}
+:look.vertical-mode #deck::after,:look.print-mode #deck::after{display:none}
+/* the collar: quadrangle name left, scale bar and sheet right, below the neatline */
+:look #sd-frame{left:28px;right:28px;bottom:22px;justify-content:space-between;align-items:center;font-family:var(--font-body);font-weight:600;font-size:var(--t-label);letter-spacing:.18em;text-transform:uppercase;color:var(--ink)}
+:look #sd-frame b{display:none}
+:look #sd-frame .f-meta{font-weight:400;letter-spacing:.08em;color:var(--ink-2)}
+:look #sd-frame .f-sheet::before{content:'';display:inline-block;width:120px;height:6px;margin-right:14px;vertical-align:middle;border:1px solid var(--ink);background:linear-gradient(90deg,var(--ink) 0 25%,transparent 25% 50%,var(--ink) 50% 75%,transparent 75%)}
+:look #sd-frame i{font-style:normal}
+:look #counter{display:none}
+:look #brand{display:none}
+:look .lesson-title,:look .talk-title,:look .close-title,:look .case-title,:look .big-text,:look .full-overlay h2,:look .speaker-name{font-family:var(--font-display);font-weight:600;letter-spacing:.06em;line-height:1.02;text-transform:uppercase}
+:look .event-tag,:look .lesson-ey,:look .case-ytag,:look .lesson-tags,:look .close-ey,:look .map-label,:look .qr-badge,:look .grid-label,:look .contact-pill .lbl,:look .big-pill{font-family:var(--font-body);font-weight:500;letter-spacing:.22em;text-transform:uppercase}
+:look .slide[data-type="cover"],:look .slide[data-type="close"],:look .slide-lesson,:look .case-slide.layout-big{align-items:flex-start;text-align:left;padding-left:clamp(56px,calc(8*var(--vw)),170px);padding-right:clamp(56px,calc(18*var(--vw)),360px)}
+:look .event-tag{color:var(--contour);opacity:1;font-size:var(--t-label);margin-bottom:var(--s3)}
+:look .talk-title{font-size:var(--t-display);letter-spacing:.03em;margin-bottom:var(--s3)}
+:look .talk-title .xr{color:var(--water)!important}
+/* water names are italic on a survey map; the subtitle borrows that */
+:look .talk-subtitle{font-style:italic;font-size:var(--t-h2);color:var(--water);margin-bottom:var(--s5)}
+:look .speaker-card{background:transparent;border:1px solid var(--ink);padding:10px 18px}
+:look .speaker-name{font-size:var(--t-body);letter-spacing:.14em}
+:look .speaker-co{font-size:var(--t-label);color:var(--ink-2)}
+/* chapter: a benchmark triangle with the number, elevation-style */
+:look .lesson-ey{justify-content:flex-start;align-items:center;gap:.8em;margin-bottom:var(--s3);font-size:var(--t-label)}
+:look .ey-badge:has(.n){color:var(--ink)!important;display:inline-flex;align-items:center;gap:.5em}
+:look .ey-badge:has(.n)::before{content:'';width:1.2em;height:1.05em;background:var(--ink);clip-path:polygon(50% 0,100% 100%,0 100%)}
+:look .ey-badge i{font-style:normal}
+:look .ey-badge .n::before{content:'BM\00a0'}
+:look .ey-badge .of{display:none}
+:look .ey-yr{color:var(--contour)}
+:look .ey-sep{display:none}
+:look .lesson-title{font-size:var(--t-h1);margin-bottom:var(--s3)}
+:look .lesson-tagline{font-size:var(--t-lead);line-height:1.45;max-width:30em;color:var(--ink-2)}
+:look .lesson-tags{margin-top:var(--s3);color:var(--ink-3);font-size:var(--t-label)}
+:look .lesson-rule{width:clamp(160px,calc(14*var(--vw)),280px);height:6px;background:linear-gradient(90deg,var(--ink) 0 25%,transparent 25% 50%,var(--ink) 50% 75%,transparent 75%)!important;border:1px solid var(--ink)}
+:look .case-image{background:var(--paper-2);border:1.5px solid var(--ink)}
+:look .case-ytag{color:var(--contour)!important;opacity:1;font-size:var(--t-label)}
+:look .case-title{font-size:var(--t-h2)}
+:look .case-sub{font-style:italic;font-size:var(--t-body);color:var(--water)}
+:look .case-bl{gap:var(--s2)}
+:look .case-bl li{font-size:var(--t-body);color:var(--ink);padding-left:1.6em}
+:look .case-bl li::before{width:.55em;height:.55em;border-radius:50%;background:transparent!important;border:2px solid var(--contour);opacity:1;top:.45em}
+:look .layout-big .big-stack{align-items:flex-start;gap:var(--s3)}
+:look .layout-big .big-eyebrow{font-size:var(--t-label);color:var(--contour);letter-spacing:.22em;text-transform:uppercase}
+:look .layout-big .big-text{font-size:var(--t-h1);color:var(--ink)}
+:look .layout-big .big-caption{font-style:italic;font-size:var(--t-lead);color:var(--water)}
+:look .big-pill{background:transparent!important;color:var(--ink)!important;border:1px solid var(--ink)}
+:look .full-overlay{background:var(--paper)!important;color:var(--ink);border-top:1.5px solid var(--ink)}
+:look .full-overlay h2{color:var(--ink)}
+:look .grid-stage{gap:6px;padding:40px 40px 80px}
+:look .grid-cell{border:1px solid var(--ink)}
+:look .grid-label{background:var(--paper);color:var(--ink);left:0;top:0;padding:4px 10px;font-size:var(--t-label)}
+:look .close-ey{color:var(--contour);opacity:1;font-size:var(--t-label)}
+:look .close-title{font-size:var(--t-display)}
+:look .close-sub{font-style:italic;font-size:var(--t-lead);color:var(--water)}
+:look .contact-row,:look .close-qr-row{justify-content:flex-start}
+:look .contact-pill{background:transparent;border:1px solid var(--ink);color:var(--ink)}
+:look .qr-card img{background:#fff;padding:6px;border:1px solid var(--ink)}
+:look #map-svg text{fill:var(--ink)!important}
+:look #map-svg line,:look #map-svg path{stroke:var(--contour)!important}
+:look .lesson-rule{margin-left:0;margin-right:auto}
+:look #deck .slide.active[data-type="close"]~#sd-frame{visibility:hidden}

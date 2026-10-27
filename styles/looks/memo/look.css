@@ -1,0 +1,67 @@
+/* Look: Memo (technical memorandum). Typewritten government and lab reports of the 1950s to 70s: one monospace,
+   a TO/FROM/SUBJECT header, numbered paragraphs, a rubber-stamp red. `:look` -> body[data-look="memo"]. */
+:look{--logo-filter:invert(1);--paper:#f3efe3;--paper-2:#e8e2d2;--ink:#1d1c1a;--ink-2:#4a4741;--ink-3:#85807a;--rule:rgba(29,28,26,.4);--rule-2:rgba(29,28,26,.08);
+  --acc-1:#b3261e;--acc-2:#1d1c1a;--acc-3:#b3261e;--acc-4:#1d1c1a;
+  --font-display:'IBM Plex Mono',ui-monospace,monospace;--font-body:'IBM Plex Mono',ui-monospace,monospace;--font-mono:'IBM Plex Mono',ui-monospace,monospace;
+  --ambient-blend:multiply;--ambient-opacity:.45;
+  --m-enter:sd-memo-type;--m-enter-2:sd-memo-fade;--m-dur:.9s;--m-ease:steps(28,end);--m-stagger:.5s}
+@keyframes sd-memo-type{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes sd-memo-fade{from{opacity:0}to{opacity:1}}
+/* memo header: SUBJECT / FROM / PAGE, top left, ruled under */
+:look #sd-frame{left:clamp(48px,calc(7*var(--vw)),140px);right:clamp(48px,calc(7*var(--vw)),140px);top:26px;flex-direction:row;gap:clamp(18px,calc(3*var(--vw)),56px);padding-bottom:8px;border-bottom:1px solid var(--ink);font-size:var(--t-label);color:var(--ink);text-transform:uppercase}
+:look #sd-frame b{font-weight:600}
+:look #sd-frame .f-project b{font-size:0}:look #sd-frame .f-project b::before{content:'SUBJECT:\00a0';font-size:var(--t-label)}
+:look #sd-frame .f-meta b{font-size:0}:look #sd-frame .f-meta b::before{content:'FROM:\00a0';font-size:var(--t-label)}
+:look #sd-frame .f-sheet{margin-left:auto}:look #sd-frame .f-sheet b{font-size:0}:look #sd-frame .f-sheet b::before{content:'PAGE\00a0';font-size:var(--t-label)}
+:look #sd-frame i{font-style:normal}
+:look #counter{display:none}
+:look #brand{font-weight:500;letter-spacing:.06em}
+:look .lesson-title,:look .talk-title,:look .close-title,:look .case-title,:look .big-text,:look .full-overlay h2,:look .speaker-name{font-family:var(--font-display);font-weight:600;letter-spacing:-.02em;line-height:1.08;text-transform:uppercase}
+:look .event-tag,:look .lesson-ey,:look .case-ytag,:look .lesson-tags,:look .close-ey,:look .map-label,:look .qr-badge,:look .grid-label,:look .contact-pill .lbl,:look .big-pill{font-family:var(--font-mono);font-weight:500;letter-spacing:.08em;text-transform:uppercase}
+:look .slide[data-type="cover"],:look .slide[data-type="close"],:look .slide-lesson,:look .case-slide.layout-big{align-items:flex-start;text-align:left;padding-left:clamp(48px,calc(7*var(--vw)),140px);padding-right:clamp(48px,calc(16*var(--vw)),320px)}
+/* the stamp */
+:look .event-tag{color:var(--acc-1);opacity:.9;font-size:var(--t-label);font-weight:600;border:3px double var(--acc-1);padding:.4em .9em;transform:rotate(-3deg);margin-bottom:var(--s4)}
+:look .talk-title{font-size:calc(var(--t-h1)*1.1);margin-bottom:var(--s3)}
+:look .talk-title .xr{color:var(--ink)!important;text-decoration:underline;text-decoration-thickness:.06em;text-underline-offset:.12em}
+:look .talk-subtitle{font-size:var(--t-lead);color:var(--ink-2);margin-bottom:var(--s5)}
+:look .speaker-card{background:transparent;border:0;border-top:1px dashed var(--ink);padding:10px 0 0}
+:look .speaker-name{font-size:var(--t-body);text-transform:uppercase}
+:look .speaker-co{font-size:var(--t-label);color:var(--ink-2)}
+:look .lesson-ey{justify-content:flex-start;gap:.8em;margin-bottom:var(--s3);font-size:var(--t-label)}
+:look .ey-badge i{font-style:normal}
+:look .ey-badge .n::before{content:'Section\00a0'}
+:look .ey-badge .n::after{content:'.'}
+:look .ey-badge .of{display:none}
+:look .ey-badge{color:var(--ink)!important}
+:look .ey-yr{color:var(--ink-2)}
+:look .ey-sep{display:none}
+:look .lesson-title{font-size:var(--t-h1);max-width:none;margin-bottom:var(--s3)}
+:look .lesson-tagline{font-size:var(--t-lead);line-height:1.55;max-width:36em;color:var(--ink)}
+:look .lesson-tags{margin-top:var(--s3);color:var(--ink-3);font-size:var(--t-label)}
+:look .lesson-rule{width:100%;max-width:36em;height:0;border-top:1px dashed var(--ink);background:none!important}
+:look .case-image{background:var(--paper-2);border:1px solid var(--ink)}
+:look .case-ytag{color:var(--acc-1)!important;opacity:1;font-size:var(--t-label)}
+:look .case-title{font-size:var(--t-h2)}
+:look .case-sub{font-size:var(--t-label);color:var(--ink-2)}
+:look .case-bl{counter-reset:para;gap:var(--s2)}
+:look .case-bl li{counter-increment:para;font-size:var(--t-body);color:var(--ink);padding-left:2.4em;line-height:1.5}
+:look .case-bl li::before{content:counter(para) '.';background:none!important;width:auto;height:auto;top:0;border-radius:0;opacity:1;color:var(--ink)}
+:look .layout-big .big-stack{align-items:flex-start;gap:var(--s3)}
+:look .layout-big .big-eyebrow{font-size:var(--t-label);color:var(--acc-1);letter-spacing:.08em;text-transform:uppercase}
+:look .layout-big .big-text{font-size:var(--t-h1);color:var(--ink)}
+:look .layout-big .big-caption{font-size:var(--t-body);color:var(--ink-2);padding-left:var(--s2);border-left:1px solid var(--ink)}
+:look .big-pill{background:transparent!important;color:var(--acc-1)!important;border:2px solid var(--acc-1)}
+:look .full-overlay{background:var(--paper)!important;border-top:1px solid var(--ink);color:var(--ink)}
+:look .full-overlay h2{color:var(--ink)}
+:look .grid-stage{gap:10px}
+:look .grid-cell{border:1px solid var(--ink)}
+:look .grid-label{background:var(--paper);color:var(--ink);left:0;top:0;padding:5px 10px;font-size:var(--t-label);border:solid var(--ink);border-width:0 1px 1px 0}
+:look .close-ey{color:var(--acc-1);opacity:1;font-size:var(--t-label)}
+:look .close-title{font-size:calc(var(--t-h1)*1.1)}
+:look .close-sub{font-size:var(--t-lead);color:var(--ink-2)}
+:look .contact-row,:look .close-qr-row{justify-content:flex-start}
+:look .contact-pill{background:transparent;border:1px solid var(--ink);color:var(--ink)}
+:look .qr-card img{background:#fff;padding:6px;border:1px solid var(--ink)}
+:look .slide-bonus .ey-badge{color:var(--acc-1)!important}
+:look #map-svg text{fill:var(--ink)!important}
+:look .lesson-rule{margin-left:0;margin-right:auto}

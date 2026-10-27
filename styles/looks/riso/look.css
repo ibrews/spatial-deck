@@ -1,0 +1,65 @@
+/* Look: Riso (risograph zine). Two spot inks, federal blue and orange, on cream stock; overprint where they meet,
+   a hard misregistered second pass on titles, halftone dots. No blur. `:look` -> body[data-look="riso"]. */
+:look{--logo-filter:invert(1);--paper:#f4efe1;--paper-2:#e9e1cc;--ink:#2a3f86;--ink-2:#46588f;--ink-3:#8590b0;--rule:rgba(42,63,134,.5);--rule-2:rgba(42,63,134,.1);
+  --acc-1:#ff6c2f;--acc-2:#2a3f86;--acc-3:#ff6c2f;--acc-4:#2a3f86;
+  --font-display:'Bricolage Grotesque',system-ui,sans-serif;--font-body:'Bricolage Grotesque',system-ui,sans-serif;--font-mono:'IBM Plex Mono',ui-monospace,monospace;
+  --ambient-blend:multiply;--ambient-opacity:.6;
+  --m-enter:sd-riso-pass;--m-enter-2:sd-riso-fade;--m-dur:.45s;--m-ease:cubic-bezier(.3,1.4,.5,1);--m-stagger:.15s}
+@keyframes sd-riso-pass{from{opacity:0;transform:translate(6px,-4px)}to{opacity:1;transform:none}}
+@keyframes sd-riso-fade{from{opacity:0}to{opacity:1}}
+/* folio: page number at the bottom center, like a stapled zine */
+:look #sd-frame{left:0;right:0;bottom:26px;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:var(--t-body);color:var(--acc-1)}
+:look #sd-frame b,:look #sd-frame .f-project,:look #sd-frame .f-meta{display:none}
+:look #sd-frame i{font-style:normal}
+:look #counter{display:none}
+:look #brand{font-family:var(--font-display);font-weight:700;letter-spacing:0;text-transform:none;color:var(--acc-1)}
+:look .lesson-title,:look .talk-title,:look .close-title,:look .case-title,:look .big-text,:look .full-overlay h2,:look .speaker-name{font-family:var(--font-display);font-weight:800;letter-spacing:-.03em;line-height:.94;text-transform:none}
+/* the second pass: an orange copy offset 3px, no blur (misregistration, not a glow) */
+:look .talk-title,:look .lesson-title,:look .close-title,:look .layout-big .big-text{text-shadow:.045em .03em 0 var(--acc-1)!important}
+:look .event-tag,:look .lesson-ey,:look .case-ytag,:look .lesson-tags,:look .close-ey,:look .map-label,:look .qr-badge,:look .grid-label,:look .contact-pill .lbl,:look .big-pill{font-family:var(--font-mono);font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+:look .event-tag{color:var(--paper);background:var(--ink);opacity:1;font-size:var(--t-label);padding:.35em .8em;margin-bottom:var(--s4);transform:rotate(-1.5deg)}
+:look .talk-title{font-size:calc(var(--t-display)*1.1);margin-bottom:var(--s3)}
+:look .talk-title .xr{color:var(--acc-1)!important;text-shadow:.045em .03em 0 var(--ink)!important}
+:look .talk-subtitle{font-size:var(--t-h2);font-weight:500;color:var(--ink);margin-bottom:var(--s4)}
+:look .speaker-card{background:var(--acc-1);border:0;padding:12px 22px;color:var(--ink);mix-blend-mode:multiply}
+:look .speaker-name{font-size:var(--t-lead)}
+:look .speaker-co{font-size:var(--t-body);color:var(--ink)}
+/* chapter: a halftone disc behind the number */
+:look .slide-lesson::before{content:'';position:absolute;z-index:0;right:8%;top:50%;width:min(44vw,70vh);aspect-ratio:1;transform:translateY(-50%);background:radial-gradient(circle,rgba(255,108,47,.7) 1.8px,transparent 2.4px) 0 0/12px 12px;-webkit-mask:radial-gradient(circle,#000 0 70%,transparent 70.5%);mask:radial-gradient(circle,#000 0 70%,transparent 70.5%);pointer-events:none}
+:look .slide-lesson>*{position:relative;z-index:1}
+:look .slide-lesson{align-items:flex-start;text-align:left;padding-left:clamp(48px,calc(8*var(--vw)),170px);padding-right:clamp(48px,calc(34*var(--vw)),660px)}
+:look .lesson-ey{justify-content:flex-start;gap:.6em;margin-bottom:var(--s3);font-size:var(--t-label)}
+:look .ey-badge:has(.n){display:inline-flex;align-items:center;justify-content:center;width:2.8em;height:2.8em;border-radius:50%;background:var(--acc-1);color:var(--ink)!important;font-family:var(--font-display);font-weight:800;font-size:1.6em;letter-spacing:-.02em;mix-blend-mode:multiply}
+:look .ey-badge i{font-style:normal}
+:look .ey-badge .of{display:none}
+:look .ey-yr{color:var(--ink);background:var(--paper);padding:.2em .5em}
+:look .ey-sep{display:none}
+:look .lesson-title{font-size:calc(var(--t-h1)*1.1);margin-bottom:var(--s3);background:var(--paper);padding:.05em .2em}
+:look .lesson-tagline{font-size:var(--t-lead);line-height:1.4;max-width:30em;color:var(--ink);background:var(--paper);padding:.3em .5em}
+:look .lesson-tags{margin-top:var(--s2);color:var(--ink-2);font-size:var(--t-label);background:var(--paper);padding:.2em .5em}
+:look .lesson-rule{display:none}
+:look .case-image{background:var(--paper-2);mix-blend-mode:multiply}
+:look .case-ytag{color:var(--acc-1)!important;opacity:1;font-size:var(--t-label)}
+:look .case-title{font-size:var(--t-h2)}
+:look .case-sub{font-size:var(--t-body);color:var(--ink-2)}
+:look .case-bl{gap:var(--s2)}
+:look .case-bl li{font-size:var(--t-body);color:var(--ink);padding-left:1.4em}
+:look .case-bl li::before{width:.6em;height:.6em;border-radius:50%;background:var(--acc-1)!important;opacity:1;top:.45em;mix-blend-mode:multiply}
+:look .layout-big .big-stack{gap:var(--s3)}
+:look .layout-big .big-eyebrow{font-family:var(--font-mono);font-size:var(--t-label);color:var(--acc-1);letter-spacing:.04em;text-transform:uppercase}
+:look .layout-big .big-text{font-size:calc(var(--t-h1)*1.15);color:var(--ink)}
+:look .layout-big .big-caption{font-size:var(--t-lead);color:var(--ink-2)}
+:look .big-pill{background:var(--acc-1)!important;color:var(--ink)!important;border:0}
+:look .full-overlay{background:var(--paper)!important;color:var(--ink)}
+:look .full-overlay h2{color:var(--ink)}
+:look .grid-stage{gap:10px}
+:look .grid-cell{mix-blend-mode:multiply}
+:look .grid-label{background:var(--acc-1);color:var(--ink);left:8px;top:8px;padding:4px 10px;font-size:var(--t-label)}
+:look .close-ey{color:var(--acc-1);opacity:1;font-size:var(--t-label)}
+:look .close-title{font-size:calc(var(--t-display)*1.05)}
+:look .close-sub{font-size:var(--t-lead);color:var(--ink)}
+:look .contact-pill{background:transparent;border:2px solid var(--ink);color:var(--ink)}
+:look .qr-card img{background:#fff;padding:6px}
+:look .slide-bonus .ey-badge:has(.n){background:var(--ink);color:var(--paper)!important}
+:look #map-svg text{fill:var(--ink)!important}
+:look #deck .slide.active[data-type="close"]~#sd-frame{visibility:hidden}

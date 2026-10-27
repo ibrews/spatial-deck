@@ -1,0 +1,53 @@
+{
+  "id": "transit",
+  "kind": "look",
+  "name": "Transit",
+  "summary": "Wayfinding signage: white grotesk on black sign panels, a white rule under the band, chapters as colored route bullets.",
+  "lineage": "NYCTA Graphics Standards Manual (Unimark International: Massimo Vignelli and Bob Noorda, 1970); airport and rail signage systems.",
+  "tokens": {
+    "paper": "#151515",
+    "paper-2": "#262626",
+    "ink": "#f5f5f2",
+    "ink-2": "#bdbdb8",
+    "ink-3": "#85857f",
+    "acc-1": "#ee352e",
+    "acc-2": "#00933c",
+    "acc-3": "#fccc0a",
+    "acc-4": "#0062cf"
+  },
+  "type": {
+    "display": "Libre Franklin 600",
+    "body": "Libre Franklin 400",
+    "label": "Libre Franklin 600, sentence case"
+  },
+  "motion": {
+    "grammar": "arrive: elements slide in .8em from the right and stop, .5 s, 140 ms stagger",
+    "palette": {
+      "bg": "#151515",
+      "bg2": "#262626",
+      "text": "#f5f5f2",
+      "white": "#f5f5f2",
+      "teal": "#f5f5f2",
+      "purple": "#85857f",
+      "violet": "#85857f",
+      "amber": "#fccc0a",
+      "rose": "#ee352e"
+    },
+    "font": "Libre Franklin",
+    "stripGlow": true
+  },
+  "frame": "a black sign band across the top with a white rule under it: project, presenter, page",
+  "css": "styles/looks/transit/look.css",
+  "scope": "body[data-look=\"transit\"]",
+  "motionSource": {
+    "bg": "#060810",
+    "bg2": "#0a0e1c",
+    "text": "#f0f4ff",
+    "white": "#ffffff",
+    "teal": "#00d4ff",
+    "purple": "#a78bfa",
+    "violet": "#7c3aed",
+    "amber": "#f59e0b",
+    "rose": "#f43f5e"
+  }
+}

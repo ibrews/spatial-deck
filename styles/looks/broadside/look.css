@@ -1,0 +1,68 @@
+/* Look: Broadside. 19th-century letterpress handbills and broadsides: newsprint stock, everything centered, a slab
+   display face mixed with a book serif, double and ornamental rules, one red second color. `:look` -> body[data-look="broadside"]. */
+:look{--logo-filter:invert(1);--paper:#efe6d2;--paper-2:#e3d8bf;--ink:#1a1714;--ink-2:#463f36;--ink-3:#837a6b;--rule:rgba(26,23,20,.85);--rule-2:rgba(26,23,20,.08);
+  --acc-1:#a3271f;--acc-2:#1a1714;--acc-3:#a3271f;--acc-4:#1a1714;
+  --font-display:'Alfa Slab One',Georgia,serif;--font-body:'EB Garamond',Georgia,serif;--font-mono:'EB Garamond',Georgia,serif;
+  --ambient-blend:multiply;--ambient-opacity:.5;
+  --m-enter:sd-broadside-press;--m-enter-2:sd-broadside-fade;--m-dur:.3s;--m-ease:ease-out;--m-stagger:.2s}
+@keyframes sd-broadside-press{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:none}}
+@keyframes sd-broadside-fade{from{opacity:0}to{opacity:1}}
+/* thick-thin rules across the top and bottom of the sheet */
+:look #deck::after{content:'';position:absolute;z-index:14;left:36px;right:36px;top:30px;bottom:30px;border-top:6px double var(--ink);border-bottom:6px double var(--ink);pointer-events:none}
+:look.vertical-mode #deck::after,:look.print-mode #deck::after{display:none}
+:look #sd-frame{left:0;right:0;bottom:44px;justify-content:center;gap:1.4em;font-family:var(--font-body);font-size:var(--t-body);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)}
+:look #sd-frame b,:look #sd-frame .f-meta{display:none}
+:look #sd-frame .f-project::after{content:'\00a0\00a0\2766';color:var(--acc-1)}
+:look #sd-frame i{font-style:normal}
+:look #counter{display:none}
+:look #brand{font-family:var(--font-body);font-weight:500;letter-spacing:.14em}
+:look .lesson-title,:look .talk-title,:look .close-title,:look .case-title,:look .big-text,:look .full-overlay h2{font-family:var(--font-display);font-weight:400;letter-spacing:.01em;line-height:1;text-transform:uppercase}
+:look .speaker-name{font-family:var(--font-body);font-weight:600;text-transform:uppercase;letter-spacing:.12em}
+:look .event-tag,:look .lesson-ey,:look .case-ytag,:look .lesson-tags,:look .close-ey,:look .map-label,:look .qr-badge,:look .grid-label,:look .contact-pill .lbl,:look .big-pill{font-family:var(--font-body);font-weight:500;letter-spacing:.2em;text-transform:uppercase}
+:look .lesson-tagline,:look .case-bl li,:look .talk-subtitle,:look .close-sub,:look .big-caption,:look .speaker-co,:look .case-sub{font-family:var(--font-body)}
+:look .slide[data-type="cover"],:look .slide[data-type="close"],:look .slide-lesson,:look .case-slide.layout-big{align-items:center;text-align:center}
+:look .event-tag{color:var(--ink);opacity:1;font-size:var(--t-lead);margin-bottom:var(--s3);padding:.3em 1.2em;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink)}
+:look .talk-title{font-size:calc(var(--t-display)*1.05);margin-bottom:var(--s2)}
+:look .talk-title .xr{color:var(--acc-1)!important}
+:look .talk-subtitle{font-style:italic;font-size:var(--t-h2);color:var(--ink);margin-bottom:var(--s4)}
+:look .talk-subtitle::after{content:'\2014\00a0\2766\00a0\2014';display:block;font-style:normal;font-size:.6em;color:var(--acc-1);margin-top:var(--s2)}
+:look .speaker-card{background:transparent;border:0;padding:0}
+:look .speaker-name{font-size:var(--t-lead)}
+:look .speaker-co{font-style:italic;font-size:var(--t-body);color:var(--ink-2)}
+:look .lesson-ey{justify-content:center;gap:.8em;margin-bottom:var(--s3);font-size:var(--t-label)}
+:look .ey-badge{color:var(--acc-1)!important}
+:look .ey-badge i{font-style:normal}
+:look .ey-badge .n::before{content:'Part\00a0'}
+:look .ey-badge .of{display:none}
+:look .ey-yr{color:var(--ink)}
+:look .ey-sep{color:var(--acc-1)}
+:look .lesson-title{font-size:var(--t-h1);margin-bottom:var(--s3);max-width:16em}
+:look .lesson-tagline{font-size:var(--t-lead);line-height:1.45;max-width:30em;color:var(--ink);font-style:italic}
+:look .lesson-tags{margin-top:var(--s3);color:var(--ink-3);font-size:var(--t-label)}
+:look .lesson-rule{width:clamp(200px,calc(22*var(--vw)),420px);height:6px;border-top:3px solid var(--ink);border-bottom:1px solid var(--ink);background:none!important;margin:var(--s3) auto 0}
+:look .case-image{background:var(--paper-2);border:1px solid var(--ink);outline:3px solid var(--ink);outline-offset:4px}
+:look .case-image img{filter:grayscale(1) sepia(.25) contrast(1.1)}
+:look .case-ytag{color:var(--acc-1)!important;opacity:1;font-size:var(--t-label)}
+:look .case-title{font-size:var(--t-h2)}
+:look .case-sub{font-style:italic;font-size:var(--t-body);color:var(--ink-2)}
+:look .case-bl{gap:var(--s2)}
+:look .case-bl li{font-size:var(--t-body);color:var(--ink);padding-left:1.5em}
+:look .case-bl li::before{content:'\261E';background:none!important;width:auto;height:auto;top:-.05em;border-radius:0;opacity:1;color:var(--acc-1)}
+:look .layout-big .big-stack{align-items:center;gap:var(--s3)}
+:look .layout-big .big-eyebrow{font-size:var(--t-lead);color:var(--acc-1);letter-spacing:.2em;text-transform:uppercase}
+:look .layout-big .big-text{font-size:var(--t-h1);color:var(--ink)}
+:look .layout-big .big-caption{font-style:italic;font-size:var(--t-lead);color:var(--ink-2)}
+:look .big-pill{background:var(--ink)!important;color:var(--paper)!important;border:0}
+:look .full-overlay{background:var(--paper)!important;color:var(--ink);border-top:6px double var(--ink)}
+:look .full-overlay h2{color:var(--ink)}
+:look .grid-stage{gap:8px;padding:56px}
+:look .grid-cell{border:1px solid var(--ink)}
+:look .grid-cell img{filter:grayscale(1) sepia(.25) contrast(1.1)}
+:look .grid-label{background:var(--paper);color:var(--ink);left:0;top:0;padding:4px 10px;font-size:var(--t-label)}
+:look .close-ey{color:var(--acc-1);opacity:1;font-size:var(--t-lead)}
+:look .close-title{font-size:var(--t-display)}
+:look .close-sub{font-style:italic;font-size:var(--t-lead);color:var(--ink-2)}
+:look .contact-pill{background:transparent;border:0;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);color:var(--ink)}
+:look .qr-card img{background:#fff;padding:6px;border:1px solid var(--ink)}
+:look #map-svg text{fill:var(--ink)!important}
+:look #deck .slide.active[data-type="close"]~#sd-frame{visibility:hidden}

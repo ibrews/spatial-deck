@@ -18,7 +18,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 FONTS = ("https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500;600"
-         "&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Big+Shoulders+Display:wght@100..900&display=swap")
+         "&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Big+Shoulders+Display:wght@100..900"
+         "&family=Libre+Franklin:wght@300..800&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Jost:wght@300..800"
+         "&family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Alfa+Slab+One&display=swap")
 HEAD_A, HEAD_B = "<!-- ── SD LOOKS START ── -->", "<!-- ── SD LOOKS END ── -->"
 BODY_A, BODY_B = "<!-- ── SD LOOK RUNTIME START ── -->", "<!-- ── SD LOOK RUNTIME END ── -->"
 

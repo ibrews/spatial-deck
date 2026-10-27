@@ -1,0 +1,54 @@
+{
+  "id": "riso",
+  "kind": "look",
+  "name": "Riso",
+  "summary": "A risograph zine: two spot inks (federal blue and orange) on cream stock, overprint where they cross, a hard misregistered second pass on titles, halftone dots.",
+  "lineage": "Risograph printing as used by independent publishers and zine makers (Riso Kagaku duplicators; studios such as Colorama and Hato Press).",
+  "tokens": {
+    "paper": "#f4efe1",
+    "paper-2": "#e9e1cc",
+    "ink": "#2a3f86",
+    "ink-2": "#46588f",
+    "ink-3": "#8590b0",
+    "acc-1": "#ff6c2f",
+    "acc-2": "#2a3f86",
+    "acc-3": "#ff6c2f",
+    "acc-4": "#2a3f86"
+  },
+  "type": {
+    "display": "Bricolage Grotesque 800",
+    "body": "Bricolage Grotesque 400",
+    "label": "IBM Plex Mono 500 caps"
+  },
+  "motion": {
+    "grammar": "pass: the second ink lands; elements drop from a 6px offset into register, .45 s with a slight overshoot",
+    "palette": {
+      "bg": "#f4efe1",
+      "bg2": "#e9e1cc",
+      "text": "#2a3f86",
+      "white": "#2a3f86",
+      "teal": "#2a3f86",
+      "purple": "#8590b0",
+      "violet": "#8590b0",
+      "amber": "#ff6c2f",
+      "rose": "#ff6c2f"
+    },
+    "font": "Bricolage Grotesque",
+    "stripGlow": true,
+    "blend": "multiply"
+  },
+  "frame": "a page number at the bottom center, like a stapled zine",
+  "css": "styles/looks/riso/look.css",
+  "scope": "body[data-look=\"riso\"]",
+  "motionSource": {
+    "bg": "#060810",
+    "bg2": "#0a0e1c",
+    "text": "#f0f4ff",
+    "white": "#ffffff",
+    "teal": "#00d4ff",
+    "purple": "#a78bfa",
+    "violet": "#7c3aed",
+    "amber": "#f59e0b",
+    "rose": "#f43f5e"
+  }
+}

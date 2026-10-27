@@ -1,0 +1,54 @@
+{
+  "id": "memo",
+  "kind": "look",
+  "name": "Memo",
+  "summary": "A typewritten technical memorandum: one monospace, a SUBJECT / FROM / PAGE header, numbered paragraphs, a rubber-stamp red.",
+  "lineage": "Mid-century government and laboratory reports (NASA technical memoranda, RAND papers, office memos on a typewriter).",
+  "tokens": {
+    "paper": "#f3efe3",
+    "paper-2": "#e8e2d2",
+    "ink": "#1d1c1a",
+    "ink-2": "#4a4741",
+    "ink-3": "#85807a",
+    "acc-1": "#b3261e",
+    "acc-2": "#1d1c1a",
+    "acc-3": "#b3261e",
+    "acc-4": "#1d1c1a"
+  },
+  "type": {
+    "display": "IBM Plex Mono 600 caps",
+    "body": "IBM Plex Mono 400",
+    "label": "IBM Plex Mono 500 caps"
+  },
+  "motion": {
+    "grammar": "type: titles are typed on left to right in 28 steps over .9 s; copy fades in after",
+    "palette": {
+      "bg": "#f3efe3",
+      "bg2": "#e8e2d2",
+      "text": "#1d1c1a",
+      "white": "#1d1c1a",
+      "teal": "#1d1c1a",
+      "purple": "#85807a",
+      "violet": "#85807a",
+      "amber": "#b3261e",
+      "rose": "#b3261e"
+    },
+    "font": "IBM Plex Mono",
+    "stripGlow": true,
+    "blend": "multiply"
+  },
+  "frame": "memo header across the top: SUBJECT, FROM, PAGE, ruled under",
+  "css": "styles/looks/memo/look.css",
+  "scope": "body[data-look=\"memo\"]",
+  "motionSource": {
+    "bg": "#060810",
+    "bg2": "#0a0e1c",
+    "text": "#f0f4ff",
+    "white": "#ffffff",
+    "teal": "#00d4ff",
+    "purple": "#a78bfa",
+    "violet": "#7c3aed",
+    "amber": "#f59e0b",
+    "rose": "#f43f5e"
+  }
+}

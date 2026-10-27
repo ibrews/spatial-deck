@@ -1,0 +1,63 @@
+/* Look: Transit (wayfinding). The 1970 NYCTA Graphics Standards Manual (Unimark, Vignelli/Noorda): white grotesk on
+   black panels, a thin white rule under the band, chapters as colored route bullets. `:look` -> body[data-look="transit"]. */
+:look{--paper:#151515;--paper-2:#262626;--ink:#f5f5f2;--ink-2:#bdbdb8;--ink-3:#85857f;--rule:rgba(245,245,242,.85);--rule-2:rgba(245,245,242,.1);
+  --acc-1:#ee352e;--acc-2:#00933c;--acc-3:#fccc0a;--acc-4:#0062cf;
+  --font-display:'Libre Franklin',system-ui,sans-serif;--font-body:'Libre Franklin',system-ui,sans-serif;--font-mono:'Libre Franklin',system-ui,sans-serif;
+  --ambient-blend:screen;--ambient-opacity:.35;
+  --m-enter:sd-transit-arrive;--m-enter-2:sd-transit-arrive;--m-dur:.5s;--m-ease:cubic-bezier(.2,.8,.2,1);--m-stagger:.14s}
+@keyframes sd-transit-arrive{from{opacity:0;transform:translateX(.8em)}to{opacity:1;transform:none}}
+/* the band: a black sign panel along the top with the white rule under it */
+:look #sd-frame{left:0;right:0;top:0;height:clamp(44px,calc(5.6*var(--vh)),68px);background:#000;border-bottom:3px solid var(--ink);box-sizing:content-box;align-items:center;justify-content:space-between;padding:0 clamp(28px,calc(3.4*var(--vw)),64px);font-family:var(--font-body);font-weight:600;font-size:clamp(.8rem,calc(1.1*var(--vw)),1.15rem);color:var(--ink)}
+:look #sd-frame b{display:none}
+:look #sd-frame .f-meta{color:var(--ink-2);font-weight:500}
+:look #sd-frame .f-sheet i{font-style:normal}
+:look #counter{display:none}
+:look #brand{font-weight:600;letter-spacing:0;text-transform:none}
+:look .lesson-title,:look .talk-title,:look .close-title,:look .case-title,:look .big-text,:look .full-overlay h2,:look .speaker-name{font-family:var(--font-display);font-weight:600;letter-spacing:-.02em;line-height:1;text-transform:none}
+:look .event-tag,:look .lesson-ey,:look .case-ytag,:look .lesson-tags,:look .close-ey,:look .map-label,:look .qr-badge,:look .grid-label,:look .contact-pill .lbl,:look .big-pill{font-family:var(--font-body);font-weight:600;letter-spacing:0;text-transform:none}
+:look .slide[data-type="cover"],:look .slide[data-type="close"],:look .slide-lesson,:look .case-slide.layout-big{align-items:flex-start;text-align:left;padding-left:clamp(48px,calc(7*var(--vw)),140px);padding-right:clamp(48px,calc(14*var(--vw)),300px)}
+:look .event-tag{color:var(--ink-2);opacity:1;font-size:var(--t-lead);margin-bottom:var(--s3)}
+:look .talk-title{font-size:var(--t-display);margin-bottom:var(--s3)}
+:look .talk-title .xr{color:var(--acc-3)!important}
+:look .talk-subtitle{font-size:var(--t-h2);font-weight:400;color:var(--ink-2);margin-bottom:var(--s5)}
+:look .speaker-card{background:transparent;border:0;border-left:6px solid var(--acc-1);padding:4px 0 4px 18px}
+:look .speaker-name{font-size:var(--t-lead)}
+:look .speaker-co{font-size:var(--t-body);color:var(--ink-2)}
+/* chapter: the route bullet. Colors cycle through the line palette by section */
+:look .lesson-ey{justify-content:flex-start;align-items:center;gap:.7em;margin-bottom:var(--s3);font-size:var(--t-lead)}
+:look .ey-badge:has(.n){display:inline-flex;align-items:center;justify-content:center;width:2.6em;height:2.6em;border-radius:50%;background:var(--acc-1);color:#fff!important;font-weight:700;font-size:1.5em;letter-spacing:-.02em}
+:look .slide-lesson:nth-of-type(4n+2) .ey-badge:has(.n){background:var(--acc-2)}
+:look .slide-lesson:nth-of-type(4n+3) .ey-badge:has(.n){background:var(--acc-3);color:#151515!important}
+:look .slide-lesson:nth-of-type(4n) .ey-badge:has(.n){background:var(--acc-4)}
+:look .ey-badge i{font-style:normal}
+:look .ey-badge .of{display:none}
+:look .ey-yr{color:var(--ink)}
+:look .ey-sep{display:none}
+:look .lesson-title{font-size:var(--t-h1);max-width:14em;margin-bottom:var(--s3)}
+:look .lesson-tagline{font-size:var(--t-lead);line-height:1.4;max-width:30em;color:var(--ink-2)}
+:look .lesson-tags{margin-top:var(--s3);color:var(--ink-3);font-size:var(--t-body)}
+:look .lesson-rule{width:clamp(120px,calc(12*var(--vw)),240px);height:6px;background:var(--ink)!important}
+:look .case-image{background:var(--paper-2)}
+:look .case-ytag{color:var(--acc-3)!important;opacity:1;font-size:var(--t-body)}
+:look .case-title{font-size:var(--t-h2)}
+:look .case-sub{font-size:var(--t-body);color:var(--ink-2)}
+:look .case-bl{gap:var(--s2)}
+:look .case-bl li{font-size:var(--t-body);color:var(--ink);padding-left:1.6em}
+:look .case-bl li::before{content:'\2192';background:none!important;width:auto;height:auto;top:0;border-radius:0;opacity:1;color:var(--ink);font-weight:700}
+:look .layout-big .big-stack{align-items:flex-start;gap:var(--s3)}
+:look .layout-big .big-eyebrow{font-size:var(--t-lead);font-weight:600;color:var(--acc-3);letter-spacing:0;text-transform:none}
+:look .layout-big .big-text{font-size:var(--t-h1);color:var(--ink)}
+:look .layout-big .big-caption{font-size:var(--t-lead);color:var(--ink-2)}
+:look .big-pill{background:var(--ink)!important;color:#151515!important;border:0}
+:look .full-overlay{background:#000!important;border-top:3px solid var(--ink)}
+:look .grid-stage{gap:6px;padding-top:calc(clamp(44px,calc(5.6*var(--vh)),68px) + 10px)}
+:look .grid-label{background:#000;color:var(--ink);left:0;top:0;padding:6px 12px;font-size:var(--t-label)}
+:look .close-ey{color:var(--ink-2);opacity:1;font-size:var(--t-lead)}
+:look .close-title{font-size:var(--t-display)}
+:look .close-sub{font-size:var(--t-lead);color:var(--ink-2)}
+:look .contact-row,:look .close-qr-row{justify-content:flex-start}
+:look .contact-pill{background:#000;border:0;border-left:6px solid var(--acc-2);color:var(--ink)}
+:look .qr-card img{background:#fff;padding:6px}
+:look .slide-bonus .ey-badge:has(.n){background:var(--ink);color:#151515!important}
+:look #map-svg text{fill:var(--ink)!important}
+:look .lesson-rule{margin-left:0;margin-right:auto}

@@ -1,0 +1,61 @@
+/* Look: Swiss (International Typographic Style). White paper, black grotesk, one signal red, flush-left on a column
+   grid, hierarchy from size and position only. `:look` expands to body[data-look="swiss"]. Rules: look.md */
+:look{--logo-filter:invert(1);--paper:#f7f6f2;--paper-2:#e9e7e1;--ink:#111111;--ink-2:#3d3d3b;--ink-3:#7a7976;--rule:rgba(17,17,17,.85);--rule-2:rgba(17,17,17,.07);
+  --acc-1:#e1251b;--acc-2:#111111;--acc-3:#e1251b;--acc-4:#111111;
+  --font-display:'Archivo',system-ui,sans-serif;--font-body:'Archivo',system-ui,sans-serif;--font-mono:'Archivo',system-ui,sans-serif;
+  --ambient-blend:multiply;--ambient-opacity:.5;
+  --m-enter:sd-swiss-cut;--m-enter-2:sd-swiss-cut;--m-dur:.32s;--m-ease:steps(2,end);--m-stagger:.16s}
+@keyframes sd-swiss-cut{from{opacity:0;transform:translateY(.2em)}to{opacity:1;transform:none}}
+/* six-column grid on the stage, hairlines only */
+:look #deck{background:repeating-linear-gradient(90deg,transparent 0 calc(100%/6 - 1px),var(--rule-2) calc(100%/6 - 1px) calc(100%/6))}
+:look #sd-frame{left:clamp(48px,calc(5*var(--vw)),96px);right:clamp(48px,calc(5*var(--vw)),96px);top:30px;justify-content:space-between;padding-top:10px;border-top:3px solid var(--ink);font-family:var(--font-body);font-weight:700;font-size:var(--t-label);color:var(--ink)}
+:look #sd-frame b{display:none}
+:look #sd-frame .f-sheet i{font-style:normal;font-variant-numeric:tabular-nums}
+:look #counter{display:none}
+:look #brand{font-weight:700;letter-spacing:0;text-transform:none}
+:look .lesson-title,:look .talk-title,:look .close-title,:look .case-title,:look .big-text,:look .full-overlay h2,:look .speaker-name{font-family:var(--font-display);font-weight:700;letter-spacing:-.035em;line-height:.92;text-transform:none}
+:look .event-tag,:look .lesson-ey,:look .case-ytag,:look .lesson-tags,:look .close-ey,:look .map-label,:look .qr-badge,:look .grid-label,:look .contact-pill .lbl,:look .big-pill{font-family:var(--font-body);font-weight:700;letter-spacing:0;text-transform:none}
+:look .slide[data-type="cover"],:look .slide[data-type="close"],:look .slide-lesson,:look .case-slide.layout-big{align-items:flex-start;text-align:left;padding-left:clamp(48px,calc(5*var(--vw)),96px);padding-right:clamp(48px,calc(18*var(--vw)),360px)}
+:look .event-tag{color:var(--acc-1);opacity:1;font-size:var(--t-lead);margin-bottom:var(--s4)}
+:look .talk-title{font-size:calc(var(--t-display)*1.15);margin-bottom:var(--s3)}
+:look .talk-title .xr{color:var(--acc-1)!important}
+:look .talk-subtitle{font-size:var(--t-h2);font-weight:400;letter-spacing:-.015em;line-height:1.1;color:var(--ink);margin-bottom:var(--s5)}
+:look .speaker-card{background:transparent;border:0;border-top:1px solid var(--ink);padding:10px 0 0;border-radius:0}
+:look .speaker-name{font-size:var(--t-lead);letter-spacing:-.01em}
+:look .speaker-co{font-size:var(--t-body);color:var(--ink-2)}
+/* chapter: a giant numeral in the first column, title beside the grid line */
+:look .lesson-ey{flex-wrap:wrap;justify-content:flex-start;gap:.5em;margin-bottom:var(--s2);font-size:var(--t-lead)}
+:look .ey-badge:has(.n){flex-basis:100%;order:-1;color:var(--acc-1)!important;line-height:.8;margin-bottom:var(--s2)}
+:look .ey-badge i{font-style:normal}
+:look .ey-badge .n{font-size:calc(var(--t-display)*1.6);font-weight:700;letter-spacing:-.06em}
+:look .ey-badge .of{display:none}
+:look .ey-yr{color:var(--ink)}
+:look .ey-sep{display:none}
+:look .lesson-title{font-size:var(--t-h1);max-width:12em;margin-bottom:var(--s3)}
+:look .lesson-tagline{font-size:var(--t-lead);line-height:1.35;max-width:28em;color:var(--ink)}
+:look .lesson-tags{margin-top:var(--s3);color:var(--ink-3);font-size:var(--t-body)}
+:look .lesson-rule{display:none}
+:look .case-image{background:var(--paper-2)}
+:look .case-ytag{color:var(--acc-1)!important;opacity:1;font-size:var(--t-body)}
+:look .case-title{font-size:var(--t-h2);line-height:1}
+:look .case-sub{font-size:var(--t-body);color:var(--ink-2)}
+:look .case-bl{gap:var(--s2)}
+:look .case-bl li{font-size:var(--t-body);color:var(--ink);padding-left:1.2em;line-height:1.35}
+:look .case-bl li::before{content:'\2014';background:none!important;width:auto;height:auto;top:0;border-radius:0;opacity:1;color:var(--acc-1)}
+:look .layout-big .big-stack{align-items:flex-start;gap:var(--s3)}
+:look .layout-big .big-eyebrow{font-size:var(--t-lead);font-weight:700;color:var(--acc-1);text-transform:none;letter-spacing:0}
+:look .layout-big .big-text{font-size:calc(var(--t-h1)*1.15);color:var(--ink)}
+:look .layout-big .big-caption{font-size:var(--t-lead);color:var(--ink-2)}
+:look .big-pill{background:var(--acc-1)!important;color:#fff!important;border:0}
+:look .full-overlay{background:var(--paper)!important;color:var(--ink)}
+:look .full-overlay h2{color:var(--ink)}
+:look .grid-stage{gap:4px}
+:look .grid-label{background:var(--paper);color:var(--ink);left:0;top:0;padding:6px 10px;font-size:var(--t-label)}
+:look .close-ey{color:var(--acc-1);opacity:1;font-size:var(--t-lead)}
+:look .close-title{font-size:calc(var(--t-display)*1.1)}
+:look .close-sub{font-size:var(--t-h2);letter-spacing:-.015em;color:var(--ink)}
+:look .contact-row,:look .close-qr-row{justify-content:flex-start}
+:look .contact-pill{background:transparent;border:0;border-top:1px solid var(--ink);padding:8px 0;color:var(--ink)}
+:look .qr-card img{background:#fff;padding:6px}
+:look .slide-bonus .ey-badge{color:var(--acc-1)!important}
+:look #map-svg text{fill:var(--ink)!important}

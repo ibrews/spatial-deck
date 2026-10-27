@@ -300,16 +300,23 @@ Two or more keyframes on the same element build a WAAPI animation automatically.
 | `Shift + →` | Next image/video |
 | `Shift + ←` | Previous image/video |
 | `Shift + ↑` | Resume auto-advance |
-9. **Add `?look=sheet` (or `folio`, `house`) to the URL** — the same slides as a construction-document sheet, an editorial folio or a theater program; then run `node tools/lint_look.mjs --look sheet` and compare it with the original look (`--look noir`), which trips 7 generic-AI-design tells.
+9. **Add `?look=sheet` (or `swiss`, `memo`, `atlas` and nine others) to the URL**, or open [`styles/index.html`](styles/index.html) to browse all twelve looks. The same slides become a construction-document sheet, a Swiss poster, a typewritten memo or a survey map; then run `node tools/lint_look.mjs --look sheet` and compare it with the original look (`--look noir`), which trips 7 generic-AI-design tells.
 
 ---
 
 ## 🖋️ Looks (style library)
 
-Three art directions come from a curated library in [`styles/`](styles/README.md), modeled on [Keystone](https://github.com/ancarmona/keystone)'s approach (taste lives in a library of rules, tokens and example slides, not in model defaults): **Drawing Set** (`sheet`), **Folio** (`folio`) and **House** (`house`), plus the original **Noir**. Pick one with `?look=<id>` or bake a default with `python3 tools/apply_look.py --default sheet`. The deck stays a single file, and builders and interactivity don't change. `--motion-dir media/motion` also recolors seekable motion graphics to match. `node tools/lint_look.mjs` flags the stock AI look in a rendered deck, and `python3 tools/check_branding.py` stops a talk fork from shipping the template's social card, favicon or wordmark.
+Twelve art directions come from a curated library in [`styles/`](styles/README.md), modeled on [Keystone](https://github.com/ancarmona/keystone)'s approach (taste lives in a library of rules, tokens and example slides, not in model defaults): **Drawing Set** (`sheet`), **Folio** (`folio`), **House** (`house`), **Swiss** (`swiss`), **Transit** (`transit`), **Memo** (`memo`), **Riso** (`riso`), **Bauhaus** (`bauhaus`), **Gallery** (`gallery`), **Cyanotype** (`cyanotype`), **Broadside** (`broadside`), **Atlas** (`atlas`), plus the original **Noir**. Each comes from a real printed or built tradition. Browse them in [`styles/index.html`](styles/index.html). Pick one with `?look=<id>`, bake a default with `python3 tools/apply_look.py --default <id>`, or start a talk in one with `tools/new_talk.sh <slug> --title "…" --look <id>`. The deck stays a single file, and builders and interactivity don't change. `--motion-dir media/motion` also recolors seekable motion graphics to match. `node tools/lint_look.mjs` flags the stock AI look in a rendered deck, and `python3 tools/check_branding.py` stops a talk fork from shipping the template's social card, favicon or wordmark.
 
-| Drawing Set | Folio | House |
-|---|---|---|
+| Drawing Set (`sheet`) | Folio (`folio`) | House (`house`) | Swiss (`swiss`) |
+|---|---|---|---|
+| ![sheet](styles/looks/sheet/examples/chapter.jpg) | ![folio](styles/looks/folio/examples/chapter.jpg) | ![house](styles/looks/house/examples/chapter.jpg) | ![swiss](styles/looks/swiss/examples/chapter.jpg) |
+| Transit (`transit`) | Memo (`memo`) | Riso (`riso`) | Bauhaus (`bauhaus`) |
+| ![transit](styles/looks/transit/examples/chapter.jpg) | ![memo](styles/looks/memo/examples/chapter.jpg) | ![riso](styles/looks/riso/examples/chapter.jpg) | ![bauhaus](styles/looks/bauhaus/examples/chapter.jpg) |
+| Gallery (`gallery`) | Cyanotype (`cyanotype`) | Broadside (`broadside`) | Atlas (`atlas`) |
+| ![gallery](styles/looks/gallery/examples/chapter.jpg) | ![cyanotype](styles/looks/cyanotype/examples/chapter.jpg) | ![broadside](styles/looks/broadside/examples/chapter.jpg) | ![atlas](styles/looks/atlas/examples/chapter.jpg) |
+
+---|---|---|
 | ![sheet](styles/looks/sheet/examples/chapter.jpg) | ![folio](styles/looks/folio/examples/chapter.jpg) | ![house](styles/looks/house/examples/chapter.jpg) |
 
 ---
