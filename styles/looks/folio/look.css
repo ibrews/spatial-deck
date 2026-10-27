@@ -1,0 +1,72 @@
+/* Look: Folio (editorial print). Black page, warm white serif, one vermilion spot color, running head and folio.
+   Descends from Alex's own NXT BLD 2020/2021 decks (serif on black, lowercase openers); see look.md.
+   `:look` expands to body[data-look="folio"] (tools/apply_look.py). */
+:look{--paper:#0c0c0b;--paper-2:#191917;--ink:#f1ede4;--ink-2:#b4afa5;--ink-3:#77736b;--rule:rgba(241,237,228,.26);--rule-2:rgba(241,237,228,.1);
+  --acc-1:#ef5a3c;--acc-2:#ef5a3c;--acc-3:#ef5a3c;--acc-4:#ef5a3c;
+  --font-display:'Newsreader',Georgia,serif;--font-body:'Newsreader',Georgia,serif;--font-mono:'IBM Plex Mono',ui-monospace,monospace;
+  --ambient-blend:screen;--ambient-opacity:.35;
+  --m-enter:sd-folio-set;--m-enter-2:sd-folio-set;--m-dur:.8s;--m-ease:cubic-bezier(.2,.7,.2,1);--m-stagger:.22s}
+@keyframes sd-folio-set{from{opacity:0;transform:translateY(.35em)}to{opacity:1;transform:none}}
+/* running head: talk title left, folio number right, hairline under */
+:look #sd-frame{left:clamp(40px,calc(5*var(--vw)),96px);right:clamp(40px,calc(5*var(--vw)),96px);top:28px;justify-content:space-between;align-items:baseline;padding-bottom:10px;border-bottom:1px solid var(--rule);font-family:var(--font-body);font-size:clamp(.72rem,calc(.95*var(--vw)),1rem);font-variant-caps:all-small-caps;letter-spacing:.09em;color:var(--ink-2)}
+:look #sd-frame .f-meta{display:none}
+:look #sd-frame b{display:none}
+:look #sd-frame .f-sheet{font-variant-caps:normal;font-variant-numeric:oldstyle-nums;letter-spacing:.02em;color:var(--ink)}
+:look #counter{display:none}
+:look #brand{font-family:var(--font-body);font-variant-caps:all-small-caps;text-transform:none;letter-spacing:.09em;font-weight:500}
+/* type: optical-size serif, roman for titles, italic for voice */
+:look .lesson-title,:look .talk-title,:look .close-title,:look .case-title,:look .big-text,:look .full-overlay h2,:look .speaker-name{font-family:var(--font-display);font-weight:400;font-optical-sizing:auto;letter-spacing:-.012em}
+:look .event-tag,:look .case-ytag,:look .close-ey,:look .map-label,:look .lesson-tags,:look .qr-badge,:look .contact-pill .lbl{font-family:var(--font-body);font-weight:500;text-transform:none;font-variant-caps:all-small-caps;letter-spacing:.1em}
+:look .lesson-tagline,:look .case-bl li,:look .talk-subtitle,:look .close-sub,:look .big-caption{font-family:var(--font-body)}
+/* cover: masthead between two rules, XR set in italic vermilion */
+:look .slide[data-type="cover"],:look .slide[data-type="close"],:look .slide-lesson,:look .case-slide.layout-big{align-items:flex-start;text-align:left;padding-left:clamp(48px,calc(9*var(--vw)),190px);padding-right:clamp(48px,calc(14*var(--vw)),300px)}
+:look .event-tag{color:var(--ink);opacity:1;font-size:var(--t-lead);margin-bottom:var(--s4);padding:.35em 0;border-top:1px solid var(--ink);border-bottom:1px solid var(--rule);align-self:stretch}
+:look .talk-title{font-size:var(--t-display);line-height:.96;margin-bottom:var(--s3)}
+:look .talk-title .xr{font-style:italic;color:var(--acc-1)!important}
+:look .talk-subtitle{font-style:italic;font-size:var(--t-h2);line-height:1.15;color:var(--ink-2);margin-bottom:var(--s5)}
+:look .speaker-card{background:transparent;border:0;padding:0}
+:look .speaker-name{font-size:var(--t-lead)}
+:look .speaker-co{font-style:italic;font-size:var(--t-body)}
+/* chapter: lowercase kicker with ellipsis, oversized folio numeral, title, hairline, deck paragraph */
+:look .lesson-ey{justify-content:flex-start;gap:.6em;margin-bottom:var(--s2);font-family:var(--font-body);letter-spacing:0;text-transform:none;font-weight:400;font-size:var(--t-lead)}
+:look .ey-yr{text-transform:lowercase;font-style:italic;color:var(--ink-2)}
+:look .ey-yr::after{content:'\2026'}
+:look .ey-sep{display:none}
+:look .ey-badge{order:-1;color:var(--acc-1)!important;font-variant-numeric:oldstyle-nums;font-style:italic}
+:look .lesson-title{font-size:var(--t-h1);line-height:1.02;max-width:15em;margin-bottom:var(--s3)}
+:look .lesson-tagline{font-size:var(--t-lead);line-height:1.45;max-width:31em;color:var(--ink-2);padding-top:var(--s2);border-top:1px solid var(--rule)}
+:look .lesson-tags{margin-top:var(--s3);color:var(--ink-3);font-size:var(--t-body)}
+:look .lesson-rule{display:none}
+/* case, two pane: image as a plate, text as a column with a hanging number list */
+:look .case-image{background:var(--paper-2)}
+:look .case-ytag{color:var(--acc-1)!important;opacity:1;font-size:var(--t-body)}
+:look .case-title{font-size:var(--t-h2);line-height:1.08}
+:look .case-sub{font-style:italic;font-size:var(--t-body)}
+:look .case-bl{counter-reset:fn;gap:var(--s2)}
+:look .case-bl li{counter-increment:fn;font-size:var(--t-body);color:var(--ink);padding-left:1.8em;line-height:1.45}
+:look .case-bl li::before{content:counter(fn);background:none!important;width:auto;height:auto;top:0;border-radius:0;opacity:1;color:var(--acc-1);font-style:italic;font-variant-numeric:oldstyle-nums}
+/* statement: a pull quote with a hanging spot-color rule */
+:look .layout-big .big-stack{align-items:flex-start;gap:var(--s3);padding-left:var(--s4);border-left:3px solid var(--acc-1)}
+:look .layout-big .big-eyebrow{font-size:var(--t-lead);font-style:italic;font-weight:400;color:var(--ink-2)}
+:look .layout-big .big-text{font-size:var(--t-h1);line-height:1.06;font-weight:400}
+:look .layout-big .big-caption{font-size:var(--t-body);color:var(--ink-2)}
+:look .layout-big .big-sub{font-size:var(--t-lead)}
+:look .big-pill{background:transparent!important;border:0;border-bottom:1px solid currentColor;padding:0 0 4px;color:var(--acc-1)!important}
+/* plates: full bleed and grid get a caption line, not a floating chip */
+:look .full-overlay{background:linear-gradient(transparent,rgba(12,12,11,.92) 38%)!important}
+:look .full-overlay h2{font-style:italic}
+:look .grid-stage{gap:6px}
+:look .grid-label{background:var(--paper);color:var(--ink);left:0;top:auto;bottom:0;padding:6px 12px;font-family:var(--font-body);font-style:italic;font-weight:400;font-size:var(--t-body)}
+/* close */
+:look .close-ey{color:var(--acc-1);opacity:1;font-size:var(--t-lead)}
+:look .close-title{font-size:var(--t-display);line-height:.98}
+:look .close-sub{font-style:italic;font-size:var(--t-h2);line-height:1.2}
+:look .contact-row,:look .close-qr-row{justify-content:flex-start}
+:look .contact-pill{background:transparent;border:0;border-bottom:1px solid var(--rule);padding:6px 0}
+:look .qr-card img{background:#fff;padding:6px}
+:look .slide-bonus .ey-badge{color:var(--acc-1)!important}
+:look #map-svg text{fill:var(--ink)!important;font-family:var(--font-body)!important}
+:look .lesson-ey{flex-wrap:wrap}
+:look .ey-badge:has(.n){flex-basis:100%;order:-1;line-height:.85;margin-bottom:var(--s1)}
+:look .ey-badge .n{font-size:calc(var(--t-h1)*1.25);font-style:italic;font-weight:300}
+:look .ey-badge .of{display:none}

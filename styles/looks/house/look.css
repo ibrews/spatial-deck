@@ -1,0 +1,67 @@
+/* Look: House (theater program). Warm black house, cream type, a marquee-gold masthead band, condensed wood-type
+   caps for display, serif for the program copy, one hard-edged followspot on chapter cards. No soft glows.
+   `:look` expands to body[data-look="house"] (tools/apply_look.py). */
+:look{--paper:#141110;--paper-2:#211b18;--ink:#f3e9d6;--ink-2:#c7b99f;--ink-3:#8a7d69;--rule:rgba(243,233,214,.3);--rule-2:rgba(243,233,214,.1);
+  --gold:#f2b51c;--curtain:#a8232a;--acc-1:#f2b51c;--acc-2:#e04b4f;--acc-3:#f2b51c;--acc-4:#e04b4f;
+  --font-display:'Big Shoulders Display','Archivo',sans-serif;--font-body:'Newsreader',Georgia,serif;--font-mono:'Big Shoulders Display','Archivo',sans-serif;
+  --ambient-blend:screen;--ambient-opacity:.4;
+  --m-enter:sd-house-cue;--m-enter-2:sd-house-cue;--m-dur:.42s;--m-ease:ease-out;--m-stagger:.5s}
+/* a lighting cue: dark, then up. Not a slide, not a bounce */
+@keyframes sd-house-cue{0%{opacity:0}35%{opacity:.25}100%{opacity:1}}
+/* masthead band across the top, like a program cover */
+:look #sd-frame{left:0;right:0;top:0;height:clamp(30px,calc(3.4*var(--vh)),44px);background:var(--gold);color:#141110;align-items:center;justify-content:space-between;padding:0 clamp(24px,calc(3*var(--vw)),56px);font-family:var(--font-display);font-weight:800;text-transform:uppercase;letter-spacing:.16em;font-size:clamp(.72rem,calc(1*var(--vw)),1.05rem)}
+:look #sd-frame b{display:none}
+:look #sd-frame .f-meta{opacity:.8}
+:look #counter{display:none}
+:look #brand{font-family:var(--font-display);letter-spacing:.2em;font-weight:700}
+/* type */
+:look .lesson-title,:look .talk-title,:look .close-title,:look .case-title,:look .big-text,:look .full-overlay h2,:look .speaker-name{font-family:var(--font-display);font-weight:800;text-transform:uppercase;letter-spacing:.005em;line-height:.9}
+:look .event-tag,:look .case-ytag,:look .close-ey,:look .map-label,:look .lesson-tags,:look .qr-badge,:look .grid-label,:look .lesson-ey,:look .contact-pill .lbl,:look .big-pill{font-family:var(--font-display);font-weight:700;letter-spacing:.22em;text-transform:uppercase}
+:look .lesson-tagline,:look .case-bl li,:look .talk-subtitle,:look .close-sub,:look .big-caption,:look .speaker-co,:look .case-sub{font-family:var(--font-body)}
+/* cover: billing block. Event in gold caps, title huge, "an evening with" style credit line */
+:look .event-tag{color:var(--gold);opacity:1;font-size:var(--t-lead);margin-bottom:var(--s3)}
+:look .talk-title{font-size:calc(var(--t-display)*1.12);margin-bottom:var(--s3)}
+:look .talk-title .xr{color:var(--gold)!important}
+:look .talk-subtitle{font-style:italic;font-size:var(--t-h2);color:var(--ink-2);margin-bottom:var(--s4)}
+:look .speaker-card{background:transparent;border:0;border-top:1px solid var(--gold);border-bottom:1px solid var(--gold);padding:12px 36px}
+:look .speaker-name{font-size:var(--t-h2);letter-spacing:.04em}
+:look .speaker-co{font-style:italic;font-size:var(--t-body);color:var(--ink-2)}
+/* chapter: hard-edged followspot behind the title, ticket-stub kicker */
+:look .slide-lesson{background:radial-gradient(circle at 50% 46%,rgba(243,233,214,.07) 0 min(25vw,42vh),transparent calc(min(25vw,42vh) + 1px))}
+:look .lesson-ey{gap:0;font-size:calc(var(--t-label)*1.25);margin-bottom:var(--s3)}
+:look .lesson-ey>span{padding:.55em 1.1em;border:1px dashed var(--gold);color:var(--gold)!important}
+:look .ey-sep{display:none}
+:look .ey-badge{border-left:0!important}
+:look .lesson-title{font-size:calc(var(--t-h1)*1.15);max-width:none;margin-bottom:var(--s3)}
+:look .lesson-tagline{font-size:var(--t-lead);line-height:1.45;max-width:32em;color:var(--ink-2)}
+:look .lesson-tags{color:var(--ink-3);font-size:var(--t-label)}
+:look .lesson-rule{width:clamp(80px,calc(7*var(--vw)),140px);height:3px;background:var(--gold)!important}
+:look .slide-bonus .lesson-ey>span{border-color:var(--curtain);color:var(--ink)!important}
+/* case, two pane: playbill page. Image framed in a thin gold line, bullets as program notes */
+:look .case-image{outline:1px solid var(--gold);outline-offset:8px}
+:look .case-ytag{color:var(--gold)!important;opacity:1;font-size:var(--t-label)}
+:look .case-title{font-size:calc(var(--t-h2)*1.25)}
+:look .case-sub{font-style:italic;font-size:var(--t-body)}
+:look .case-bl{gap:var(--s2)}
+:look .case-bl li{font-size:var(--t-body);color:var(--ink);padding-left:1.6em}
+:look .case-bl li::before{width:.45em;height:.45em;border-radius:0;transform:rotate(45deg);background:var(--gold)!important;opacity:1;top:.6em}
+/* statement: marquee line */
+:look .layout-big .big-eyebrow{font-family:var(--font-display);font-weight:700;letter-spacing:.22em;text-transform:uppercase;font-size:var(--t-label);color:var(--gold)}
+:look .layout-big .big-text{font-size:calc(var(--t-h1)*1.1);line-height:.94;color:var(--ink)}
+:look .layout-big .big-caption{font-size:var(--t-lead);color:var(--ink-2)}
+:look .big-pill{background:var(--gold)!important;color:#141110!important;border:0}
+/* images */
+:look .full-overlay{background:linear-gradient(transparent,rgba(20,17,16,.94) 40%)!important}
+:look .grid-stage{gap:8px;padding-top:calc(clamp(30px,calc(3.4*var(--vh)),44px) + 8px)}
+:look .grid-label{background:var(--gold);color:#141110;padding:4px 10px;font-size:var(--t-label);left:0;top:0}
+/* close: curtain call */
+:look .slide[data-type="close"]{background:linear-gradient(90deg,var(--curtain) 0 3.5%,transparent 3.5% 96.5%,var(--curtain) 96.5%)}
+:look .close-ey{color:var(--gold);opacity:1;font-size:var(--t-lead)}
+:look .close-title{font-size:calc(var(--t-display)*1.1)}
+:look .close-sub{font-style:italic;font-size:var(--t-lead)}
+:look .contact-pill{background:transparent;border:1px solid var(--gold);color:var(--ink)}
+:look .qr-card img{background:#fff;padding:6px;outline:1px solid var(--gold);outline-offset:6px}
+:look #map-svg text{fill:var(--ink)!important}
+:look .ey-badge i{font-style:normal}
+:look .ey-badge .n::before{content:'No.\00a0'}
+:look .ey-badge .of::before{content:'\00a0of\00a0'}

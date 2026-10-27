@@ -77,6 +77,13 @@ index.html
 - Each click calls the next step function before advancing to next slide
 - Steps registered via `setTimeout(()=>{slideSteps.set(...)}, 0)` to defer past declaration
 
+### Looks (style library, 2026-10-27)
+- `styles/` holds art directions: `base.css` neutralizes the template's stock effects, and `looks/<id>/look.{css,json,md}` plus `examples/` defines each look. Scope placeholders are `:look` / `:looked`.
+- `tools/apply_look.py` inlines them into index.html between `SD LOOKS` sentinels (head) and `SD LOOK RUNTIME` (body). It's idempotent. Picked via `?look=`, `body[data-look]`, `window.SD_LOOK` or `--default`. The runtime builds `#sd-frame` (title block / running head / masthead) inside `#deck` and splits `.ey-badge` "n / N" into `.n`/`.of`.
+- Size tokens are declared on `#deck`, because in stage mode `#deck` is a scaled 1920x1080 box with its own `--vw`.
+- `--motion-dir` writes `look.js` (motion recolorer) and tags motion iframes with `window.name="sd-look:<id>"`, which works from file://.
+- Checks: `node tools/lint_look.mjs [--look id]` (generic tells, computed styles) and `python3 tools/check_branding.py` (forks only).
+
 ### Theme System
 - CSS custom properties on `:root`: `--bg`, `--teal`, `--purple`, `--amber`, `--rose`, `--text`, `--dim`, `--font`, `--para-gap`, `--tagline-scale`, `--title-scale`
 - Settings slide has live controls, saved to `localStorage` key `'spatial-deck-cfg'`

@@ -300,6 +300,17 @@ Two or more keyframes on the same element build a WAAPI animation automatically.
 | `Shift + →` | Next image/video |
 | `Shift + ←` | Previous image/video |
 | `Shift + ↑` | Resume auto-advance |
+9. **Add `?look=sheet` (or `folio`, `house`) to the URL** — the same slides as a construction-document sheet, an editorial folio or a theater program; then run `node tools/lint_look.mjs --look sheet` and compare it with the original look (`--look noir`), which trips 7 generic-AI-design tells.
+
+---
+
+## 🖋️ Looks (style library)
+
+Three art directions come from a curated library in [`styles/`](styles/README.md), modeled on [Keystone](https://github.com/ancarmona/keystone)'s approach (taste lives in a library of rules, tokens and example slides, not in model defaults): **Drawing Set** (`sheet`), **Folio** (`folio`) and **House** (`house`), plus the original **Noir**. Pick one with `?look=<id>` or bake a default with `python3 tools/apply_look.py --default sheet`. The deck stays a single file, and builders and interactivity don't change. `--motion-dir media/motion` also recolors seekable motion graphics to match. `node tools/lint_look.mjs` flags the stock AI look in a rendered deck, and `python3 tools/check_branding.py` stops a talk fork from shipping the template's social card, favicon or wordmark.
+
+| Drawing Set | Folio | House |
+|---|---|---|
+| ![sheet](styles/looks/sheet/examples/chapter.jpg) | ![folio](styles/looks/folio/examples/chapter.jpg) | ![house](styles/looks/house/examples/chapter.jpg) |
 
 ---
 
