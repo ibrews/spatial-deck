@@ -92,7 +92,8 @@ Draft dumb, make it amazing, ship it back out — every leg is tooled:
 5. **Press `N` to open the Presenter Popup, then navigate a few slides** — a second window tracks speaker notes, elapsed time, next-slide preview, and a pacing indicator (green / yellow / red).
 6. **Append `?vertical` to the URL (or toggle "Vertical Scroll Mode" in Settings)** — slides flip from step-through presentation to a long-form scrollable page; great for sharing a deck as a readable web doc. Toggle off (or remove `?vertical`) to return to presentation mode.
 7. **Run `python3 tools/export_pdf.py`** — every visible slide captured pixel-faithfully into a 16:9 PDF, rendered by the deck itself (needs Google Chrome installed), ending with a fidelity report of anything that degraded.
-8. **Resize your browser to phone width, or run the sweep at `375 812`** — every slide letterboxes onto a fixed 1920×1080 stage instead of reflowing, so nothing clips. `python3 tools/serve_deck.py --port 8411` then `node tools/sweep_deck.mjs http://localhost:8411/ /tmp/sweep 375 812 phone` proves it: exit 0, `problemSlides: 0`, plus contact sheets you can open.
+8. **Open any talk from the [Talks built with Spatial Deck](#-talks-built-with-spatial-deck) table** and press `→` — each is a live, single-file deck you can read the source of and fork.
+9. **Resize your browser to phone width, or run the sweep at `375 812`** — every slide letterboxes onto a fixed 1920×1080 stage instead of reflowing, so nothing clips. `python3 tools/serve_deck.py --port 8411` then `node tools/sweep_deck.mjs http://localhost:8411/ /tmp/sweep 375 812 phone` proves it: exit 0, `problemSlides: 0`, plus contact sheets you can open.
 
 ---
 
@@ -1068,13 +1069,24 @@ spatial-deck/
 
 ---
 
-## 🎤 Built With Spatial Deck
+## 🎤 Talks built with Spatial Deck
 
-- **"Productizing XR for Architecture"** — Alex Coulombe & Yu-Jun Yeh, NXT BLD 2026 ([view](https://ibrews.github.io/nxtbld-2026-productizing-xr/) · [repo](https://github.com/ibrews/nxtbld-2026-productizing-xr))
-- **"Spatial Storytelling"** — Alex Coulombe & David Gochfeld, FMX 2026 ([view](https://ibrews.github.io/fmx-2026-spatial-storytelling/) · [repo](https://github.com/ibrews/fmx-2026-spatial-storytelling))
-- **"10 Lessons from 10 Years"** — Alex Coulombe, Harvard XR Conference 2026 ([view](https://ibrews.github.io/harvardxr-keynote/) · [repo](https://github.com/ibrews/harvardxr-keynote))
-- **"Is XR Right For Your Project?"** — Sample deck included in this repo
-- *Add yours — [open a PR](https://github.com/ibrews/spatial-deck/pulls)!*
+Every talk below is its own repo (a fork-per-talk) served on GitHub Pages, newest first. Dates are the event date unless noted. Presentations by Alex Coulombe Presents.
+
+| Date | Talk | Event | Purpose | Repo |
+|---|---|---|---|---|
+| 2026-11-19 | [Architect to XR-chitect](https://ibrews.github.io/pmre-2026-xr-chitect/) | PMRE 2026 (Photo + Media for Real Estate), Las Vegas | Follows one career through architecture, theater and VR and ties it to the craft of real-estate photographers and videographers. Upcoming. | [pmre-2026-xr-chitect](https://github.com/ibrews/pmre-2026-xr-chitect) |
+| 2026-10-28 | [VR Cinematics for UE 5.8](https://ibrews.github.io/vr-cinematics-ue58-deck/) | Alex Coulombe Presents live class | How to stabilize recorded VR, re-shoot it, render it, and how the cameras of A Christmas Carol VR were built. | [vr-cinematics-ue58-deck](https://github.com/ibrews/vr-cinematics-ue58-deck) |
+| 2026-10-22 | [Old Stories, New Doors (plus Talk B, Engine Mastery x Craft)](https://ibrews.github.io/mia-2026-collective-pitch/) | MIA XR Collective Pitch, Rome | Two versions of a 10-minute pitch to film and TV producers and IP holders, from one shared slide pool: beloved stories need new audiences and revenue beyond stage and screen. | [mia-2026-collective-pitch](https://github.com/ibrews/mia-2026-collective-pitch) |
+| 2026-10-07 | [A Big Random AMA](https://ibrews.github.io/acp-livestream-2026-10-07/) | Alex Coulombe Presents live AMA (YouTube) | Every Lab tool, trailer and clip from the livestream, explorable at your own pace. | [acp-livestream-2026-10-07](https://github.com/ibrews/acp-livestream-2026-10-07) |
+| 2026-09-30 | [Data Interchange in UE5 (FBX, OpenUSD, GLB)](https://ibrews.github.io/data-interchange-ue5-class/) | Alex Coulombe Presents live class | One scene goes out of Unreal via OpenUSD and GLB into Godot and Three.js and back, measuring what each format keeps and drops. | [data-interchange-ue5-class](https://github.com/ibrews/data-interchange-ue5-class) |
+| 2026-06-23 (repo created; talk date not recorded) | [AI + MCP for Blender, Unreal & Godot](https://ibrews.github.io/sensai-2026-mcp-engines/) | SensAI Hackademy (virtual; prep for the Worlds in Action Hack @ SIGGRAPH 2026) | Workshop deck on driving Blender, Unreal and Godot with AI through MCP. | [sensai-2026-mcp-engines](https://github.com/ibrews/sensai-2026-mcp-engines) |
+| 2026-05-14 | [Productizing XR for Architecture](https://ibrews.github.io/nxtbld-2026-productizing-xr/) | NXT BLD 2026 | Where architecture firms are in the XR product cycle, across four products (Floor Tour, Blueprint Immersive, Hyperreal Estate, Holodeck Anywhere). | [nxtbld-2026-productizing-xr](https://github.com/ibrews/nxtbld-2026-productizing-xr) |
+| 2026-05-07 | [Ghosts of Performances Past: Five Years of A Christmas Carol VR](https://ibrews.github.io/fmx-2026-spatial-storytelling/) | FMX 2026 (with David Gochfeld) | Spatial storytelling lessons from five years of A Christmas Carol VR. | [fmx-2026-spatial-storytelling](https://github.com/ibrews/fmx-2026-spatial-storytelling) |
+| 2026-04-11 | [10 Lessons from 10 Years](https://ibrews.github.io/harvardxr-keynote/) | HXR 2026 (Harvard XR Conference), closing keynote | Ten lessons from running an XR enterprise studio for a decade. | [harvardxr-keynote](https://github.com/ibrews/harvardxr-keynote) |
+
+- **"Is XR Right For Your Project?"** is the sample deck included in this repo (`index.html`).
+- *Add yours: [open a PR](https://github.com/ibrews/spatial-deck/pulls) adding a row.*
 
 ---
 
