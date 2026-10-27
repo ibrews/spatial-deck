@@ -24,8 +24,12 @@
 //   declared  = what the deck promises (a module's resolved `steps`, else the slide's slideSteps length, else 0)
 //   reachable = how many ArrowRight presses stayed on the slide
 //   frame     = what an iframe module reported in its ready message
-// declared != reachable, frame != declared, or a step whose screenshot is identical to the one before it (a dead
-// step) fails the run. The sweep loads the deck with ?reduced so every beat jumps to its final frame and a step
+// declared != reachable, frame != declared, a frame module that never reports ready, or a step whose screenshot is
+// identical to the one before it (a dead step) fails the run. Be clear about what each can see: for an inline module
+// or a hand-written slide, declared and reachable come from the same slideSteps entry, so that comparison only
+// catches code that registers clicks behind the deck's back (or arrow substeps switched off). Clicks that exist but
+// do nothing are caught by the dead-step check; clicks that should exist but were never written are caught only by a
+// person reading the captioned contact sheet against the notes. The sweep loads the deck with ?reduced so every beat jumps to its final frame and a step
 // screenshot is deterministic, and hides the animated star background, the step indicator and the playing spinner
 // (they would make every frame differ).
 // --live keeps real-time motion instead (sheets show mid-animation frames; dead-step detection is then a weak signal).
@@ -123,6 +127,7 @@ async function walkSteps(i, firstShot) {
     return { mod, hidden: s.dataset.hidden === '1',
       declared: s.dataset.sdSteps != null ? +s.dataset.sdSteps : (ss ? ss.steps.length : 0),
       frame: s.dataset.sdFrameSteps != null ? +s.dataset.sdFrameSteps : null,
+      isFrame: !!s.querySelector('iframe[data-sd-frame]'),
       arrowSubstep: window._arrowSubstep !== false };
   }, i);
   const r = { ...meta, reachable: 0, dead: [], shots: [] };
@@ -145,6 +150,8 @@ async function walkSteps(i, firstShot) {
   const why = [];
   if (r.reachable !== r.declared) why.push(`declared ${r.declared} step(s), reachable ${r.reachable}`);
   if (r.frame !== null && r.frame !== r.declared) why.push(`frame reports ${r.frame} step(s), deck declares ${r.declared}`);
+  // A frame module that never sent ready gets no enter/step from the deck: it plays once, off-screen, at load.
+  if (r.isFrame && r.frame === null) why.push('iframe module never reported ready (does its html load ../../sd-frame.js and call SDFrame.init?)');
   if (r.dead.length) why.push(`dead step(s) ${r.dead.join(',')}: nothing on screen changed`);
   if (r.runaway) why.push(`still on the slide after ${MAX_STEPS} presses`);
   if (!r.arrowSubstep && r.declared) why.push('arrow substeps are switched off in Settings; steps cannot be reached');

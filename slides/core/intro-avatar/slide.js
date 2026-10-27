@@ -78,6 +78,10 @@ body:where([data-look]:not([data-look="noir"])):not(#_) .sd-mod-core-intro-avata
 body:where([data-look]:not([data-look="noir"])):not(#_) .sd-mod-core-intro-avatar .intro-stat .lbl{color:var(--ink-2)}
 `,
   render(el, props, ctx) {
+    // Seeded (mulberry32), not Math.random: the sparkle layout and fireball pattern are the same on every render, so
+    // ?print / ?shot exports and contact sheets match run to run.
+    let seed = 0x5d1e;
+    const rand = () => { seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
     const svgE = ctx.svg;
     const IMG = props.img || {};
     const badgeSrc = IMG.badge || ctx.asset('badge.svg');
@@ -158,7 +162,7 @@ body:where([data-look]:not([data-look="noir"])):not(#_) .sd-mod-core-intro-avata
     const avBody = avatar(anim, { withBeard: !!props.withBeard }).querySelector('.av-body');
     // 24 sparkles + flash
     const sparkles = svgE('g', { opacity: '0' }), COLORS = ['#fde68a', '#00d4ff', '#a78bfa', '#f59e0b', '#fff', '#fb7185'];
-    for (let i = 0; i < 24; i++) { const a = (i / 24) * Math.PI * 2 + (Math.random() - .5) * .4, d = 55 + Math.random() * 45; const sp = svgE('circle', { cx: 240, cy: 200, r: (1.2 + Math.random() * 2.2).toFixed(1), fill: COLORS[i % COLORS.length] }); sp.style.setProperty('--tx', (Math.cos(a) * d).toFixed(1) + 'px'); sp.style.setProperty('--ty', (Math.sin(a) * d).toFixed(1) + 'px'); sp.style.transformOrigin = '240px 200px'; sparkles.appendChild(sp); }
+    for (let i = 0; i < 24; i++) { const a = (i / 24) * Math.PI * 2 + (rand() - .5) * .4, d = 55 + rand() * 45; const sp = svgE('circle', { cx: 240, cy: 200, r: (1.2 + rand() * 2.2).toFixed(1), fill: COLORS[i % COLORS.length] }); sp.style.setProperty('--tx', (Math.cos(a) * d).toFixed(1) + 'px'); sp.style.setProperty('--ty', (Math.sin(a) * d).toFixed(1) + 'px'); sp.style.transformOrigin = '240px 200px'; sparkles.appendChild(sp); }
     svg.appendChild(sparkles);
     const flash = svgE('rect', { x: 0, y: 0, width: 400, height: 400, fill: '#fff', opacity: '0', 'pointer-events': 'none' }); svg.appendChild(flash);
     const nums = [...el.querySelectorAll('.num')];
@@ -199,7 +203,7 @@ body:where([data-look]:not([data-look="noir"])):not(#_) .sd-mod-core-intro-avata
 
     function shootFireball(x, y, dir) {
       const fb = svgE('g', { class: 'ti-fb', transform: `translate(${x},${y})` });
-      fb.appendChild(svgE('image', { href: Math.random() < .5 ? badgeSrc : logoSrc, x: -20, y: -20, width: 40, height: 40 }));
+      fb.appendChild(svgE('image', { href: rand() < .5 ? badgeSrc : logoSrc, x: -20, y: -20, width: 40, height: 40 }));
       svg.appendChild(fb); sfx.zap();
       let f = 0; const sp = dir * 5.5;
       const spin = () => { f++; const cx = x + sp * f, b = -Math.abs(Math.sin(f * .12)) * 18 * Math.max(0, 1 - f / 40); fb.setAttribute('transform', `translate(${cx},${y + b}) rotate(${f * 12})`); if (f < 55 && cx > 5 && cx < 395) S.raf(spin); else fb.remove(); };
@@ -216,7 +220,7 @@ body:where([data-look]:not([data-look="noir"])):not(#_) .sd-mod-core-intro-avata
       S.after(2700, () => setAnim('ue5FallDown .55s cubic-bezier(.55,0,.8,1) forwards'));
       S.after(3300, () => {
         fade([ue5Text], true, false); setAnim('none', 'translate(0,0) scale(2)');
-        const run = (startX, hop, done) => { let dir = 1, x = startX, fbt = 0, n = 0; const loop = () => { if (n > 180) { done(x); return; } n++; x += dir * 2.8; if (x > 200) dir = -1; if (x < -20) dir = 1; const hy = hop ? -Math.abs(Math.sin(n * .15)) * 8 : 0; anim.style.transform = `translate(${x}px,${hy}px) scale(2)`; if (++fbt > 18 && Math.random() < .18) { shootFireball(80 + x + (dir > 0 ? 25 : -25), 270 + hy, dir); fbt = 0; } S.raf(loop); }; S.raf(loop); };
+        const run = (startX, hop, done) => { let dir = 1, x = startX, fbt = 0, n = 0; const loop = () => { if (n > 180) { done(x); return; } n++; x += dir * 2.8; if (x > 200) dir = -1; if (x < -20) dir = 1; const hy = hop ? -Math.abs(Math.sin(n * .15)) * 8 : 0; anim.style.transform = `translate(${x}px,${hy}px) scale(2)`; if (++fbt > 18 && rand() < .18) { shootFireball(80 + x + (dir > 0 ? 25 : -25), 270 + hy, dir); fbt = 0; } S.raf(loop); }; S.raf(loop); };
         run(0, false, () => { anim.style.transform = 'translate(90px,0) scale(2)'; S.after(5000, () => run(90, true, x2 => { anim.style.transform = `translate(${x2}px,0) scale(2)`; })); });
       });
     }

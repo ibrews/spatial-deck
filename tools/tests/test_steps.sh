@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # The steps lint has to fail on a deliberately broken module before its PASS on a real deck means anything.
-# good.html must PASS the steps sweep; broken.html must FAIL on exactly its three broken slides, each for its own reason.
+# good.html must PASS the steps sweep; broken.html must FAIL on exactly its four broken slides, each for its own reason.
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"; TOOLS="$(dirname "$HERE")"; OUT="${OUT:-$(mktemp -d)}"; mkdir -p "$OUT"
 python3 "$HERE/build_steps_fixture.py" || exit 2
@@ -13,5 +13,6 @@ check() { if grep -q "STEPS .*\"mod\":\"$1\".*$2" "$OUT/broken.log"; then echo "
 check test/dead 'dead step(s) 3'
 check test/frame-liar 'frame reports 1 step(s), deck declares 2'
 check test/sneaky 'declared 0 step(s), reachable 3'
-n=$(grep -c '^STEPS ' "$OUT/broken.log"); [ "$n" -eq 3 ] && echo "ok   exactly 3 broken slides" || { echo "FAIL expected 3 broken slides, got $n"; grep '^STEPS ' "$OUT/broken.log"; fail=1; }
+check test/silent 'never reported ready'
+n=$(grep -c '^STEPS ' "$OUT/broken.log"); [ "$n" -eq 4 ] && echo "ok   exactly 4 broken slides" || { echo "FAIL expected 4 broken slides, got $n"; grep '^STEPS ' "$OUT/broken.log"; fail=1; }
 echo "logs + contact sheets: $OUT"; exit $fail

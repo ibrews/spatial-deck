@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build the step-contract fixture decks from the template (tools/tests/steps_fixture/{good,broken}.html).
-good.html uses only well-behaved modules: the steps sweep must PASS. broken.html adds three modules that each break the
-contract a different way: the sweep must FAIL on exactly those three slides. Run by tools/tests/test_steps.sh."""
+good.html uses only well-behaved modules: the steps sweep must PASS. broken.html adds four modules that each break the
+contract a different way: the sweep must FAIL on exactly those four slides. Run by tools/tests/test_steps.sh."""
 import re, sys
 from pathlib import Path
 
@@ -11,7 +11,7 @@ TEMPLATE = (HERE.parent.parent / "index.html").read_text(encoding="utf-8")
 A, B = "<!-- ── SD SLIDE MODULES START ── -->", "<!-- ── SD SLIDE MODULES END ── -->"
 
 GOOD = [{"use": "test/counter"}, {"use": "test/beats"}, {"use": "test/counter", "props": {"title": "Counter, 3 lines", "lines": ["x", "y", "z"]}, "steps": 3}]
-BROKEN = GOOD + [{"use": "test/dead"}, {"use": "test/frame-liar"}, {"use": "test/sneaky"}]
+BROKEN = GOOD + [{"use": "test/dead"}, {"use": "test/frame-liar"}, {"use": "test/sneaky"}, {"use": "test/silent"}]
 
 
 def deck(cases):

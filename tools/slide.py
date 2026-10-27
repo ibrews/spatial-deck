@@ -11,7 +11,7 @@ A slide module is slides/<namespace>/<id>/slide.js plus its assets (slides/READM
 Metadata is read by running each slide.js under Node with a stub SD.defineSlide, so it is exactly what the deck
 sees; nothing is rendered. Needs node on PATH.
 """
-import argparse, datetime, hashlib, json, re, shutil, subprocess, sys, urllib.parse, urllib.request
+import argparse, datetime, hashlib, json, re, shutil, subprocess, sys, urllib.error, urllib.parse, urllib.request
 from pathlib import Path
 
 A, B = "<!-- ── SD SLIDE MODULES START ── -->", "<!-- ── SD SLIDE MODULES END ── -->"
@@ -55,9 +55,31 @@ def deck_dir(arg):
     return p.parent if p.is_file() else p
 
 
+def url_base(u):
+    """Folder URL of a deck: https://x/talk, https://x/talk/ and https://x/talk/index.html all give https://x/talk/."""
+    u = u.split("#")[0].split("?")[0]
+    if u.endswith("/"):
+        return u
+    last = u.rsplit("/", 1)[1]
+    return (u.rsplit("/", 1)[0] if "." in last else u) + "/"
+
+
 def fetch(url):
-    with urllib.request.urlopen(url, timeout=30) as r:
-        return r.read()
+    try:
+        with urllib.request.urlopen(url, timeout=30) as r:
+            return r.read()
+    except urllib.error.HTTPError as e:
+        sys.exit(f"slide.py: {url}: HTTP {e.code}")
+    except urllib.error.URLError as e:
+        sys.exit(f"slide.py: {url}: {e.reason}")
+
+
+def talk_sources(root):
+    """index.html plus a talk's unbaked sources (talk/*.js, talk/*.json), where use: cases may live before a bake."""
+    out = (root / "index.html").read_text(encoding="utf-8") if (root / "index.html").exists() else ""
+    for p in sorted((root / "talk").glob("*.js")) + sorted((root / "talk").glob("*.json")) if (root / "talk").is_dir() else []:
+        out += "\n" + p.read_text(encoding="utf-8")
+    return out
 
 
 def uses_in(html):
@@ -77,8 +99,8 @@ def module_files(root):
 
 def cmd_list(a):
     if is_url(a.deck):
-        base = a.deck if a.deck.endswith("/") else a.deck.rsplit("/", 1)[0] + "/"
-        html = fetch(a.deck if not a.deck.endswith("/") else a.deck + "index.html").decode("utf-8", "replace")
+        base = url_base(a.deck)
+        html = fetch(base + "index.html").decode("utf-8", "replace")
         srcs = listed_in(html) or []
         tmp = Path(subprocess.run(["mktemp", "-d"], capture_output=True, text=True).stdout.strip())
         files = []
@@ -94,7 +116,7 @@ def cmd_list(a):
     else:
         root = deck_dir(a.deck)
         idx = root / "index.html"
-        html = idx.read_text(encoding="utf-8") if idx.exists() else ""
+        html = talk_sources(root)
         files = module_files(root)
         meta = node_meta(files)
         for m in meta:
@@ -138,10 +160,14 @@ def cmd_pull(a):
     into = deck_dir(a.into)
     if not (into / "index.html").exists():
         sys.exit(f"slide.py: {into} has no index.html")
+    html = (into / "index.html").read_text(encoding="utf-8")
+    if A not in html or B not in html or "SD.defineSlide" not in html:
+        sys.exit(f"slide.py: {into / 'index.html'} has no module loader (SD SLIDE MODULES block); re-seed it from "
+                 "ibrews/spatial-deck index.html first. Nothing was copied.")
     dst = into / "slides" / mid
     tmp = None
     if is_url(a.deck):
-        base = a.deck if a.deck.endswith("/") else a.deck.rsplit("/", 1)[0] + "/"
+        base = url_base(a.deck)
         tmp = Path(subprocess.run(["mktemp", "-d"], capture_output=True, text=True).stdout.strip())
         src = tmp / "slides" / mid
         src.mkdir(parents=True)
@@ -163,7 +189,10 @@ def cmd_pull(a):
         if not (src / "slide.js").exists():
             have = ", ".join(m["id"] for m in node_meta(module_files(root)) if "id" in m) or "none"
             sys.exit(f"slide.py: {root} has no module {mid} (it has: {have})")
-        meta = node_meta([src / "slide.js"])[0]
+        metas = node_meta([src / "slide.js"])
+        if not metas:
+            sys.exit(f"slide.py: {mid}/slide.js does not call SD.defineSlide")
+        meta = metas[0]
         commit, origin = git_head(root)
         origin = origin or str(root)
     if "error" in meta:
@@ -173,6 +202,8 @@ def cmd_pull(a):
     if undeclared and not is_url(a.deck):
         print(f"slide.py: note: {len(undeclared)} file(s) in {mid}/ are not in its assets list and will be copied anyway: "
               + ", ".join(str(p.relative_to(src)) for p in undeclared[:5]))
+    if dst.resolve() == src.resolve() or dst.resolve() in src.resolve().parents or src.resolve() in dst.resolve().parents:
+        sys.exit(f"slide.py: source and destination are the same folder ({src}); nothing to pull")
     if dst.exists() and not a.force:
         same = all((dst / p.relative_to(src)).exists() and sha256(dst / p.relative_to(src)) == sha256(p)
                    for p in src.rglob("*") if p.is_file() and p.name != ".pulled.json")
@@ -183,25 +214,26 @@ def cmd_pull(a):
     if dst.exists():
         shutil.rmtree(dst)
     shutil.copytree(src, dst, ignore=shutil.ignore_patterns(".pulled.json"))
-    if meta["frame"]:
-        rt_src, rt_dst = root / FRAME_RUNTIME, into / FRAME_RUNTIME
-        if rt_src.exists() and (not rt_dst.exists() or sha256(rt_src) != sha256(rt_dst)):
-            if rt_dst.exists():
-                print(f"slide.py: updating {FRAME_RUNTIME} in {into} (frame protocol runtime)")
-            shutil.copyfile(rt_src, rt_dst)
-    # Files shared by several modules (slides/kit/…) come along; a differing local copy is kept unless --force.
-    for sh in meta["shared"]:
+    # Runtime and shared files (slides/sd-frame.js, slides/look.js for frame modules, slides/kit/…) come along. A
+    # differing local copy is kept unless --force: it is what the talk was rehearsed with, and replacing it would
+    # change every module that uses it.
+    support = (["sd-frame.js", "look.js"] if meta["frame"] else []) + list(meta["shared"])
+    support_hashes = {}
+    for sh in support:
         s_src, s_dst = root / "slides" / sh, into / "slides" / sh
         if not s_src.exists():
+            if sh == "look.js":
+                continue  # written by tools/apply_look.py; only needed for non-noir looks
             sys.exit(f"slide.py: {mid} needs slides/{sh} but the source deck does not have it")
         if s_dst.exists() and sha256(s_dst) != sha256(s_src) and not a.force:
             print(f"slide.py: keeping your slides/{sh} (differs from the source's; --force replaces it)")
-            continue
-        s_dst.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(s_src, s_dst)
+        else:
+            s_dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(s_src, s_dst)
+        support_hashes[sh] = sha256(s_dst)
     rec = {"id": mid, "pulled_from": origin, "commit": commit, "pulled_at": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
            "files": {str(p.relative_to(dst)): sha256(p) for p in sorted(dst.rglob("*")) if p.is_file()},
-           "provenance": meta["provenance"]}
+           "support_files": support_hashes, "provenance": meta["provenance"]}
     (dst / ".pulled.json").write_text(json.dumps(rec, indent=1) + "\n", encoding="utf-8")
     if tmp:
         shutil.rmtree(tmp, ignore_errors=True)
@@ -242,7 +274,7 @@ def cmd_check(a):
         disk = [p.relative_to(root).as_posix() for p in module_files(root)]
         if sorted(listed) != sorted(disk):
             errs.append(f"modules block is stale (lists {len(listed)}, slides/ has {len(disk)}): run tools/slide.py sync")
-    for u in uses_in(html):
+    for u in uses_in(talk_sources(root)):
         if u not in by_id:
             errs.append(f"use: '{u}' has no module in slides/")
     for m in by_id.values():
@@ -263,7 +295,7 @@ def cmd_check(a):
             errs.append(f"{m['id']}: is an iframe module but {FRAME_RUNTIME} is missing")
     for e in errs:
         print("  FAIL " + e)
-    print(f"slide.py check: {len(by_id)} module(s), {len(uses_in(html))} used id(s), {len(errs)} problem(s)")
+    print(f"slide.py check: {len(by_id)} module(s), {len(uses_in(talk_sources(root)))} used id(s), {len(errs)} problem(s)")
     return 1 if errs else 0
 
 

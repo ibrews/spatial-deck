@@ -10,8 +10,9 @@ cases: [
 ]
 ```
 
-Everything else about a case still works on a module slide: `notes`, `opt` / `keep` in talks that have an options
-picker, the step indicator, the timing estimate, `?print`, `?shot=N`, `?notes`. The deck owns navigation and chrome
+Everything else about a case still works on a module slide: the case's `notes`, `opt` / `keep` in talks that have an
+options picker, the step indicator, `?print`, `?shot=N`, `?notes`. (A module's own `notes` field is guidance for the
+talk author, not presenter notes; the timing estimate counts clicks, not a module's `duration`.) The deck owns navigation and chrome
 (`?chrome=full|quiet|none`); the module owns what is inside the slide.
 
 ## Library vs talk
@@ -64,10 +65,15 @@ SD.defineSlide({
 `var(--text)`, `var(--ink)` …) so every `styles/` look recolors it. Hard-coded hex is only for pixel art that is the
 same in every look.
 
+**Lifecycle order.** On every slide change the old slide's `leave()` runs before the new slide's `enter()`; a click
+that arrives in the same task as the slide change enters the slide first. `enter()` runs again on every re-entry
+(going back included), from step 0.
+
 **Deck-level layers listen, they don't patch.** Every slide change (module or not) fires
 `document.addEventListener('sd:slide', e => …)` with `e.detail = {index, slide, type, section, year, module, shows}`.
 A persistent companion (a journey minimap, a walking sprite) reads the chapter from `section`/`year` and steps aside
-when `shows` includes what it would draw (`'avatar'`). The event does not fire in `?print`/`?shot`.
+when `shows` includes what it would draw (`'avatar'`). It fires once per change; the first slide is announced when
+the page has finished parsing, so a listener added by any script in the page hears it. Not in `?print`/`?shot`.
 
 **Never register `slideSteps` yourself.** The deck builds a module's clicks from `steps`; a module that adds its own is
 exactly the "substeps came back by accident" failure, and the steps sweep fails it.
@@ -91,6 +97,13 @@ frame at 4 s, which is what `tools/render_motion.mjs` uses for MP4s. postMessage
 no server. Animate only with CSS animations or WAAPI (`document.getAnimations()` must see everything); the gotchas
 are in the KB technique *seekable-html-motion-graphics-for-decks*.
 
+**Exports.** In `?print` and `?shot=N` an iframe module loads `?static` (its final frame). A deck that has rendered
+posters (`tools/render_motion.mjs`) can show those instead, which does not depend on the frame finishing loading:
+set `poster: 'media/motion/mp4/lane-poster{.look}.png'` on a case, or one pattern for the whole deck,
+`window.SD_POSTERS = 'media/motion/mp4/{motion}-poster{.look}.png'` (`{motion}` = the case's `motion` name,
+`{id}` = module id with `/` → `-`, `{.look}` = `''` for noir else `.sheet` etc.). A missing look poster falls back to
+the noir one, then to the live frame.
+
 ## Tools
 
 ```bash
@@ -105,8 +118,10 @@ bash tools/tests/test_steps.sh                                       # the steps
 
 `sweep_deck.mjs --steps` presses the real ArrowRight key on every slide until the slide changes, screenshots each
 substep into the contact sheets (captioned `12 · step 3`), and fails the run when declared steps differ from
-reachable steps, when an iframe reports a different count than the deck asks for, or when a click changes nothing on
-screen (a dead step).
+reachable steps, when an iframe reports a different count than the deck asks for (or never reports at all), or when
+a click changes nothing on screen (a dead step). What it cannot see: a click that should exist but was never written.
+For an inline module, declared and reachable come from the same `steps`, so that comparison only catches code that
+adds clicks behind the deck's back; reading the captioned sheet against the speaker notes is the check for the rest.
 
 ## Why it is built this way
 

@@ -1690,11 +1690,12 @@ function playBing(){try{const c=sfxCtx(),t=c.currentTime,o=c.createOscillator(),
   function audio(){if(INSTANT)return null;try{if(!_audio||_audio.state==='closed')_audio=new(window.AudioContext||window.webkitAudioContext)();if(_audio.state==='suspended')_audio.resume();return _audio;}catch(e){return null;}}
   function call(r,fn,...a){const f=r.inst&&r.inst[fn];if(typeof f!=='function')return;try{return f.apply(r.inst,a);}catch(e){console.error('SD: '+r.id+'.'+fn+'() threw',e);}}
   function resolveSteps(def,c,props){const n=c.steps!=null?c.steps:(typeof def.steps==='function'?def.steps(props):def.steps);return Math.max(0,Math.floor(+n||0));}
+  const esc=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   function fail(s,msg){s.classList.add('sd-mod-error');s.innerHTML=`<div class="sd-iframe-ph"><span class="ph-kicker">slide module</span><span>${msg}</span></div>`;console.error('SD: '+msg.replace(/<[^>]+>/g,''));}
   SD._build=function(s,c,sec){
     const id=c.use,def=SD.modules[id];
     s.dataset.sdMod=id;s.classList.add('sd-mod','sd-mod-'+id.replace(/[^\w-]/g,'-'));
-    if(!def){s.dataset.sdMissing='1';fail(s,`Module <code>${id}</code> is not loaded. Put it in slides/${id}/ and run tools/slide.py sync.`);return;}
+    if(!def){s.dataset.sdMissing='1';fail(s,`Module <code>${esc(id)}</code> is not loaded. Put it in slides/${esc(id)}/ and run tools/slide.py sync.`);return;}
     if(def.css&&!document.querySelector(`style[data-sd-mod="${id}"]`)){const st=document.createElement('style');st.dataset.sdMod=id;st.textContent=def.css;document.head.appendChild(st);}
     const props=Object.assign({},def.props||{},c.props||{});  // shallow: a talk replaces a whole prop, arrays included
     const steps=resolveSteps(def,c,props);s.dataset.sdSteps=steps;
@@ -1704,9 +1705,9 @@ function playBing(){try{const c=sfxCtx(),t=c.currentTime,o=c.createOscillator(),
     const ctx={id,slide:s,props,steps,base:def.base,asset:p=>def.base+p,instant:INSTANT,exportMode:EXPORT,params:Q,
       clock:clock(),audio,svg:svgE,section:sec,look:()=>window.SD_ACTIVE_LOOK||document.body.dataset.look||'noir'};
     const r={id,def,c,props,ctx,steps,inst:{},on:false,cur:0,frozen:false};recs.set(s,r);
-    try{r.inst=def.frame?frameInstance(r):(def.render(s,props,ctx)||{});}catch(e){fail(s,`Module <code>${id}</code> failed to render: ${String(e&&e.message||e)}`);r.inst={};}
+    try{r.inst=def.frame?frameInstance(r):(def.render(s,props,ctx)||{});}catch(e){fail(s,`Module <code>${esc(id)}</code> failed to render: ${esc(e&&e.message||e)}`);r.inst={};}
     if(steps>0)slideSteps.set(s,{current:0,sdModule:id,reset(){},
-      steps:Array.from({length:steps},(_,i)=>()=>{if(r.frozen)return;r.cur=i+1;call(r,'step',i+1);})});
+      steps:Array.from({length:steps},(_,i)=>()=>{if(r.frozen)return;if(!r.on)sync();r.cur=i+1;call(r,'step',i+1);})});
   };
   function enter(r){if(r.on||r.frozen)return;r.on=true;r.cur=0;r.ctx.clock.stop();call(r,'enter');}
   function leave(r){if(!r.on)return;r.on=false;r.ctx.clock.stop();call(r,'leave');}
@@ -1717,11 +1718,17 @@ function playBing(){try{const c=sfxCtx(),t=c.currentTime,o=c.createOscillator(),
   function announce(sl){if(!sl)return;const i=allSlides.indexOf(sl),r=recs.get(sl);
     document.dispatchEvent(new CustomEvent('sd:slide',{detail:{index:i,slide:sl,type:sl.dataset.type||'',section:sl.dataset.section!=null?+sl.dataset.section:null,
       year:sl.dataset.year||null,module:r?r.id:null,shows:(sl.dataset.sdShows||'').split(' ').filter(Boolean)}}));}
+  // One deck-level observer, so the old slide always leaves before the new one enters and each change is announced
+  // once (per-slide observers fired in creation order: going backward entered A before B left).
+  let shown=null,booting=false;
+  function sync(){const a=deck.querySelector(':scope>.slide.active');if(a===shown)return;const prev=shown;shown=a;
+    const rp=prev&&recs.get(prev),ra=a&&recs.get(a);if(rp)leave(rp);if(ra)enter(ra);if(!booting)announce(a);}
   SD._wire=function(){
-    if(!EXPORT){allSlides.forEach(sl=>new MutationObserver(()=>{if(sl.classList.contains('active'))announce(sl);}).observe(sl,{attributes:true,attributeFilter:['class']}));
-      queueMicrotask(()=>announce(deck.querySelector('.slide.active')));}
     if(EXPORT){recs.forEach((r,s)=>{freeze(r);const ss=slideSteps.get(s);if(ss)ss.current=ss.steps.length;});return;}
-    recs.forEach((r,s)=>{new MutationObserver(()=>{s.classList.contains('active')?enter(r):leave(r);}).observe(s,{attributes:true,attributeFilter:['class']});if(s.classList.contains('active'))enter(r);});
+    const mo=new MutationObserver(sync);allSlides.forEach(sl=>mo.observe(sl,{attributes:true,attributeFilter:['class']}));
+    // Enter the first slide now; announce it once the page has parsed, so listeners added by later scripts hear it.
+    booting=true;sync();booting=false;const first=shown;
+    const late=()=>{if(shown===first)announce(first);};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',late,{once:true});else late();
   };
   // ── iframe modules: slides/<ns>/<id>/<frame>.html + slides/sd-frame.js speak this protocol ──
   // parent → frame {sd:'spatial-deck',v:1,type:'enter'|'step'|'leave'|'seek'|'static', n?, t?, instant?}
@@ -1733,9 +1740,27 @@ function playBing(){try{const c=sfxCtx(),t=c.currentTime,o=c.createOscillator(),
     const s=r.ctx.slide,def=r.def;
     const src=def.base+def.frame+(EXPORT?'?static':'')+'#sdp='+encodeURIComponent(JSON.stringify(r.props));
     s.classList.add('layout-full');  // same box as an IFRAME: full slide, so looks style both identically
-    s.innerHTML=`<div class="full-stage sd-frame-stage"><iframe class="full-media anim-frame" data-sd-frame="${r.id}" src="${src}" frameborder="0" scrolling="no" allow="autoplay"></iframe></div>`;
-    const f=r.frameEl=s.querySelector('iframe');let ready=false;
-    const post=m=>{if(!ready||!f.contentWindow)return;f.contentWindow.postMessage(Object.assign({sd:MSG,v:1,instant:r.ctx.instant},m),'*');};
+    s.innerHTML=`<div class="full-stage sd-frame-stage"></div>`;
+    let ready=false,f=null;
+    // The look (and so window.name) is only final after the look runtime at the end of <body> and a talk's options
+    // picker have run. The frame is created then, with its name already set: a name given to an iframe that already
+    // has a browsing context never reaches the frame's window.name, and a file:// frame cannot read its parent.
+    // Exports (?print, ?shot) want a finished picture, not a frame that may still be loading or recoloring: when the
+    // case names a poster (c.poster, or the deck-wide window.SD_POSTERS pattern), show that image instead.
+    // Tokens: {motion} = case.motion, {id} = module id with / as -, {.look} = '' for noir else '.<look>'. If the
+    // look's poster is missing it falls back to the noir one, then to the live ?static frame.
+    const poster=EXPORT&&(r.c.poster||window.SD_POSTERS);
+    if(poster){const fill=lk=>poster.replace(/\{motion\}/g,r.c.motion||'').replace(/\{id\}/g,r.id.replace('/','-')).replace(/\{\.look\}/g,lk&&lk!=='noir'?'.'+lk:'');
+      const show=()=>{const lk=window.SD_ACTIVE_LOOK||document.body.dataset.look||Q.get('look');const im=document.createElement('img');im.className='full-media sd-motion-poster';im.alt='';
+        const urls=[...new Set([fill(lk),fill('noir')])];let k=0;im.onerror=()=>{if(++k<urls.length)im.src=urls[k];else{im.remove();go();}};im.src=urls[0];
+        s.querySelector('.sd-frame-stage').appendChild(im);};
+      if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',show,{once:true});else show();}
+    const go=()=>{f=r.frameEl=document.createElement('iframe');f.className='full-media anim-frame';f.dataset.sdFrame=r.id;
+      const lk=window.SD_ACTIVE_LOOK||document.body.dataset.look||Q.get('look');if(lk)f.name='sd-look:'+lk;
+      f.setAttribute('frameborder','0');f.setAttribute('scrolling','no');f.setAttribute('allow','autoplay');f.src=src;
+      s.querySelector('.sd-frame-stage').appendChild(f);};
+    if(!poster){if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',go,{once:true});else go();}
+    const post=m=>{if(!ready||!f||!f.contentWindow)return;f.contentWindow.postMessage(Object.assign({sd:MSG,v:1,instant:r.ctx.instant},m),'*');};
     const sync=()=>{if(r.frozen){post({type:'static'});return;}if(r.on){post({type:'enter'});for(let i=1;i<=r.cur;i++)post({type:'step',n:i,instant:true});}else post({type:'leave'});};
     r.frameReady=d=>{ready=true;s.dataset.sdFrameSteps=d.steps|0;if(d.duration)s.dataset.sdDuration=d.duration;
       if((d.steps|0)!==r.steps)console.warn(`SD: ${r.id} frame reports ${d.steps|0} step(s) but the deck asks for ${r.steps}`);sync();};
