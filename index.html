@@ -1751,7 +1751,7 @@ function playBing(){try{const c=sfxCtx(),t=c.currentTime,o=c.createOscillator(),
     // look's poster is missing it falls back to the noir one, then to the live ?static frame.
     const poster=EXPORT&&(r.c.poster||window.SD_POSTERS);
     if(poster){const fill=lk=>poster.replace(/\{motion\}/g,r.c.motion||'').replace(/\{id\}/g,r.id.replace('/','-')).replace(/\{\.look\}/g,lk&&lk!=='noir'?'.'+lk:'');
-      const show=()=>{const lk=window.SD_ACTIVE_LOOK||document.body.dataset.look||Q.get('look');const im=document.createElement('img');im.className='full-media sd-motion-poster';im.alt='';
+      const show=()=>{const lk=window.SD_ACTIVE_LOOK||document.body.dataset.look||Q.get('look');const im=document.createElement('img');im.className='full-media sd-mod-poster';im.alt='';
         const urls=[...new Set([fill(lk),fill('noir')])];let k=0;im.onerror=()=>{if(++k<urls.length)im.src=urls[k];else{im.remove();go();}};im.src=urls[0];
         s.querySelector('.sd-frame-stage').appendChild(im);};
       if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',show,{once:true});else show();}
