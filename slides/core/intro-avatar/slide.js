@@ -8,6 +8,7 @@
    from ctx.clock and nothing is global, so two copies on one deck do not interfere. */
 SD.defineSlide({
   id: 'core/intro-avatar',
+  shows: ['avatar'],
   steps: 3,
   props: {
     eyebrow: 'Your Speaker',

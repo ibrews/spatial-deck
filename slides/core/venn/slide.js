@@ -2,6 +2,7 @@
 // reacts), overlap labels light up as it crosses them, and it ends on the center pill. Seekable, 13.5 s, no clicks.
 SD.defineSlide({
   id: 'core/venn',
+  shows: ['avatar'],
   frame: 'venn.html',
   steps: 0,
   duration: 13.5,

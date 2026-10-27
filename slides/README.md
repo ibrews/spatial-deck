@@ -35,6 +35,7 @@ SD.defineSlide({
   assets: ['icon.png'],     // every file in the folder besides slide.js, so `slide.py pull <url>` can fetch them
   shared: ['kit/sprite.js'],// files under slides/ that several modules use; pull copies them along
   provenance: ['harvardxr-keynote@7c6fbf5 index.html buildVennSlide'],
+  shows: ['avatar'],        // optional: what the slide already shows; a case can override with its own `shows`
   render(el, props, ctx) {  // build the slide's DOM into el; return the instance (all methods optional)
     return {
       enter() {},           // the slide became active: play the entry motion from t = 0 (state = step 0)
@@ -62,6 +63,11 @@ SD.defineSlide({
 **Style from the look, not from the module.** Color a module with the deck's CSS variables (`var(--teal)`,
 `var(--text)`, `var(--ink)` …) so every `styles/` look recolors it. Hard-coded hex is only for pixel art that is the
 same in every look.
+
+**Deck-level layers listen, they don't patch.** Every slide change (module or not) fires
+`document.addEventListener('sd:slide', e => …)` with `e.detail = {index, slide, type, section, year, module, shows}`.
+A persistent companion (a journey minimap, a walking sprite) reads the chapter from `section`/`year` and steps aside
+when `shows` includes what it would draw (`'avatar'`). The event does not fire in `?print`/`?shot`.
 
 **Never register `slideSteps` yourself.** The deck builds a module's clicks from `steps`; a module that adds its own is
 exactly the "substeps came back by accident" failure, and the steps sweep fails it.

@@ -11,6 +11,7 @@
    (the live counter's last frame is empty, which made the click a dead step). */
 SD.defineSlide({
   id: 'core/intro-lens',
+  shows: ['avatar'],
   steps: (props) => (props.sequence === false ? 0 : 5),
   props: {
     sequence: true,

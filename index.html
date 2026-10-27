@@ -1699,6 +1699,8 @@ function playBing(){try{const c=sfxCtx(),t=c.currentTime,o=c.createOscillator(),
     const props=Object.assign({},def.props||{},c.props||{});  // shallow: a talk replaces a whole prop, arrays included
     const steps=resolveSteps(def,c,props);s.dataset.sdSteps=steps;
     if(def.duration)s.dataset.sdDuration=def.duration;
+    // What the slide already shows (e.g. 'avatar'), so a deck-level companion can step aside: module default, case overrides.
+    const shows=c.shows||def.shows;if(shows&&shows.length)s.dataset.sdShows=[].concat(shows).join(' ');
     const ctx={id,slide:s,props,steps,base:def.base,asset:p=>def.base+p,instant:INSTANT,exportMode:EXPORT,params:Q,
       clock:clock(),audio,svg:svgE,section:sec,look:()=>window.SD_ACTIVE_LOOK||document.body.dataset.look||'noir'};
     const r={id,def,c,props,ctx,steps,inst:{},on:false,cur:0,frozen:false};recs.set(s,r);
@@ -1710,7 +1712,14 @@ function playBing(){try{const c=sfxCtx(),t=c.currentTime,o=c.createOscillator(),
   function leave(r){if(!r.on)return;r.on=false;r.ctx.clock.stop();call(r,'leave');}
   // Final frame with every step applied: staticFrame() if the module has one, else an instant replay of every beat.
   function freeze(r){r.frozen=true;r.ctx.clock.stop();if(typeof r.inst.staticFrame==='function')call(r,'staticFrame');else{const i0=r.ctx.instant;r.ctx.instant=true;call(r,'enter');for(let i=1;i<=r.steps;i++)call(r,'step',i);r.ctx.instant=i0;}r.ctx.clock.stop();}
+  // One event for every slide change (module or not), so persistent deck layers (a progress minimap, a companion sprite)
+  // hook here instead of patching goTo: detail = {index, slide, type, section, year, module, shows[]}.
+  function announce(sl){if(!sl)return;const i=allSlides.indexOf(sl),r=recs.get(sl);
+    document.dispatchEvent(new CustomEvent('sd:slide',{detail:{index:i,slide:sl,type:sl.dataset.type||'',section:sl.dataset.section!=null?+sl.dataset.section:null,
+      year:sl.dataset.year||null,module:r?r.id:null,shows:(sl.dataset.sdShows||'').split(' ').filter(Boolean)}}));}
   SD._wire=function(){
+    if(!EXPORT){allSlides.forEach(sl=>new MutationObserver(()=>{if(sl.classList.contains('active'))announce(sl);}).observe(sl,{attributes:true,attributeFilter:['class']}));
+      queueMicrotask(()=>announce(deck.querySelector('.slide.active')));}
     if(EXPORT){recs.forEach((r,s)=>{freeze(r);const ss=slideSteps.get(s);if(ss)ss.current=ss.steps.length;});return;}
     recs.forEach((r,s)=>{new MutationObserver(()=>{s.classList.contains('active')?enter(r):leave(r);}).observe(s,{attributes:true,attributeFilter:['class']});if(s.classList.contains('active'))enter(r);});
   };
