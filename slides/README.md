@@ -97,6 +97,10 @@ frame at 4 s, which is what `tools/render_motion.mjs` uses for MP4s. postMessage
 no server. Animate only with CSS animations or WAAPI (`document.getAnimations()` must see everything); the gotchas
 are in the KB technique *seekable-html-motion-graphics-for-decks*.
 
+**Motion names.** A case's `motion: '<name>'` is copied onto its module iframe as `data-motion`, so tools that
+keep per-graphic data (posters, MP4s, safe-zone fits) key on the talk's name, not the module's file name (two
+modules can both ship a `venn.html`).
+
 **Exports.** In `?print` and `?shot=N` an iframe module loads `?static` (its final frame). A deck that has rendered
 posters (`tools/render_motion.mjs`) can show those instead, which does not depend on the frame finishing loading:
 set `poster: 'media/motion/mp4/lane-poster{.look}.png'` on a case, or one pattern for the whole deck,
