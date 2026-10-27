@@ -6,7 +6,8 @@ single file. This writes, between sentinels, into the deck's index.html:
   - one Google Fonts link for every look's faces, and one <style> with base.css + every look.css, with the scope
     placeholders expanded (`:look` -> body[data-look="<id>"], `:looked` -> any look except noir, at zero added specificity);
   - the look runtime: picks the look from ?look=<id>, else body[data-look] (a talk's options picker may set it),
-    else window.SD_LOOK, else the --default; builds the look frame (#sd-frame: title block / running head /
+    else window.SD_LOOK, else the --default; sets the chrome density (?chrome=full|quiet|none, else body[data-chrome],
+    else window.SD_CHROME, else --chrome); builds the look frame (#sd-frame: title block / running head /
     masthead); tags motion iframes with window.name "sd-look:<id>" so they can recolor themselves offline.
 With --motion-dir it also writes <dir>/look.js (the motion recolorer, palettes from each look.json) and adds
 <script src="look.js"></script> to every seekable motion graphic there. Idempotent; re-run after editing styles/.
@@ -30,10 +31,16 @@ RUNTIME = r"""<script>
   const LOOKS=@@LOOKS@@;const P=new URLSearchParams(location.search);
   let look=P.get('look')||document.body.dataset.look||window.SD_LOOK||'@@DEFAULT@@';if(!LOOKS.includes(look))look='noir';
   document.body.dataset.look=look;window.SD_ACTIVE_LOOK=look;
+  // chrome (independent of the look): full = running frame, counter, wordmark and section kickers on every slide;
+  // quiet = none of that on content slides, wordmark only on cover and close; none = chapter cards lose their kicker too
+  const CHROMES=['full','quiet','none'];let chrome=P.get('chrome')||document.body.dataset.chrome||window.SD_CHROME||'@@CHROME@@';if(!CHROMES.includes(chrome))chrome='full';
+  document.body.dataset.chrome=chrome;window.SD_ACTIVE_CHROME=chrome;
+  const deck0=document.getElementById('deck');const slideType=()=>{const a=deck0.querySelector('.slide.active');document.body.dataset.slide=a?(a.dataset.type||''):'';};
+  if(deck0){new MutationObserver(slideType).observe(deck0,{subtree:true,attributes:true,attributeFilter:['class']});slideType();}
   const tag=f=>{if(/media\/motion\//.test(f.getAttribute('src')||''))f.name='sd-look:'+look;};
   document.querySelectorAll('iframe').forEach(tag);
   new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.tagName==='IFRAME')tag(n);else if(n.querySelectorAll)n.querySelectorAll('iframe').forEach(tag);}))).observe(document.body,{childList:true,subtree:true});
-  if(look==='noir')return;
+  if(look==='noir'){if(chrome!=='full')document.querySelectorAll('.ey-badge').forEach(b=>{const m=/^\s*(\d+)\s*\/\s*(\d+)\s*$/.exec(b.textContent);if(m)b.textContent=m[1];});return;}
   // chapter badges "1 / 8" become two parts so each look can typeset them (callout circle, folio numeral, No. x of y)
   document.querySelectorAll('.ey-badge').forEach(b=>{const m=/^\s*(\d+)\s*\/\s*(\d+)\s*$/.exec(b.textContent);if(m)b.innerHTML=`<i class="n">${m[1]}</i><i class="of">${m[2]}</i>`;});
   const meta=n=>document.querySelector(`meta[name="${n}"]`)?.content||'';
@@ -95,6 +102,8 @@ def main():
     ap.add_argument("--html", default=str(ROOT / "index.html"))
     ap.add_argument("--styles", default=str(ROOT / "styles"), help="style library folder (default: this repo's styles/)")
     ap.add_argument("--default", default="noir", help="look when nothing picks one (default: noir, the template's original)")
+    ap.add_argument("--chrome", default="full", choices=("full", "quiet", "none"),
+                    help="page chrome when nothing picks one: full (frame, counter, kickers on every slide), quiet, none")
     ap.add_argument("--motion-dir", help="folder of seekable motion graphics to give the recolorer")
     a = ap.parse_args()
     styles, html = Path(a.styles), Path(a.html)
@@ -108,7 +117,7 @@ def main():
         sys.exit(f"apply_look: unknown --default {a.default!r}; looks: noir, {', '.join(looks)}")
     s = html.read_text(encoding="utf-8")
     head = f'{HEAD_A}\n<link href="{FONTS}" rel="stylesheet">\n<style id="sd-looks">\n' + "\n".join(css) + f"\n</style>\n{HEAD_B}"
-    run = BODY_A + "\n" + RUNTIME.replace("@@LOOKS@@", json.dumps(["noir"] + looks)).replace("@@DEFAULT@@", a.default) + "\n" + BODY_B
+    run = BODY_A + "\n" + RUNTIME.replace("@@LOOKS@@", json.dumps(["noir"] + looks)).replace("@@DEFAULT@@", a.default).replace("@@CHROME@@", a.chrome) + "\n" + BODY_B
     for A, B, block, anchor in ((HEAD_A, HEAD_B, head, "</head>"), (BODY_A, BODY_B, run, "</body>")):
         if A in s:
             s = re.sub(re.escape(A) + r".*?" + re.escape(B), lambda m: block, s, count=1, flags=re.S)
@@ -118,7 +127,7 @@ def main():
                 sys.exit(f"apply_look: {anchor} not found in {html}")
             s = s[:i] + block + "\n" + s[i:]
     html.write_text(s, encoding="utf-8")
-    print(f"apply_look: {html} — looks noir (original), {', '.join(looks)}; default {a.default}")
+    print(f"apply_look: {html} — looks noir (original), {', '.join(looks)}; default {a.default}, chrome {a.chrome}")
     if a.motion_dir:
         md = Path(a.motion_dir)
         src = next(iter(meta.values()))["motionSource"] if meta else {}

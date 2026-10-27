@@ -81,6 +81,7 @@ index.html
 - `styles/` holds twelve art directions (gallery: `styles/index.html`, built by `tools/build_look_gallery.py`; `tools/new_talk.sh --look <id>` sets a new talk's default): `base.css` neutralizes the template's stock effects, and `looks/<id>/look.{css,json,md}` plus `examples/` defines each look. Scope placeholders are `:look` / `:looked`.
 - `tools/apply_look.py` inlines them into index.html between `SD LOOKS` sentinels (head) and `SD LOOK RUNTIME` (body). It's idempotent. Picked via `?look=`, `body[data-look]`, `window.SD_LOOK` or `--default`. The runtime builds `#sd-frame` (title block / running head / masthead) inside `#deck` and splits `.ey-badge` "n / N" into `.n`/`.of`.
 - Size tokens are declared on `#deck`, because in stage mode `#deck` is a scaled 1920x1080 box with its own `--vw`.
+- Chrome density is separate from the look: `?chrome=full|quiet|none` (runtime sets `body[data-chrome]` and `body[data-slide]`; rules at the end of `styles/base.css`). Template baked `--chrome quiet`; `apply_look.py --chrome` defaults to `full` so re-running it in older forks changes nothing.
 - `--motion-dir` writes `look.js` (motion recolorer) and tags motion iframes with `window.name="sd-look:<id>"`, which works from file://.
 - Checks: `node tools/lint_look.mjs [--look id]` (generic tells, computed styles) and `python3 tools/check_branding.py` (forks only).
 

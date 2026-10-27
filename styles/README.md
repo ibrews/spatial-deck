@@ -34,6 +34,18 @@ Twelve looks plus the original. Browse them with example slides in [`index.html`
 | [`broadside`](looks/broadside/look.md) | Broadside | A letterpress broadside: newsprint stock, everything centered, a slab display face with a book serif, thick-thin rules and fleurons, one red second color. | [cover](looks/broadside/examples/cover.jpg) |
 | [`atlas`](looks/atlas/look.md) | Atlas | A survey map: buff paper, a neatline with a map collar, brown contours, blue water, letterspaced caps for names and italic for water features. | [cover](looks/atlas/examples/cover.jpg) |
 
+## Chrome (independent of the look)
+
+`?chrome=full|quiet|none` (or `body[data-chrome]`, `window.SD_CHROME`, `apply_look.py --chrome`). Feedback on the
+first looks (Henry Keyser, 2026-10-27): a header, footer, page number and section label on every slide "is so
+corporate perfect that it sets off warning bells as not made by a human". The template is baked `quiet`.
+
+| Chrome | What shows |
+|---|---|
+| `full` | The look's frame (title block, running head, masthead), page counter, wordmark and the section kicker on every case slide |
+| `quiet` *(template default)* | No frame, counter or section kicker on content slides. The wordmark appears only on cover and close. Chapter cards keep their kicker and number, without the "of N" total |
+| `none` | As quiet, and chapter cards lose their kicker and tags too: title and lead only |
+
 ## Use it
 
 ```bash

@@ -645,6 +645,13 @@ body:where([data-look]:not([data-look="noir"])):not(#_) .slide.active .lesson-ti
 body:where([data-look]:not([data-look="noir"])):not(#_) .slide.active .lesson-tagline,body:where([data-look]:not([data-look="noir"])):not(#_) .slide.active .case-bl,body:where([data-look]:not([data-look="noir"])):not(#_) .slide.active .big-caption,body:where([data-look]:not([data-look="noir"])):not(#_) .slide.active .talk-subtitle,body:where([data-look]:not([data-look="noir"])):not(#_) .slide.active .close-sub{animation:var(--m-enter-2,var(--m-enter,none)) var(--m-dur,.6s) var(--m-ease,ease) var(--m-stagger,.12s) both}
 @media (prefers-reduced-motion:reduce){body:where([data-look]:not([data-look="noir"])):not(#_) .slide.active *{animation:none!important}}
 body:where([data-look]:not([data-look="noir"])):not(#_).reduced-motion .slide.active *{animation:none!important}
+
+body[data-chrome="quiet"]:not(#_) #sd-frame,body[data-chrome="none"]:not(#_) #sd-frame,
+body[data-chrome="quiet"]:not(#_) #counter,body[data-chrome="none"]:not(#_) #counter,
+body[data-chrome="quiet"]:not(#_) .ey-badge .of,body[data-chrome="none"]:not(#_) .ey-badge .of,
+body[data-chrome="quiet"]:not(#_) .case-ytag,body[data-chrome="none"]:not(#_) .case-ytag{display:none!important}
+body[data-chrome="quiet"]:not(#_):not([data-slide="cover"]):not([data-slide="close"]) #brand,body[data-chrome="none"]:not(#_) #brand{opacity:0!important;pointer-events:none}
+body[data-chrome="none"]:not(#_) .lesson-ey,body[data-chrome="none"]:not(#_) .lesson-tags{display:none!important}
 body[data-look="atlas"]:not(#_){--logo-filter:invert(1);--paper:#f3eedb;--paper-2:#e7e0c6;--ink:#2b2a26;--ink-2:#55524a;--ink-3:#8a8577;--rule:rgba(43,42,38,.7);--rule-2:rgba(166,100,58,.16);
   --contour:#a6643a;--water:#3f7cac;--wood:#6e8b3d;--acc-1:#a6643a;--acc-2:#3f7cac;--acc-3:#6e8b3d;--acc-4:#c2412d;
   --font-display:'Libre Franklin',system-ui,sans-serif;--font-body:'Libre Franklin',system-ui,sans-serif;--font-mono:'IBM Plex Mono',ui-monospace,monospace;
@@ -3612,10 +3619,16 @@ updateHUD();
   const LOOKS=["noir", "atlas", "bauhaus", "broadside", "cyanotype", "folio", "gallery", "house", "memo", "riso", "sheet", "swiss", "transit"];const P=new URLSearchParams(location.search);
   let look=P.get('look')||document.body.dataset.look||window.SD_LOOK||'noir';if(!LOOKS.includes(look))look='noir';
   document.body.dataset.look=look;window.SD_ACTIVE_LOOK=look;
+  // chrome (independent of the look): full = running frame, counter, wordmark and section kickers on every slide;
+  // quiet = none of that on content slides, wordmark only on cover and close; none = chapter cards lose their kicker too
+  const CHROMES=['full','quiet','none'];let chrome=P.get('chrome')||document.body.dataset.chrome||window.SD_CHROME||'quiet';if(!CHROMES.includes(chrome))chrome='full';
+  document.body.dataset.chrome=chrome;window.SD_ACTIVE_CHROME=chrome;
+  const deck0=document.getElementById('deck');const slideType=()=>{const a=deck0.querySelector('.slide.active');document.body.dataset.slide=a?(a.dataset.type||''):'';};
+  if(deck0){new MutationObserver(slideType).observe(deck0,{subtree:true,attributes:true,attributeFilter:['class']});slideType();}
   const tag=f=>{if(/media\/motion\//.test(f.getAttribute('src')||''))f.name='sd-look:'+look;};
   document.querySelectorAll('iframe').forEach(tag);
   new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.tagName==='IFRAME')tag(n);else if(n.querySelectorAll)n.querySelectorAll('iframe').forEach(tag);}))).observe(document.body,{childList:true,subtree:true});
-  if(look==='noir')return;
+  if(look==='noir'){if(chrome!=='full')document.querySelectorAll('.ey-badge').forEach(b=>{const m=/^\s*(\d+)\s*\/\s*(\d+)\s*$/.exec(b.textContent);if(m)b.textContent=m[1];});return;}
   // chapter badges "1 / 8" become two parts so each look can typeset them (callout circle, folio numeral, No. x of y)
   document.querySelectorAll('.ey-badge').forEach(b=>{const m=/^\s*(\d+)\s*\/\s*(\d+)\s*$/.exec(b.textContent);if(m)b.innerHTML=`<i class="n">${m[1]}</i><i class="of">${m[2]}</i>`;});
   const meta=n=>document.querySelector(`meta[name="${n}"]`)?.content||'';

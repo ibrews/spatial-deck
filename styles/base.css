@@ -33,3 +33,12 @@ body.print-mode #sd-frame,body.notes-mode #sd-frame,body.vertical-mode #sd-frame
 :looked .slide.active .lesson-tagline,:looked .slide.active .case-bl,:looked .slide.active .big-caption,:looked .slide.active .talk-subtitle,:looked .slide.active .close-sub{animation:var(--m-enter-2,var(--m-enter,none)) var(--m-dur,.6s) var(--m-ease,ease) var(--m-stagger,.12s) both}
 @media (prefers-reduced-motion:reduce){:looked .slide.active *{animation:none!important}}
 :looked.reduced-motion .slide.active *{animation:none!important}
+/* chrome density, independent of the look (look runtime: ?chrome=full|quiet|none). Feedback 2026-10-27: a header,
+   footer, page number and section label on every slide reads as machine-made. Quiet keeps identity where it earns
+   its place: the chapter card says which chapter, the cover and close carry the wordmark, content slides carry content. */
+body[data-chrome="quiet"]:not(#_) #sd-frame,body[data-chrome="none"]:not(#_) #sd-frame,
+body[data-chrome="quiet"]:not(#_) #counter,body[data-chrome="none"]:not(#_) #counter,
+body[data-chrome="quiet"]:not(#_) .ey-badge .of,body[data-chrome="none"]:not(#_) .ey-badge .of,
+body[data-chrome="quiet"]:not(#_) .case-ytag,body[data-chrome="none"]:not(#_) .case-ytag{display:none!important}
+body[data-chrome="quiet"]:not(#_):not([data-slide="cover"]):not([data-slide="close"]) #brand,body[data-chrome="none"]:not(#_) #brand{opacity:0!important;pointer-events:none}
+body[data-chrome="none"]:not(#_) .lesson-ey,body[data-chrome="none"]:not(#_) .lesson-tags{display:none!important}
