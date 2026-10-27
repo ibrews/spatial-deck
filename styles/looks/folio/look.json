@@ -1,0 +1,53 @@
+{
+  "id": "folio",
+  "kind": "look",
+  "name": "Folio",
+  "summary": "Editorial print on a black page: warm white optical-size serif, one vermilion spot color, running head with folio number, lowercase italic kickers.",
+  "lineage": "Magazine and book typography; Alex's own NXT BLD 2020/2021 decks (serif on black, lowercase 'recently...' openers).",
+  "tokens": {
+    "paper": "#0c0c0b",
+    "paper-2": "#191917",
+    "ink": "#f1ede4",
+    "ink-2": "#b4afa5",
+    "ink-3": "#77736b",
+    "acc-1": "#ef5a3c",
+    "acc-2": "#ef5a3c",
+    "acc-3": "#ef5a3c",
+    "acc-4": "#ef5a3c"
+  },
+  "type": {
+    "display": "Newsreader 400, optical size",
+    "body": "Newsreader 400 / italic",
+    "label": "Newsreader small caps"
+  },
+  "motion": {
+    "grammar": "set: type settles .35em upward and fades in reading order; .8 s, ease (.2,.7,.2,1), 220 ms stagger",
+    "palette": {
+      "bg": "#0c0c0b",
+      "bg2": "#191917",
+      "text": "#f1ede4",
+      "white": "#f1ede4",
+      "teal": "#f1ede4",
+      "purple": "#8d887f",
+      "violet": "#8d887f",
+      "amber": "#ef5a3c",
+      "rose": "#ef5a3c"
+    },
+    "font": "Newsreader",
+    "stripGlow": true
+  },
+  "frame": "running head, top: talk title left, folio number right",
+  "css": "styles/looks/folio/look.css",
+  "scope": "body[data-look=\"folio\"]",
+  "motionSource": {
+    "bg": "#060810",
+    "bg2": "#0a0e1c",
+    "text": "#f0f4ff",
+    "white": "#ffffff",
+    "teal": "#00d4ff",
+    "purple": "#a78bfa",
+    "violet": "#7c3aed",
+    "amber": "#f59e0b",
+    "rose": "#f43f5e"
+  }
+}

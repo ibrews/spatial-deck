@@ -1,0 +1,33 @@
+/* Spatial Deck look base. Inlined by tools/apply_look.py; `:looked` expands to every look except noir.
+   It switches off the template's stock effects (starfield, glow blobs, gradient text, pills, glass, ghost year)
+   and maps the template's color variables onto the look tokens, so builder markup needs no change. */
+:looked{--bg-dark:var(--paper);--bg:var(--paper);--text:var(--ink);--dim:var(--ink-2);--font:var(--font-body);
+  --teal:var(--acc-1);--purple:var(--acc-2);--amber:var(--acc-3);--rose:var(--acc-4);--primary:var(--acc-1);--secondary:var(--acc-2);
+  --t-display:clamp(3rem,calc(7.4*var(--vw)),8.4rem);--t-h1:clamp(2.4rem,calc(5.4*var(--vw)),6rem);--t-h2:clamp(1.7rem,calc(3.2*var(--vw)),3.4rem);
+  --t-lead:clamp(1.1rem,calc(1.85*var(--vw)),1.75rem);--t-body:clamp(1rem,calc(1.4*var(--vw)),1.35rem);--t-label:clamp(.68rem,calc(.9*var(--vw)),.9rem);
+  --s1:.5rem;--s2:1rem;--s3:1.5rem;--s4:2.5rem;--s5:4rem;--s6:6.5rem;
+  background:var(--paper);color:var(--ink);font-family:var(--font-body)}
+:looked #stars,:looked .bg-overlay,:looked .year-ghost{display:none!important}
+:looked .bg-gradient{background:var(--paper-bg,var(--paper))!important;animation:none!important;filter:none!important}
+:looked .talk-title,:looked .close-title,:looked .big-text,:looked .talk-title .xr,:looked .layout-big .big-text{background:none!important;-webkit-background-clip:border-box!important;background-clip:border-box!important;-webkit-text-fill-color:currentColor!important;color:var(--ink)}
+:looked .speaker-card,:looked .contact-pill,:looked .big-pill,:looked .grid-label,:looked .grid-cell,:looked .case-image,:looked .full-overlay,:looked .qr-card img{border-radius:0!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:none!important}
+:looked .slide h1,:looked .slide h2,:looked .slide p{text-shadow:none}
+:looked .fx-fs-target{box-shadow:none!important}
+:looked #fx-fs-overlay.open{background:var(--paper);backdrop-filter:none;-webkit-backdrop-filter:none}
+:looked .qr-badge{animation:none!important}
+:looked .lesson-rule{border-radius:0;opacity:1}
+:looked .case-bl li,:looked .big-eyebrow,:looked .big-caption,:looked .big-sub,:looked .full-overlay .full-sub,:looked .speaker-co,:looked .qr-label,:looked .lesson-tagline,:looked .case-sub,:looked .close-sub,:looked .talk-subtitle{color:var(--ink-2)}
+:looked .lesson-tags,:looked .ey-yr,:looked .ey-sep,:looked .map-label{color:var(--ink-3)}
+:looked #counter,:looked #brand{color:var(--ink-3)}
+:looked .grid-cell{background:var(--paper-2)}
+:looked .slide[data-type="close"]>div>svg{filter:var(--logo-filter,none)}  /* the white wordmark, dark on paper looks */
+:looked .cover-ambient{mix-blend-mode:var(--ambient-blend,normal);opacity:var(--ambient-opacity,.9)}
+/* the look frame (title block / running head / masthead) built by the look runtime */
+#sd-frame{display:none}
+:looked #sd-frame{display:flex;position:fixed;z-index:15;pointer-events:none;font-family:var(--font-mono);font-size:var(--t-label);color:var(--ink-2)}
+body.print-mode #sd-frame,body.notes-mode #sd-frame,body.vertical-mode #sd-frame{display:none!important}
+/* motion grammar: one entrance per look, on the active slide only; reduced motion lands on the final state */
+:looked .slide.active .lesson-title,:looked .slide.active .talk-title,:looked .slide.active .case-title,:looked .slide.active .big-text,:looked .slide.active .close-title{animation:var(--m-enter,none) var(--m-dur,.6s) var(--m-ease,ease) both}
+:looked .slide.active .lesson-tagline,:looked .slide.active .case-bl,:looked .slide.active .big-caption,:looked .slide.active .talk-subtitle,:looked .slide.active .close-sub{animation:var(--m-enter-2,var(--m-enter,none)) var(--m-dur,.6s) var(--m-ease,ease) var(--m-stagger,.12s) both}
+@media (prefers-reduced-motion:reduce){:looked .slide.active *{animation:none!important}}
+:looked.reduced-motion .slide.active *{animation:none!important}

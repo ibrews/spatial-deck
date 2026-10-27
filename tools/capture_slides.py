@@ -55,7 +55,9 @@ def find_chrome():
 
 
 def _file_url(html_path, query):
-    return Path(html_path).resolve().as_uri() + "?" + query
+    # SD_QUERY (or --query) appends extra deck params to every capture, e.g. "theme=sheet&cut=30".
+    extra = os.environ.get("SD_QUERY", "")
+    return Path(html_path).resolve().as_uri() + "?" + query + ("&" + extra if extra else "")
 
 
 def _run_chrome(chrome, args, artifact, timeout=60, settle=0.7):
@@ -211,8 +213,11 @@ def main():
     ap.add_argument("--width", type=int, default=1920)
     ap.add_argument("--height", type=int, default=1080)
     ap.add_argument("--parallel", type=int, default=4)
+    ap.add_argument("--query", default="", help="extra URL params for every capture, e.g. theme=sheet")
     ap.add_argument("--json", action="store_true", help="print manifest as JSON")
     args = ap.parse_args()
+    if getattr(args, "query", ""):
+        os.environ["SD_QUERY"] = args.query
 
     chrome = find_chrome()
     man = read_manifest(args.html, chrome)

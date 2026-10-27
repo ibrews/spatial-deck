@@ -1,0 +1,82 @@
+/* Look: Drawing Set (sheet). Paper, ink, 1px hairlines, a title block, redline as the one accent.
+   `:look` expands to body[data-look="sheet"] (tools/apply_look.py). Rules: styles/looks/sheet/look.md */
+:look{--logo-filter:invert(1);--paper:#f2f0ea;--paper-2:#e7e4dc;--ink:#16181b;--ink-2:#45494f;--ink-3:#7d8187;--rule:rgba(22,24,27,.28);--rule-2:rgba(22,24,27,.09);
+  --acc-1:#c8302b;--acc-2:#2d5fa8;--acc-3:#a8701a;--acc-4:#c8302b;
+  --font-display:'Archivo',system-ui,sans-serif;--font-body:'Archivo',system-ui,sans-serif;--font-mono:'IBM Plex Mono',ui-monospace,monospace;
+  --paper-bg:linear-gradient(var(--rule-2) 1px,transparent 1px) 0 0/40px 40px,linear-gradient(90deg,var(--rule-2) 1px,transparent 1px) 0 0/40px 40px,#f2f0ea;
+  --ambient-blend:multiply;--ambient-opacity:.55;
+  --m-enter:sd-sheet-draw;--m-enter-2:sd-sheet-fade;--m-dur:.55s;--m-ease:cubic-bezier(.4,0,.2,1);--m-stagger:.18s}
+@keyframes sd-sheet-draw{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes sd-sheet-fade{from{opacity:0}to{opacity:1}}
+/* drawing border: an outer hairline and a heavier inner line, inset like a sheet margin */
+:look .bg::after{content:'';position:absolute;inset:22px;border:1px solid var(--rule);outline:2px solid var(--ink);outline-offset:-10px;pointer-events:none}
+:look.vertical-mode .bg::after{display:none}
+/* title block, bottom right */
+:look #sd-frame{right:22px;bottom:22px;border-top:2px solid var(--ink);border-left:2px solid var(--ink);background:var(--paper);flex-direction:row;align-items:stretch;text-transform:uppercase;letter-spacing:.08em;font-size:clamp(.55rem,calc(.68*var(--vw)),.72rem)}
+:look #sd-frame>span{display:flex;flex-direction:column;justify-content:center;padding:6px 14px;border-right:1px solid var(--rule);line-height:1.35}
+:look #sd-frame>span:last-child{border-right:0}
+:look #sd-frame b{font-weight:500;color:var(--ink-3);font-size:.82em}
+:look #sd-frame i{font-style:normal}
+:look #sd-frame .f-sheet{font-size:1.6em;color:var(--ink);font-weight:600;min-width:4.2em;align-items:center}
+:look #counter{display:none}
+:look #brand{left:44px;bottom:36px;font-family:var(--font-mono);font-weight:500;letter-spacing:.14em}
+/* type */
+:look .lesson-title,:look .talk-title,:look .close-title,:look .case-title,:look .big-text,:look .full-overlay h2{font-family:var(--font-display);font-stretch:75%;font-weight:600;letter-spacing:-.005em}
+:look .lesson-title,:look .talk-title,:look .close-title{text-transform:uppercase;line-height:.98}
+:look .event-tag,:look .lesson-ey,:look .case-ytag,:look .lesson-tags,:look .close-ey,:look .map-label,:look .qr-badge,:look .grid-label,:look .contact-pill .lbl,:look .big-pill{font-family:var(--font-mono);font-weight:500;letter-spacing:.14em;text-transform:uppercase}
+/* cover: title sheet. Left aligned on the margin, event + speaker as title-block cells */
+:look .slide[data-type="cover"],:look .slide[data-type="close"],:look .slide-lesson{align-items:flex-start;text-align:left;padding-left:clamp(56px,calc(8*var(--vw)),170px);padding-right:clamp(56px,calc(14*var(--vw)),300px)}
+:look .event-tag{color:var(--acc-1);opacity:1;font-size:var(--t-label);margin-bottom:var(--s3);padding-bottom:var(--s1);border-bottom:1px solid var(--acc-1)}
+:look .talk-title{font-size:var(--t-display);margin-bottom:var(--s3)}
+:look .talk-title .xr{color:var(--acc-1)!important}
+:look .talk-subtitle{font-size:var(--t-lead);color:var(--ink-2);margin-bottom:var(--s5)}
+:look .speaker-card{background:transparent;border:1px solid var(--ink);padding:0;gap:0}
+:look .speaker-card>div{padding:12px 22px}
+:look .speaker-name{font-family:var(--font-display);font-stretch:75%;font-size:var(--t-lead);text-transform:uppercase;letter-spacing:.02em}
+:look .speaker-co{font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.06em;color:var(--ink-2)}
+/* chapter (lesson): detail callout + dimension line */
+:look .lesson-ey{justify-content:flex-start;margin-bottom:var(--s3);font-size:var(--t-label);gap:12px}
+:look .ey-badge:has(.n){display:inline-flex;align-items:center;justify-content:center;width:3.4em;height:3.4em;border:1.5px solid var(--ink);border-radius:50%;color:var(--ink)!important;letter-spacing:0;font-weight:600;background:linear-gradient(transparent calc(50% - .5px),var(--ink) calc(50% - .5px),var(--ink) calc(50% + .5px),transparent calc(50% + .5px));font-size:1.3em;line-height:1;padding-top:.1em}
+:look .ey-yr{color:var(--ink);order:2}
+:look .ey-sep{display:none}
+:look .lesson-title{font-size:var(--t-h1);max-width:none;margin-bottom:var(--s4)}
+:look .lesson-tagline{font-size:var(--t-lead);line-height:1.5;max-width:34em;padding-top:var(--s2);border-top:1px solid var(--rule)}
+:look .lesson-tags{color:var(--ink-3);margin-top:var(--s3);font-size:var(--t-label)}
+:look .lesson-rule{width:clamp(160px,calc(16*var(--vw)),320px);height:1px;background:var(--ink)!important;margin:var(--s4) 0 0;position:relative}
+:look .lesson-rule::before,:look .lesson-rule::after{content:'';position:absolute;top:-7px;width:1px;height:15px;background:var(--ink);transform:rotate(45deg)}
+:look .lesson-rule::before{left:0}:look .lesson-rule::after{right:0}
+/* case, two pane: framed image as a detail, keynoted bullets */
+:look .case-image{border:1px solid var(--ink);background:var(--paper-2)}
+:look .case-ytag{color:var(--acc-1)!important;opacity:1}
+:look .case-title{font-size:var(--t-h2);text-transform:uppercase;line-height:1.02}
+:look .case-sub{font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.04em}
+:look .case-bl{counter-reset:kn;gap:var(--s2)}
+:look .case-bl li{counter-increment:kn;font-size:var(--t-body);padding-left:2.6em;color:var(--ink)}
+:look .case-bl li::before{content:counter(kn);width:1.7em;height:1.7em;top:.05em;border-radius:0;background:transparent!important;border:1px solid var(--ink);opacity:1;font-family:var(--font-mono);font-size:.72em;display:flex;align-items:center;justify-content:center;color:var(--ink)}
+/* statement (big): a sheet note, not a poster */
+:look .case-slide.layout-big{align-items:flex-start;text-align:left;padding-left:clamp(56px,calc(8*var(--vw)),170px)}
+:look .layout-big .big-stack{align-items:flex-start;gap:var(--s3)}
+:look .layout-big .big-eyebrow{font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;text-transform:uppercase;color:var(--acc-1);padding-bottom:var(--s1);border-bottom:1px solid var(--acc-1)}
+:look .layout-big .big-text{font-size:var(--t-h1);line-height:1.04;color:var(--ink)}
+:look .layout-big .big-caption{font-style:normal;font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.04em;padding-left:var(--s2);border-left:2px solid var(--acc-1)}
+:look .big-pill{background:transparent!important;border:1px solid currentColor}
+/* full bleed + grid: images sit in frames, labels are drawing tags */
+:look .full-overlay{background:var(--paper)!important;border-top:2px solid var(--ink);color:var(--ink)}
+:look .full-overlay h2{text-transform:uppercase;color:var(--ink)}
+:look .grid-stage{gap:10px;padding:34px 34px clamp(96px,calc(13*var(--vh)),150px)}
+:look .grid-cell{border:1px solid var(--ink)}
+:look .grid-label{background:var(--paper);color:var(--ink);border:1px solid var(--ink);left:0;top:0;border-width:0 1px 1px 0;padding:5px 10px;font-size:var(--t-label)}
+/* close */
+:look .close-ey{color:var(--acc-1);opacity:1;font-size:var(--t-label);padding-bottom:var(--s1);border-bottom:1px solid var(--acc-1)}
+:look .close-title{font-size:var(--t-display)}
+:look .contact-row{justify-content:flex-start}
+:look .contact-pill{background:transparent;border:1px solid var(--ink);color:var(--ink)}
+:look .close-qr-row{justify-content:flex-start}
+:look .qr-card img{border:1px solid var(--ink);padding:6px;background:#fff}
+:look .qr-label{color:var(--ink)}
+/* map + bonus */
+:look .slide-bonus .ey-badge{color:var(--ink)!important}
+:look #map-svg text{fill:var(--ink)!important}
+:look #map-svg line,:look #map-svg path{stroke:var(--ink-3)!important}
+:look .ey-badge:has(.n){flex-direction:column}
+:look .ey-badge i{font-style:normal;display:flex;align-items:center;justify-content:center;height:50%;line-height:1}

@@ -1,0 +1,54 @@
+{
+  "id": "sheet",
+  "kind": "look",
+  "name": "Drawing Set",
+  "summary": "Paper, ink and 1px hairlines in a drawing border with a title block; redline red is the one accent, blue pencil the second.",
+  "lineage": "Architectural construction documents: sheet border, title block, detail callouts, keynotes, dimension lines.",
+  "tokens": {
+    "paper": "#f2f0ea",
+    "paper-2": "#e7e4dc",
+    "ink": "#16181b",
+    "ink-2": "#45494f",
+    "ink-3": "#7d8187",
+    "acc-1": "#c8302b",
+    "acc-2": "#2d5fa8",
+    "acc-3": "#a8701a",
+    "acc-4": "#c8302b"
+  },
+  "type": {
+    "display": "Archivo 600, width 75%, caps",
+    "body": "Archivo 400",
+    "label": "IBM Plex Mono 500, caps, +.14em"
+  },
+  "motion": {
+    "grammar": "draw: titles wipe on left to right like a pen stroke; supporting copy fades after 180 ms; .55 s, ease (.4,0,.2,1)",
+    "palette": {
+      "bg": "#f2f0ea",
+      "bg2": "#e7e4dc",
+      "text": "#16181b",
+      "white": "#16181b",
+      "teal": "#2d5fa8",
+      "purple": "#3f7a58",
+      "violet": "#3f7a58",
+      "amber": "#a8701a",
+      "rose": "#c8302b"
+    },
+    "font": "Archivo",
+    "stripGlow": true,
+    "blend": "multiply"
+  },
+  "frame": "title block, bottom right: project, speaker, sheet number",
+  "css": "styles/looks/sheet/look.css",
+  "scope": "body[data-look=\"sheet\"]",
+  "motionSource": {
+    "bg": "#060810",
+    "bg2": "#0a0e1c",
+    "text": "#f0f4ff",
+    "white": "#ffffff",
+    "teal": "#00d4ff",
+    "purple": "#a78bfa",
+    "violet": "#7c3aed",
+    "amber": "#f59e0b",
+    "rose": "#f43f5e"
+  }
+}

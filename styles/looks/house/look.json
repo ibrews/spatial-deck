@@ -1,0 +1,53 @@
+{
+  "id": "house",
+  "kind": "look",
+  "name": "House",
+  "summary": "Theater program: warm black house, cream type, marquee-gold masthead band, condensed wood-type caps, serif program copy, a hard-edged followspot on chapter cards.",
+  "lineage": "Playbill covers and theater posters: masthead band, billing block, ticket stubs, curtain call.",
+  "tokens": {
+    "paper": "#141110",
+    "paper-2": "#211b18",
+    "ink": "#f3e9d6",
+    "ink-2": "#c7b99f",
+    "ink-3": "#8a7d69",
+    "acc-1": "#f2b51c",
+    "acc-2": "#e04b4f",
+    "acc-3": "#f2b51c",
+    "acc-4": "#e04b4f"
+  },
+  "type": {
+    "display": "Big Shoulders Display 800, caps",
+    "body": "Newsreader 400 / italic",
+    "label": "Big Shoulders Display 700, caps, +.22em"
+  },
+  "motion": {
+    "grammar": "cue: a lighting cue, dark then up (.42 s ease-out), supporting copy on the next cue 500 ms later; no movement",
+    "palette": {
+      "bg": "#141110",
+      "bg2": "#211b18",
+      "text": "#f3e9d6",
+      "white": "#f3e9d6",
+      "teal": "#f2b51c",
+      "purple": "#c7b99f",
+      "violet": "#c7b99f",
+      "amber": "#f2b51c",
+      "rose": "#e04b4f"
+    },
+    "font": "Big Shoulders Display",
+    "stripGlow": true
+  },
+  "frame": "masthead band, top: project, speaker, page",
+  "css": "styles/looks/house/look.css",
+  "scope": "body[data-look=\"house\"]",
+  "motionSource": {
+    "bg": "#060810",
+    "bg2": "#0a0e1c",
+    "text": "#f0f4ff",
+    "white": "#ffffff",
+    "teal": "#00d4ff",
+    "purple": "#a78bfa",
+    "violet": "#7c3aed",
+    "amber": "#f59e0b",
+    "rose": "#f43f5e"
+  }
+}
