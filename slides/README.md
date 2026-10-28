@@ -22,7 +22,9 @@ talk author, not presenter notes; the timing estimate counts clicks, not a modul
   spatial-deck; keep it that way by construction.)
 - A talk repo keeps its own modules under its own namespace (`slides/pmre/…`) and pulled copies of library modules
   under `slides/core/…`. A pulled copy carries `.pulled.json` (source repo, commit, file hashes), so a talk pins the
-  version it rehearsed with and nothing changes under it when the library moves.
+  version it rehearsed with and nothing changes under it when the library moves. `pull` refuses a source whose
+  commit does not hold the files (untracked, modified, or a commit no remote branch has): commit and push the module
+  first, or pass `--dirty`, which pulls anyway and lists the reasons in `.pulled.json` under `dirty`.
 
 ## The contract
 
@@ -35,6 +37,7 @@ SD.defineSlide({
   css: `…`,                 // optional; injected once. Scope it under .sd-mod-<namespace>-<id>
   assets: ['icon.png'],     // every file in the folder besides slide.js, so `slide.py pull <url>` can fetch them
   shared: ['kit/sprite.js'],// files under slides/ that several modules use; pull copies them along
+  requires: { importmap: ['three'] }, // bare import specifiers the page must map (see Runtime dependencies)
   provenance: ['harvardxr-keynote@7c6fbf5 index.html buildVennSlide'],
   shows: ['avatar'],        // optional: what the slide already shows; a case can override with its own `shows`
   render(el, props, ctx) {  // build the slide's DOM into el; return the instance (all methods optional)
@@ -74,6 +77,14 @@ that arrives in the same task as the slide change enters the slide first. `enter
 A persistent companion (a journey minimap, a walking sprite) reads the chapter from `section`/`year` and steps aside
 when `shows` includes what it would draw (`'avatar'`). It fires once per change; the first slide is announced when
 the page has finished parsing, so a listener added by any script in the page hears it. Not in `?print`/`?shot`.
+
+**Runtime dependencies.** A bare `import('three')` resolves only through the page's `<script type="importmap">`
+(for an iframe module, the frame document's own importmap). When the entry is missing, the import fails inside the
+module, which usually catches it and falls back, so nothing on screen says it broke. Declare every bare specifier in
+`requires.importmap` (a prefix entry such as `three/addons/` covers its subpaths). `slide.py check` fails a module
+that imports a bare specifier it does not declare, and a declared entry the host page does not map; `slide.py pull`
+prints the entry to add; the deck logs a console error at load for an inline module. A library you would rather not depend on a CDN for
+is vendored: ship the file in the module's folder, list it in `assets`, and import it by relative path.
 
 **Never register `slideSteps` yourself.** The deck builds a module's clicks from `steps`; a module that adds its own is
 exactly the "substeps came back by accident" failure, and the steps sweep fails it.
@@ -115,9 +126,10 @@ python3 tools/slide.py list ../pmre-2026-xr-chitect                 # modules, s
 python3 tools/slide.py list https://ibrews.github.io/pmre-2026-xr-chitect/
 python3 tools/slide.py pull ../spatial-deck core/venn --into ../my-talk      # copies files, writes .pulled.json, syncs
 python3 tools/slide.py sync ../my-talk                               # rewrite index.html's module list from slides/
-python3 tools/slide.py check ../my-talk                              # every use: resolves, every file declared
+python3 tools/slide.py check ../my-talk                              # every use: resolves, every file + importmap dep declared
 node tools/sweep_deck.mjs http://localhost:8000/ /tmp/sweep 1920 1080 steps --steps   # screenshot EVERY substep
 bash tools/tests/test_steps.sh                                       # the steps lint must fail its broken fixtures
+bash tools/tests/test_slide_py.sh                                    # pull provenance + dependency checks must fail theirs
 ```
 
 `sweep_deck.mjs --steps` presses the real ArrowRight key on every slide until the slide changes, screenshots each

@@ -94,6 +94,12 @@ window.SD=window.SD||{};
     if(!def.render&&!def.frame)throw new Error('SD.defineSlide('+def.id+'): needs render(el, props, ctx) or frame:"<file>.html"');
     // Assets resolve against the folder slide.js was loaded from, so a pulled module keeps working wherever it lands.
     const cs=document.currentScript;def.base=def.base||(cs&&cs.src?cs.src.replace(/[^/]*$/,''):'slides/'+def.id+'/');
+    // A missing importmap entry otherwise fails inside the module's own import(), which usually just falls back.
+    const need=(def.requires&&def.requires.importmap)||[];
+    if(need.length&&!def.frame)document.addEventListener('DOMContentLoaded',()=>{
+      const im={};document.querySelectorAll('script[type="importmap"]').forEach(s=>{try{Object.assign(im,JSON.parse(s.textContent).imports||{});}catch(e){}});
+      need.forEach(k=>{if(!im[k]&&!Object.keys(im).some(p=>p.endsWith('/')&&k.startsWith(p)))console.error('SD.defineSlide('+def.id+'): needs importmap entry "'+k+'", which this deck does not map (tools/slide.py check)');});
+    });
     if(reg[def.id])console.warn('SD: module '+def.id+' is defined twice; the later definition wins');
     reg[def.id]=def;return def;
   };

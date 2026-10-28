@@ -5,7 +5,8 @@ A slide module is slides/<namespace>/<id>/slide.js plus its assets (slides/READM
     python3 tools/slide.py list  <deck>                       # modules in a deck dir, index.html or https URL
     python3 tools/slide.py pull  <deck> <ns/id> --into <talk>  # copy a module (and its files) into another deck
     python3 tools/slide.py sync  [<talk>]                     # rewrite the deck's SD SLIDE MODULES block from disk
-    python3 tools/slide.py check [<talk>]                     # static checks: every use: resolves, every file declared
+    python3 tools/slide.py check [<talk>]                     # static checks: every use: resolves, every file and
+                                                              # runtime dependency (importmap entry) declared and present
 
 <deck> is a folder (with index.html and slides/), a path to index.html, or a URL such as a GitHub Pages deck.
 Metadata is read by running each slide.js under Node with a stub SD.defineSlide, so it is exactly what the deck
@@ -28,7 +29,8 @@ for(const f of process.argv.slice(1)){
   for(const d of defs){let steps=d.steps;let dyn=false;if(typeof steps==='function'){dyn=true;try{steps=steps(d.props||{});}catch(e){steps=null;}}
     out.push({file:f,id:d.id,steps:steps==null?0:steps,dynamicSteps:dyn,duration:d.duration||null,frame:d.frame||null,
       seekable:typeof d.seek==='function'||!!d.frame||/\bseek\s*\(/.test(String(d.render||'')),
-      props:Object.keys(d.props||{}),assets:d.assets||[],shared:d.shared||[],provenance:d.provenance||[],notes:d.notes||'',version:d.version||1});}
+      props:Object.keys(d.props||{}),assets:d.assets||[],shared:d.shared||[],provenance:d.provenance||[],notes:d.notes||'',version:d.version||1,
+      requires:{importmap:(d.requires&&d.requires.importmap)||[]}});}
 }
 process.stdout.write(JSON.stringify(out));
 """
@@ -143,6 +145,38 @@ def cmd_list(a):
     return 1 if missing else 0
 
 
+# Bare module specifiers ('three', 'three/addons/x.js') resolve only through an importmap, and an iframe module's
+# imports resolve against the frame document's importmap, not the deck's. A missing entry fails at run time inside
+# a dynamic import(), which a module usually catches and turns into a fallback, so nothing on screen says it broke.
+BARE_IMPORT = re.compile(r"""(?:\bimport\s*\(\s*|\b(?:import|export)\s+[\w$*{}\s,]+?\s+from\s*|\bimport\s+)['"]([^'"]+)['"]""")
+
+
+def bare_imports(text):
+    return sorted({s for s in BARE_IMPORT.findall(text) if not re.match(r"^(\.|/|[a-z][\w+.-]*:)", s)})
+
+
+def importmap_of(html):
+    imports = {}
+    for body in re.findall(r"<script[^>]*type=[\"']?importmap[\"']?[^>]*>(.*?)</script>", html, flags=re.S | re.I):
+        try:
+            imports.update(json.loads(body).get("imports", {}))
+        except ValueError:
+            pass
+    return imports
+
+
+def mapped(spec, imports):
+    return spec in imports or any(k.endswith("/") and spec.startswith(k) for k in imports)
+
+
+def dep_host(root, m):
+    """(label, html) of the document whose importmap the module's imports resolve against."""
+    if m["frame"]:
+        f = root / "slides" / m["id"] / m["frame"]
+        return f"slides/{m['id']}/{m['frame']}", (f.read_text(encoding="utf-8") if f.exists() else "")
+    return "index.html", (root / "index.html").read_text(encoding="utf-8")
+
+
 def sha256(p):
     return hashlib.sha256(p.read_bytes()).hexdigest()
 
@@ -151,6 +185,22 @@ def git_head(d):
     r = subprocess.run(["git", "-C", str(d), "rev-parse", "HEAD"], capture_output=True, text=True)
     r2 = subprocess.run(["git", "-C", str(d), "remote", "get-url", "origin"], capture_output=True, text=True)
     return (r.stdout.strip() or None), (r2.stdout.strip() or None)
+
+
+def unpublished(root, commit, origin, paths):
+    """Reasons the recorded commit/origin cannot reproduce these files: untracked, ignored or modified, or a commit
+    no remote branch contains. Empty for a folder that is not a git repo (then the path itself is the provenance)."""
+    if not commit:
+        return []
+    rel = [str(Path(p).resolve().relative_to(root.resolve())) for p in paths if Path(p).exists()]
+    r = subprocess.run(["git", "-C", str(root), "status", "--porcelain", "--ignored", "--", *rel], capture_output=True, text=True)
+    kind = {"??": "untracked", "!!": "ignored (never committed)"}
+    out = [f"{kind.get(l[:2], 'uncommitted change')}: {l[3:]}" for l in r.stdout.splitlines() if l.strip()]
+    if origin:
+        rb = subprocess.run(["git", "-C", str(root), "branch", "-r", "--contains", commit], capture_output=True, text=True)
+        if not rb.stdout.strip():
+            out.append(f"commit {commit[:7]} is not on any remote branch of {origin} (push it)")
+    return out
 
 
 def cmd_pull(a):
@@ -182,7 +232,7 @@ def cmd_pull(a):
         for sh in meta["shared"]:
             (tmp / "slides" / sh).parent.mkdir(parents=True, exist_ok=True)
             (tmp / "slides" / sh).write_bytes(fetch(urllib.parse.urljoin(base, f"slides/{sh}")))
-        origin, commit, root = a.deck, None, tmp
+        origin, commit, root, dirty = a.deck, None, tmp, []
     else:
         root = deck_dir(a.deck)
         src = root / "slides" / mid
@@ -194,6 +244,13 @@ def cmd_pull(a):
             sys.exit(f"slide.py: {mid}/slide.js does not call SD.defineSlide")
         meta = metas[0]
         commit, origin = git_head(root)
+        dirty = unpublished(root, commit, origin, [src, *[root / "slides" / sh for sh in
+                            (["sd-frame.js"] if meta.get("frame") else []) + list(meta.get("shared", []))]])
+        if dirty and not a.dirty:
+            sys.exit(f"slide.py: {origin or root} at {(commit or 'no commit')[:7]} does not hold what would be copied, "
+                     "so .pulled.json would name a source that cannot reproduce it:\n  " + "\n  ".join(dirty) +
+                     "\nCommit and push it in the source repo first, or pass --dirty to pull anyway (recorded as dirty). "
+                     "Nothing was copied.")
         origin = origin or str(root)
     if "error" in meta:
         sys.exit(f"slide.py: {mid}/slide.js does not load: {meta['error']}")
@@ -234,10 +291,22 @@ def cmd_pull(a):
     rec = {"id": mid, "pulled_from": origin, "commit": commit, "pulled_at": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
            "files": {str(p.relative_to(dst)): sha256(p) for p in sorted(dst.rglob("*")) if p.is_file()},
            "support_files": support_hashes, "provenance": meta["provenance"]}
+    if dirty:
+        rec["dirty"] = dirty
     (dst / ".pulled.json").write_text(json.dumps(rec, indent=1) + "\n", encoding="utf-8")
     if tmp:
         shutil.rmtree(tmp, ignore_errors=True)
     cmd_sync(argparse.Namespace(talk=str(into), quiet=True))
+    label, host = dep_host(into, {**meta, "id": mid})
+    need = [s for s in meta["requires"]["importmap"] if not mapped(s, importmap_of(host))]
+    if need:
+        have = importmap_of(dep_host(root, {**meta, "id": mid})[1]) if not tmp else {}
+        print(f"slide.py: WARN {mid} needs importmap entries that {label} does not have; add them to its "
+              '<script type="importmap"> (slide.py check fails until you do):')
+        for s in need:
+            print(f'    "{s}": "{have.get(s, "<url or vendored path>")}"')
+    if dirty:
+        print("slide.py: WARN pulled with --dirty; .pulled.json records why the source commit cannot reproduce it")
     print(f"slide.py: pulled {mid} ({meta['steps']} step(s){', ' + str(meta['duration']) + 's' if meta['duration'] else ''}) into {dst.relative_to(into)}")
     print("  add it to SECTIONS as a case, overriding any of its props:")
     print(f"    {{ use: '{mid}', props: {{ {', '.join(p + ': …' for p in meta['props'])} }}, notes: '' }},")
@@ -293,6 +362,17 @@ def cmd_check(a):
                 errs.append(f"{m['id']}: needs shared file slides/{sh}, which is missing")
         if m["frame"] and not (root / FRAME_RUNTIME).exists():
             errs.append(f"{m['id']}: is an iframe module but {FRAME_RUNTIME} is missing")
+        req = m["requires"]["importmap"]
+        code = Path(m["file"]).read_text(encoding="utf-8") + (
+            (d / m["frame"]).read_text(encoding="utf-8") if m["frame"] and (d / m["frame"]).exists() else "")
+        for s in bare_imports(code):
+            if not mapped(s, {k: 1 for k in req}):
+                errs.append(f"{m['id']}: imports '{s}' but does not declare it; add requires: {{ importmap: ['{s}'] }}")
+        label, host = dep_host(root, m)
+        im = importmap_of(host)
+        for s in req:
+            if not mapped(s, im):
+                errs.append(f"{m['id']}: requires importmap entry '{s}', which {label} does not map")
     for e in errs:
         print("  FAIL " + e)
     print(f"slide.py check: {len(by_id)} module(s), {len(uses_in(talk_sources(root)))} used id(s), {len(errs)} problem(s)")
@@ -304,6 +384,7 @@ def main():
     sub = ap.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("list"); p.add_argument("deck"); p.add_argument("--json", action="store_true")
     p = sub.add_parser("pull"); p.add_argument("deck"); p.add_argument("id"); p.add_argument("--into", required=True); p.add_argument("--force", action="store_true")
+    p.add_argument("--dirty", action="store_true", help="pull files the source commit does not hold (recorded in .pulled.json)")
     p = sub.add_parser("sync"); p.add_argument("talk", nargs="?", default=str(ROOT))
     p = sub.add_parser("check"); p.add_argument("talk", nargs="?", default=str(ROOT))
     a = ap.parse_args()
